@@ -1,0 +1,105 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>告警记录--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/assignment.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/assignment.html" class="button-link">任务</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">告警记录</a>
+    </article>
+
+    <article class="" style="margin-top: 35px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>责任人</th>
+                        <th>控制点</th>
+                        <th>最晚完成时间</th>
+                        <th>告警时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($taskWarn in $list)
+                        <tr>
+                            <td>$!taskWarn.taskName</td>
+                            <td>$!taskWarn.employeeName</td>
+                            <td>$!taskWarn.name</td>
+                            <td>#if($taskWarn.finishTime) $DateUtils.formatTimeForHM($taskWarn.finishTime)  #end</td>
+                            <td>#if($taskWarn.createdDate) $DateUtils.formatTimeForHM($taskWarn.createdDate) #end</td>
+                            #if($!taskWarn.status eq 0)
+                                <td class="state state-warning">未解决</td>
+                            #else
+                                <td>已解决</td>
+                            #end
+
+                            <td><a href="/admin/assignment/warning/detail.html?id=$!taskWarn.id" class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+                        #end
+                    #*<tr>
+                        <td>12/21常规保洁任务</td>
+                        <td>张某某</td>
+                        <td>某某控制点</td>
+                        <td>8:30</td>
+                        <td>8:31</td>
+                        <td class="state state-warning">未解决</td>
+                        <td><a href="/admin/assignment/warning/detail.html" class="button-link button-link-small">查看</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>12/21常规保洁任务</td>
+                        <td>张某某</td>
+                        <td>某某控制点</td>
+                        <td>8:30</td>
+                        <td>8:31</td>
+                        <td class="state state-already">未解决</td>
+                        <td><a href="/admin/assignment/warning/detail.html" class="button-link button-link-small">查看</a>
+                        </td>
+                    </tr>*#
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无告警记录</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var ASSIGNMENT = {
+            init: function () {
+
+            }
+        };
+
+        ASSIGNMENT.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/assignment/warning.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

@@ -1,0 +1,233 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">员工管理</a>
+    </article>
+
+
+    <article class="form-condition">
+        <div class="operate-group">
+            <a href="/attachment/template/download.html?fileName=employee.xlsx"
+               class="button-link button-download">模板下载</a>
+            <a href="/employee/exportFile.html" class="button-link button-download">数据下载</a>
+            <a href="javascript:void(0);" class="button-link button-upload" id="btn-file-upload">数据导入</a>
+            <a href="/admin/staff/create.html" class="button-link button-add">新增员工</a>
+        </div>
+        <form action="/admin/staff.html" method="post">
+            <div class="condition-group clearfix">
+                <div class="title">岗位</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="select-liable-0">
+                        <input type="hidden" name="departmentId" class="input-hidden" value="$!departmentId">
+                        <span class="select-placeholder">#if($departmentName) $departmentName #else 全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($departmentList && $departmentList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($department in $departmentList)
+                                        <li data-value="$!department.id" #if($!departmentId==$!department.id)
+                                            class="selected" #end>$!department.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($departmentList && $departmentList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($department in $departmentList)
+                                    <option value="$!department.id" #if($!departmentId==$!department.id)
+                                            selected #end>$!department.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        </select>
+                    </div>
+
+                    <div class="select-primary select-small" id="select-liable-1">
+                        <input type="hidden" name="positionId" class="input-hidden" value="$!positionId">
+                        <span class="select-placeholder">#if($positionName) $!positionName #else 全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($positionList && $positionList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($positon in $positionList)
+                                        <li data-value="$!positon.id" #if($!positonId==$!positon.id)
+                                            class="selected" #end>$!positon.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($positionList && $positionList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($positon in $positionList)
+                                    <option value="$!positon.id" #if($!positonId==$!positon.id)
+                                            selected #end>$!positon.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">手机号</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" placeholder="请输入手机号" class="input-primary input-x-small" value="$!mobile"
+                               name="mobile">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">姓名</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 120px;">
+                        <input type="search" placeholder="请输入姓名" class="input-primary input-x-small input-search"
+                               value="$!name"
+                               name="name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+    </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>岗位</th>
+                        <th>完成任务数</th>
+                        <th>接单数</th>
+                        <th>评价分</th>
+                        <th>入职时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($employee in $list)
+                        <tr>
+                            <td>$!employee.employeeName</td>
+                            <td>$!employee.employeeMobile</td>
+                            <td>$!employee.departmentName/$!employee.positionName</td>
+                            <td>$!employee.taskCount</td>
+                            <td>$!employee.orderCount</td>
+                            <td>#if($employee.evaluateStar && $!employee.evaluateStar gt 0 ) $!{employee.evaluateStar}
+                                分 #else
+                                0分 #end</td>
+                            <td>$!DateUtils.formatTimeInSecond($!employee.createdDate)</td>
+                            #if($employee.status eq 0 )
+                                <td> 在职</td> #else
+                                <td class="state state-already"> 离职</td> #end
+                            <td>
+                                <a href="/admin/staff/detail/baseinfo.html?employeeId=$!employee.employeeId"
+                                   class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无考勤信息</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+#end
+
+#define($style)
+<title>员工管理--i家帮管理后台</title>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var STAFF = {
+            init: function () {
+                COMMON.selectBind($('#select-liable-0'), undefined);
+                COMMON.selectBind($('#select-liable-1'), undefined);
+                COMMON.selectBind($('#select-liable-0'), STAFF.getEmployeeName);
+                COMMON.fileUploadBind('/employee/importExcel.html');
+            },
+            getEmployeeName: function (PID) {
+                $.ajax({
+                    url: "/department/positionList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        departmentId: PID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="positionId" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">全部</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>全部</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            $('#select-liable-1').html(str).show();
+                            COMMON.selectBind($('#select-liable-1'), undefined);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        };
+
+        STAFF.init();
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/staff.html',
+                {
+                    departmentId: '$!departmentId',
+                    positionId: '$!positionId',
+                    name: '$!name',
+                    mobile: '$!mobile',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

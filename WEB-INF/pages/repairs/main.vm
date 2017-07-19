@@ -1,0 +1,196 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>报修--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">报修列表</a>
+    </article>
+
+    <form action="" method="post">
+        <article class="form-condition">
+            <div class="operate-group">
+                <a href="/admin/repairs/type/create.html" class="button-link button-add">新建报修类型</a>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="repairsTypeId">
+                        <input type="hidden" name="repairsTypeId" value="$!repairsTypeId" class="input-hidden">
+                        #if($repairsTypeId && $!repairsTypeId gt 0 )
+                            #foreach($!repairsType in $!repairsTypeList)
+                                #if($!repairsTypeId eq $!repairsType.id)
+                                    <span class="select-placeholder">$!repairsType.name</span>
+                                #end
+                            #end
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!repairsTypeId eq 0) class="selected" #end>全部</li>
+								#foreach($!repairsType in $!repairsTypeList)
+                                    <li data-value="$!repairsType.id" #if($!repairsTypeId eq $!repairsType.id)
+                                        class="selected"#end>$!repairsType.name</li>
+								#end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!repairsTypeId eq 0) selected #end>全部</option>
+							#foreach($!repairsType in $!repairsTypeList)
+                                <option value="$!repairsType.id" #if($!repairsTypeId eq $!repairsType.id)
+                                        selected #end>$!repairsType.name</option>
+							#end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">状态</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="repairsStatus">
+                        <input type="hidden" name="repairsStatus" value="$!repairsStatus" class="input-hidden">
+                        #if($repairsStatus && $!repairsStatus ne '' )
+                            #foreach($!repairsStatusItem in $!repairsStatusList)
+                                #if($!repairsStatus eq $!repairsStatusItem.code)
+                                    <span class="select-placeholder">$!repairsStatusItem.desc</span>
+                                #end
+                            #end
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="" #if($!repairsStatus eq '') class="selected" #end>全部</li>
+                                #foreach($!repairsStatusItem in $!repairsStatusList)
+                                    <li data-value="$!repairsStatusItem.code" #if($!repairsStatus eq $!repairsStatusItem.code)
+                                        class="selected"#end>$!repairsStatusItem.desc</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="" #if($!repairsStatus eq '') class="selected" #end>全部</option>
+                            #foreach($!repairsStatusItem in $!repairsStatusList)
+                                <option value="$!repairsStatusItem.code" #if($!repairsStatus eq $!repairsStatusItem.code)
+                                        class="selected"#end>$!repairsStatusItem.desc</option>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar"
+                           value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                           placeholder="xxxx年xx月xx日">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+
+        </article>
+    </form>
+
+    <article class="">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>报修单ID</th>
+                        <th>报修类型</th>
+                        <th>报修内容</th>
+                        <th>提交人</th>
+                        <th>房间</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($repairsVo in $list)
+                        <tr>
+                            <td>$!repairsVo.id</td>
+                            <td>$!repairsVo.typeName</td>
+                            <td>$!repairsVo.content</td>
+                            <td>$!{repairsVo.ownersInfoVo.ownersName}</td>
+                            <td>$!{repairsVo.ownersInfoVo.buildingName}$!repairsVo.ownersInfoVo.buildingCellName$!repairsVo.ownersInfoVo.buildingUnitName$!repairsVo.ownersInfoVo.num</td>
+                            <td>$!DateUtils.formatTimeYMDHM($!repairsVo.createdDate)</td>
+                            #if($!{repairsVo.status} eq 0)
+                            ## 待接单
+                                <td class="state state-warning">$!repairsVo.statusMsg</td>
+                            #elseif($!{repairsVo.status} eq 1)
+                            ## 待服务
+                                <td class="state state-warning">$!repairsVo.statusMsg</td>
+                            #elseif($!{repairsVo.status} eq 2)
+                            ## 待确认费用
+                                <td class="state state-warning">$!repairsVo.statusMsg</td>
+                            #elseif($!{repairsVo.status} eq 3)
+                            ## 待付款
+                                <td class="state state-warning">$!repairsVo.statusMsg</td>
+                            #elseif($!{repairsVo.status} eq 4)
+                            ## 待评价
+                                <td>$!repairsVo.statusMsg</td>
+                            #elseif($!{repairsVo.status} eq 5)
+                            ## 已完成
+                                <td class="state state-already">$!repairsVo.statusMsg</td>
+                            #end
+                            <td><a href="/admin/repairs/detail.html?id=$!{repairsVo.id}" class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无报修</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        window.FORM = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        FORM.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/repairs.html',
+                {
+                    repairsTypeId: '$!repairsTypeId',
+                    repairsStatus: '$!repairsStatus',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

@@ -1,0 +1,200 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>申请提现--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/charge.html" class="button-link">收费</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">申请提现</a>
+    </article>
+
+    <form action="" method="get" class="form-main" style="margin-top: 35px;">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">账户余额</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!NumberUtils.chinaCurrencyFormat($!companyAccount.balance)</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">可提现</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!NumberUtils.chinaCurrencyFormat($!companyAccount.balance)<a href="javascript:void(0);" class="button-link button-link-small" style="margin: 0 0 0 35px; display: none;">查看规则</a></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">提现金额</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 110px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-cash" placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-cash"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">开户名</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入开户名">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">银行卡号</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-card" placeholder="请输入银行卡号">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-card"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">银行</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-bank" placeholder="请输入所属银行">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-bank"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">开户行</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-subbank" placeholder="请输入开户的银行">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-subbank"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit" style="float: left; width: 200px; margin: 20px 0 0 0;">提交</a>
+                    <a href="/admin/charge.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var CHARGE = {
+            init: function () {
+                CHARGE.btnSubmitBind();
+            },
+            btnSubmitBind: function() {
+                var btnSubmit = $('.btn-submit'),
+                    inputCash = $('#input-cash'),
+                    inputName = $('#input-name'),
+                    inputCard = $('#input-card'),
+                    inputBank = $('#input-bank'),
+                    inputSubbank = $('#input-subbank');
+
+                btnSubmit.on('click', function() {
+                    var inputCashVal = inputCash.val(),
+                        inputNameVal = inputName.val(),
+                        inputCardVal = inputCard.val(),
+                        inputBankVal = inputBank.val(),
+                        inputSubbankVal = inputSubbank.val();
+
+                    if(btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-cash').html('');
+                    $('.errMsg-name').html('');
+                    $('.errMsg-card').html('');
+                    $('.errMsg-bank').html('');
+                    $('.errMsg-subbank').html('');
+
+                    if(!COMMON.checkNull(inputCashVal)) {
+                        COMMON.errMsg($('.errMsg-cash'), '请输入提现金额!');
+                        return false;
+                    }
+                    if(!COMMON.checkPositive(inputCashVal)) {
+                        COMMON.errMsg($('.errMsg-cash'), '提现金额必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-cash').html('');
+
+                    if(!COMMON.checkNull(inputNameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入开户名!');
+                        return false;
+                    }
+                    $('.errMsg-card').html('');
+
+                    if(!COMMON.checkNull(inputCardVal)) {
+                        COMMON.errMsg($('.errMsg-card'), '请输入银行卡号!');
+                        return false;
+                    }
+                    $('.errMsg-card').html('');
+
+                    if(!COMMON.checkNull(inputBankVal)) {
+                        COMMON.errMsg($('.errMsg-bank'), '请输入所属银行!');
+                        return false;
+                    }
+                    $('.errMsg-bank').html('');
+
+                    if(!COMMON.checkNull(inputSubbankVal)) {
+                        COMMON.errMsg($('.errMsg-subbank'), '请输入开户的银行!');
+                        return false;
+                    }
+                    $('.errMsg-bank').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在提交...');
+
+                    $.ajax({
+                        url: "/charge/withdraw.html",
+                        dataType:"json",
+                        type:"post",
+                        data: {
+                            inputCashVal: inputCashVal,
+                            inputNameVal: inputNameVal,
+                            inputCardVal: inputCardVal,
+                            inputBankVal: inputBankVal,
+                            inputSubbankVal: inputSubbankVal
+                        },
+                        success:function(data) {
+                            if(data.code != 200) {
+                                COMMON.errMsg($('.errMsg-subbank'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('提交');
+                            } else {
+                                location.href = '/admin/charge.html';
+                            }
+                        },
+                        error: function() {
+                            COMMON.errMsg($('.errMsg-bank'), '提交失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('提交');
+                        }
+                    });
+                });
+            }
+        };
+
+        CHARGE.init();
+    });
+</script>
+#end

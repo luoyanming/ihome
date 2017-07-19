@@ -1,0 +1,81 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>组织架构管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/admin/staff/structure/create.html" class="button-link button-add"
+               style="margin: 0 26px 0 0; color: #218adb;">新增部门</a>
+        </div>
+
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">组织架构管理</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>部门名称</th>
+                        <th>岗位数</th>
+                        <th>员工数量</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($department in $list)
+                        <tr>
+                            <td>$!department.name</td>
+                            <td>$!department.positionCount</td>
+                            <td>$!department.employeeCount</td>
+                            <td>
+                                <a href="/admin/staff/structure/create.html?id=$!department.id"
+                                   class="button-link button-link-small btn-edit">编辑</a>
+                            </td>
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无组织架构信息</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var STAFF = {
+            init: function () {
+
+            }
+        };
+
+        STAFF.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/staff/structure.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

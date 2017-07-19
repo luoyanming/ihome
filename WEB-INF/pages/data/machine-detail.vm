@@ -1,0 +1,128 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看设备--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            #if(!$!equipment.used)
+                <a href="/admin/data/machine/create.html?id=$!equipment.id" class="button-primary-able button-grey"
+                   style="margin: 0 26px 0 0;">编辑</a>
+            #end
+        </div>
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/machine.html" class="button-link">设备管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看设备</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">编码</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!equipment.code</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!equipment.name</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类别</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!equipment.equipmentTypeName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">状态</div>
+                <div class="group-item">
+                    #if($!equipment.status==0)
+                        <div class="input-item-text state state-ING" style="margin-left: 0;">正常</div>
+                    #else
+                        <div class="input-item-text state state-already" style="margin-left: 0;">异常</div>
+                    #end
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">品牌</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!equipment.brand</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">型号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!equipment.model</div>
+                </div>
+            </div>
+            #if($equipment.fieldDataList && $equipment.fieldDataList.size()>0)
+                #foreach($fieldData in $equipment.fieldDataList)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!fieldData.fieldName</div>
+                        <div class="group-item">
+                            <div class="input-item-text" style="margin-left: 0;">$!fieldData.fieldValue</div>
+                        </div>
+                    </div>
+                #end
+            #end
+        #*<div class="form-group clearfix">
+            <div class="group-title">字段B</div>
+            <div class="group-item">
+                <div class="input-item-text" style="margin-left: 0;">字段Bxxxx</div>
+            </div>
+        </div>*#
+
+            <div class="form-group clearfix">
+                <div class="group-title">地点</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!equipment.place</div>
+                </div>
+            </div>
+            
+            #*
+            <div class="form-group clearfix">
+                <div class="group-title">检修表单</div>
+                <div class="group-item clearfix" style="padding: 11px 0;">
+                    <a href="javascript:void(0);" class="button-link link-normal"
+                       style="float: left; margin: 0;">$!equipment.formTypeName</a>
+                </div>
+            </div>
+            *#
+
+
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

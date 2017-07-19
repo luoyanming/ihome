@@ -1,0 +1,579 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>表单--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/machine.html" class="button-link">设备管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">管理设备类型</a>
+    </article>
+
+    <form action="/admin/data/machine/type.html" method="post">
+        <article class="form-condition">
+            <div class="operate-group">
+                <a href="javascript:void(0);" class="button-link button-add" id="btn-machine-type-add">新建设备类型</a>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 200px;">
+                        <input type="text" placeholder="请输入设备名称" name="name" class="input-primary input-x-small" value="$!paramName">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="title">提交日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="startDate" placeholder="xxxx年xx月xx日" value="$!paramStartDate">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="endDate" placeholder="xxxx年xx月xx日" value="$!paramEndDate">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-machine-type">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>字段数</th>
+                        <th>日期</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($type in $list)
+                        <tr data-id="$!type.id">
+                            <td>$!type.name</td>
+                            <td>$!type.fieldCount</td>
+                            <td>$!type.createDate</td>
+                            #if($!type.used)
+                                <td>&nbsp;</td>
+                            #else
+                                <td>
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-link-small btn-machine-type-edit">编辑</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-link-small btn-del" onclick="javascript: COMMON.createConfirmation('/equipment/deleteEquipmentType.html?id=$!type.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                                </td>
+                            #end
+                        </tr>
+                        #end
+                    #*<tr data-id="1">
+                        <td>空调</td>
+                        <td>6</td>
+                        <td>2016/12/20</td>
+                        <td>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-machine-type-edit">编辑</a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                        </td>
+                    </tr>
+                    <tr data-id="2">
+                        <td>空调</td>
+                        <td>6</td>
+                        <td>2016/12/20</td>
+                        <td>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-machine-type-edit">编辑</a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                        </td>
+                    </tr>*#
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无设备类型</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="machine-type-modal">
+    <div class="modal-header">
+        <h1>新建设备类型</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part form-part-whole">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-machine-name"
+                               placeholder="请输入设备名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-machine-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">字段</div>
+                <div class="group-item">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                               id="table-modal-machine-type">
+                            <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>必填</th>
+                                <th>字数</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            ##	<tr>
+							##		<td data-name="A字段">A字段</td>
+							##		<td data-must="0">是</td>
+							##		<td data-limit="20">20字</td>
+							##		<td>
+							##			<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+							##			&nbsp;&nbsp;&nbsp;&nbsp;
+							##			<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+							##		</td>
+							##	</tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <a href="javascript:void(0);" class="button-link button-add">添加字段</a>
+                    </div>
+                    <p class="errMsg errMsg-modal-machine-table"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="type-add">
+    <div class="modal-header">
+        <h1>添加新字段</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-type-add-name"
+                               placeholder="请输入字段名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-type-add-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">必填</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" id="select-modal-type-add-must">
+                            <input type="hidden" name="" class="input-hidden" value="0">
+                            <span class="select-placeholder">是</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" class="selected">是</li>
+                                    <li data-value="1">否</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="0" selected>是</option>
+                                <option value="1">否</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-modal-type-add-tabnav">
+                        <label>
+                            <input name="type" type="radio" value="0" checked="checked"/>
+                            <p class="radio-text">输入框</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix type-input">
+                <div class="group-title">最长字数</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 72px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-type-add-limit"
+                               placeholder="0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text">字</div>
+                    <p class="errMsg errMsg-modal-type-add-limit"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var tableMachineType = $('#table-machine-type'),
+                btnMachineTypeAdd = $('#btn-machine-type-add'),
+                btnMachineTypeEdit = tableMachineType.find('.btn-machine-type-edit');
+
+        var modalMask = $('.modal-mask'),
+                machineTypeModal = $('#machine-type-modal'),
+                machineTypeModalTitle = machineTypeModal.find('.modal-header h1'),
+                inputModalMachineName = $('#input-modal-machine-name'),
+                tableModalMachineType = $('#table-modal-machine-type'),
+                btnModalMachineTypeSubmit = machineTypeModal.find('.btn-modal-submit');
+
+        var typeAddModal = $('#type-add'),
+                typeAddModalTitle = typeAddModal.find('.modal-header h1'),
+                inputModalTypeAddName = $('#input-modal-type-add-name'),
+                selectModalTypeAddMust = $('#select-modal-type-add-must'),
+                inputModalTypeAddLimit = $('#input-modal-type-add-limit'),
+                btnModalTypeAddSubmit = typeAddModal.find('.btn-modal-submit');
+
+        var DATA = {
+            init: function () {
+                DATA.btnBind();
+            },
+            btnBind: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+
+                btnMachineTypeAdd.on('click', function () {
+                    DATA.showMachineTypeModal(0, undefined, undefined, '');
+                });
+
+                btnMachineTypeEdit.on('click', function () {
+                    DATA.showMachineTypeModal(1, $(this), $(this).parent().parent().attr('data-id'), $(this).parent().parent().find('td').eq(0).html());
+                });
+
+                DATA.btnModalMachineTypeSubmitBind();
+
+                DATA.btnModalTypeAddSubmitBind();
+            },
+            btnFieldAddEditBind: function () {
+                var btnFieldAdd = machineTypeModal.find('.button-add'),
+                        btnFieldEdit = machineTypeModal.find('.btn-edit'),
+                        btnFieldDel = machineTypeModal.find('.btn-del');
+
+                btnFieldDel.unbind('click');
+                btnFieldDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+
+                btnFieldAdd.unbind('click');
+                btnFieldAdd.on('click', function () {
+                    DATA.typeAdd(0, undefined, undefined);
+                });
+
+                btnFieldEdit.unbind('click');
+                btnFieldEdit.on('click', function () {
+                    DATA.typeAdd(1, $(this), $(this).parent().parent().index());
+                });
+            },
+            showMachineTypeModal: function (operate, obj, id, title) {
+                $('.errMsg-modal-machine-name').html('');
+                $('.errMsg-modal-machine-table').html('');
+
+                if (operate == 1) {
+                    // edit
+                    machineTypeModalTitle.html('编辑设备类型').attr('data-id', id);
+
+                    inputModalMachineName.val(title);
+
+                    DATA.getMachineTypeFieldList(id);
+                } else if (operate == 0) {
+                    // add
+                    machineTypeModalTitle.html('新建设备类型').attr('data-id', '');
+
+                    inputModalMachineName.val(title);
+                    tableModalMachineType.find('tbody').html('');
+                    DATA.btnFieldAddEditBind();
+                }
+
+                modalMask.fadeIn(200);
+                machineTypeModal.fadeIn(200);
+            },
+            getMachineTypeFieldList: function (id) {
+                $.ajax({
+                    url: "/equipment/equipmentTypeFieldList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        equipmentTypeId: id
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-modal-machine-table'), data.msg);
+                        } else {
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr>';
+                                str += '<td data-name="' + data.list[i].name + '">' + data.list[i].name + '</td>';
+                                if (data.list[i].mustInput == 0) {
+                                    str += '<td data-must="0">是</td>';
+                                } else {
+                                    str += '<td data-must="1">否</td>';
+                                }
+                                str += '<td data-limit="' + data.list[i].sizeLimit + '">' + data.list[i].sizeLimit + '</td>';
+                                str += '<td>';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                                str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                                str += '</td>';
+                                str += '</tr>';
+                            }
+                            tableModalMachineType.find('tbody').html(str);
+                            DATA.btnFieldAddEditBind();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-modal-machine-table'), '获取字段失败，请重试！');
+                    }
+                });
+            },
+            btnModalMachineTypeSubmitBind: function () {
+                btnModalMachineTypeSubmit.on('click', function () {
+                    var _this = $(this);
+
+                    if (_this.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+
+                    var nameVal = inputModalMachineName.val(),
+                            fieldStr = DATA.getFieldArray();
+                    $('.errMsg-modal-machine-name').html('');
+                    $('.errMsg-modal-machine-table').html('');
+
+                    if (!COMMON.checkNull(nameVal)) {
+                        COMMON.errMsg($('.errMsg-modal-machine-name'), '请输入设备名称');
+                        return false;
+                    }
+                    $('.errMsg-modal-machine-name').html('');
+
+                    if (!fieldStr) {
+                        COMMON.errMsg($('.errMsg-modal-machine-table'), '请添加字段');
+                        return false;
+                    }
+                    $('.errMsg-modal-machine-table').html('');
+
+                    _this.addClass('button-primary-disable').html('保存中...');
+
+                    console.log(fieldStr)
+
+                    $.ajax({
+                        url: "/equipment/saveEquipmentType.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: machineTypeModalTitle.attr('data-id'),
+                            name: nameVal,
+                            fieldStr: fieldStr
+                        },
+                        success: function (data) {
+                            if (!data.code == 200) {
+                                COMMON.errMsg($('.errMsg-modal-machine-table'), data.msg);
+                                _this.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = '/admin/data/machine/type.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-machine-table'), '保存失败，请重试！');
+                            _this.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            getFieldArray: function () {
+                var arr = [],
+                        tableFieldItem = tableModalMachineType.find('tbody tr');
+
+                if (!tableFieldItem || tableFieldItem.length == 0) {
+                    return false;
+                }
+
+                for (var i = 0; i < tableFieldItem.length; i++) {
+                    var itemTD = tableFieldItem.eq(i).find('td'),
+                            strName = itemTD.eq(0).attr('data-name'),
+                            strMustInput = itemTD.eq(1).attr('data-must'),
+                            strLimit = itemTD.eq(2).attr('data-limit');
+                    arr.push({name: strName, mustInput: strMustInput, limit: strLimit});
+                }
+
+                return JSON.stringify(arr);
+            },
+            typeAdd: function (operate, obj, index) {
+                $('.errMsg-modal-type-add-name').html('');
+                $('.errMsg-modal-type-add-limit').html('');
+
+                if (operate == 1) {
+                    // edit
+                    typeAddModalTitle.html('编辑字段').attr('data-index', index);
+
+                    var currTR = obj.parent().parent(),
+                            currName = currTR.find('td').eq(0).attr('data-name'),
+                            currMust = currTR.find('td').eq(1).attr('data-must'),
+                            currLimit = currTR.find('td').eq(2).attr('data-limit');
+
+                    inputModalTypeAddName.val(currName);
+
+                    if (currMust == 0) {
+                        selectModalTypeAddMust.find('.input-hidden').val('0');
+                        selectModalTypeAddMust.find('.select-placeholder').html('是');
+                        selectModalTypeAddMust.find('.select-options ul li.selected').removeClass('selected');
+                        selectModalTypeAddMust.find('.select-options ul li').eq(0).addClass('selected');
+                        selectModalTypeAddMust.find('.select-select option').eq(0).attr('selected', true);
+                    } else if (currMust == 1) {
+                        selectModalTypeAddMust.find('.input-hidden').val('1');
+                        selectModalTypeAddMust.find('.select-placeholder').html('否');
+                        selectModalTypeAddMust.find('.select-options ul li.selected').removeClass('selected');
+                        selectModalTypeAddMust.find('.select-options ul li').eq(1).addClass('selected');
+                        selectModalTypeAddMust.find('.select-select option').eq(1).attr('selected', true);
+                    }
+
+                    inputModalTypeAddLimit.val(currLimit);
+                } else if (operate == 0) {
+                    // add
+                    typeAddModalTitle.html('添加新字段').attr('data-index', '');
+
+                    inputModalTypeAddName.val('');
+
+                    selectModalTypeAddMust.find('.input-hidden').val('0');
+                    selectModalTypeAddMust.find('.select-placeholder').html('是');
+                    selectModalTypeAddMust.find('.select-options ul li.selected').removeClass('selected');
+                    selectModalTypeAddMust.find('.select-options ul li').eq(0).addClass('selected');
+                    selectModalTypeAddMust.find('.select-select option').eq(0).attr('selected', true);
+
+                    inputModalTypeAddLimit.val('');
+                }
+
+                machineTypeModal.fadeOut(100);
+                typeAddModal.fadeIn(200);
+            },
+            btnModalTypeAddSubmitBind: function () {
+                btnModalTypeAddSubmit.on('click', function () {
+                    var newName = inputModalTypeAddName.val(),
+                            newMust = selectModalTypeAddMust.find('.input-hidden').val(),
+                            newLimit = inputModalTypeAddLimit.val();
+
+                    $('.errMsg-modal-type-add-name').html('');
+                    $('.errMsg-modal-type-add-limit').html('');
+
+                    if (!COMMON.checkNull(newName)) {
+                        COMMON.errMsg($('.errMsg-modal-type-add-name'), '请输入字段名称');
+                        return false;
+                    }
+                    $('.errMsg-modal-type-add-name').html('');
+
+                    if (!COMMON.checkNull(newLimit)) {
+                        COMMON.errMsg($('.errMsg-modal-type-add-limit'), '请输入最长字数');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(newLimit)) {
+                        COMMON.errMsg($('.errMsg-modal-type-add-limit'), '最长字数必须是正整数');
+                        return false;
+                    }
+                    $('.errMsg-modal-type-add-limit').html('');
+
+                    var tableStr = '';
+                    tableStr += '<tr>';
+                    tableStr += '<td data-name="' + newName + '">' + newName + '</td>';
+                    if (newMust == 0) {
+                        tableStr += '<td data-must="0">是</td>';
+                    } else if (newMust == 1) {
+                        tableStr += '<td data-must="1">否</td>';
+                    }
+                    tableStr += '<td data-limit="' + newLimit + '">' + newLimit + '</td>';
+                    tableStr += '<td>';
+                    tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    tableStr += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    tableStr += '</td>';
+                    tableStr += '</tr>';
+
+
+                    var index = $('#type-add .modal-header h1').attr('data-index');
+                    if (index == '') {
+                        // add
+                        tableModalMachineType.find('tbody').append(tableStr);
+                    } else {
+                        // edit
+                        tableModalMachineType.find('tbody tr').eq(index).replaceWith(tableStr);
+                    }
+
+                    DATA.btnFieldAddEditBind();
+                    typeAddModal.fadeOut(100);
+                    machineTypeModal.fadeIn(200);
+                });
+            }
+        };
+
+        DATA.init();
+    });
+
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/machine/type.html',
+                {
+                    name: '$!paramName',
+                    startDate: '$!paramStartDate',
+                    endDate: '$!paramEndDate',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

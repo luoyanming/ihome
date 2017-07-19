@@ -1,0 +1,114 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>登录--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/login.css" />
+#end
+
+
+## #define($header)
+## #parse("/share/header-new-mb.vm")
+## #end
+
+<div class="wrapper">
+	<section class="modules-center">
+		<h1>i家帮系统后台</h1>
+		<div class="tabnav tabnav-boss clearfix">
+			<a href="javascript:void(0);" class="tabnav-item link-disable" style="width: 100%;">登录</a>	
+		</div>
+
+		<div class="form-part">
+			<div class="input-item">
+				<input type="text" class="input-primary input-primary-boss input-null input-mobile" placeholder="请输入手机号码" value="">
+				<i class="icon-delete"></i>
+			</div>
+			<div class="errMsg errMsg-mobile"></div>
+			<div class="input-item">
+				<input type="password" class="input-primary input-primary-boss input-null input-pwd" placeholder="请输入密码" value="">
+				<i class="icon-delete"></i>
+			</div>
+			<div class="errMsg errMsg-pwd"></div>
+
+	    	<a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-submit">登录</a>
+		</div>
+
+
+	    <div class="forget-box">
+	    	<a href="/boss/forgetPwd/step1.html" class="button-link button-boss-link">忘记密码</a>
+	    </div>
+	</section>
+</div>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+	$(function() {
+		var inputMobile = $('.input-mobile'),
+			inputPwd = $('.input-pwd'),
+			btnSubmit = $('.btn-submit');
+
+		var LOGIN = {
+			init: function() {
+				LOGIN.btnSubmitBind();
+			},
+			btnSubmitBind: function() {
+				btnSubmit.on('click', function() {
+					var mobile = inputMobile.val(),
+						pwd = inputPwd.val();
+
+					if(btnSubmit.hasClass('button-primary-disable')) {
+						return false;
+					}
+					$('.errMsg-mobile').html('');
+					$('.errMsg-pwd').html('');
+
+					if(!COMMON.checkNull(mobile)) {
+						COMMON.errMsg($('.errMsg-mobile'), '手机号码不能为空!');
+						return false;
+					}
+					if(!COMMON.checkMobile(mobile)) {
+						COMMON.errMsg($('.errMsg-mobile'), '手机号码格式不正确!');
+						return false;
+					}
+					$('.errMsg-mobile').html('');
+
+					if(!COMMON.checkNull(pwd)) {
+						COMMON.errMsg($('.errMsg-pwd'), '请输入密码!');
+						return false;
+					}
+					$('.errMsg-pwd').html('');
+
+					btnSubmit.addClass('button-primary-disable button-primary-boss-disable').html('正在登录...');
+
+					$.ajax({
+			            url: "/boss/ajax/login.html",
+			            dataType:"json",
+			            type:"post",
+			            data: {
+			                mobile: mobile,
+			                pwd: pwd
+			            },
+			            success:function(data) {
+			            	if(data.code != 200) {
+			            		COMMON.errMsg($('.errMsg-pwd'), data.msg);
+			            		btnSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('登录');
+			            	} else {
+			            		location.href = '/boss/signup.html';
+			            	}
+			            },
+			            error: function() {
+			                COMMON.errMsg($('.errMsg-pwd'), '登录失败，请重试！');
+							btnSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('登录');
+			            }
+			        });
+				});
+			}
+		};
+
+		LOGIN.init();
+	});
+</script>
+#end

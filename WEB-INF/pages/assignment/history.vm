@@ -1,0 +1,254 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>任务记录--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/assignment.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/assignment.html" class="button-link button-link-disable">任务</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">任务记录</a>
+    </article>
+
+    <form action="/admin/assignment/history.html" method="post">
+        <article class="form-condition">
+            <div class="condition-group clearfix">
+                <div class="title">责任人</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="select-liable-0">
+                        <input type="hidden" name="departmentId" class="input-hidden" value="$!paramDepartmentId">
+                        <span class="select-placeholder">#if($paramDepartmentName) $paramDepartmentName #else
+                            全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($departmentList && $departmentList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($department in $departmentList)
+                                        <li data-value="$!department.id" #if($!paramDepartmentId==$!department.id)
+                                            class="selected" #end>$!department.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">全部</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($departmentList && $departmentList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($department in $departmentList)
+                                    <option value="$!department.id" #if($!paramDepartmentId==$!department.id)
+                                            selected #end>$!department.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">全部</li>
+                            #end
+                        </select>
+                    </div>
+
+                    <div class="select-primary select-small" id="select-liable-1">
+                        <input type="hidden" name="employeeId" class="input-hidden" value="$!paramEmployeeId">
+                        <span class="select-placeholder">#if($paramEmployeetName) $paramEmployeetName #else 全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <ul>
+                                    #if($employeeList && $employeeList.size()>0)
+                                        <li data-value="">全部</li>
+                                        #foreach($employee in $employeeList)
+                                            <li data-value="$!employee.employeeId" #if($!paramEmployeeId==$!employee.employeeId)
+                                                class="selected" #end>$!employee.employeeName</li>
+                                        #end
+                                    #else
+                                        <li data-value="" class="selected">全部</li>
+                                    #end
+                                </ul>
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($employeeList && $employeeList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($employee in $employeeList)
+                                    <option value="$!employee.id" #if($!paramEmployeeId==$!employee.employeeId)
+                                            selected #end>$!employee.employeeName</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">全部</li>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">种类</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="select-liable-2">
+                        <input type="hidden" name="kind" class="input-hidden" value="$!paramKind">
+                        <span class="select-placeholder">#if($kindFormat) $kindFormat #else 全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="" #if(!$paramKind) class="selected" #end>全部</li>
+                                <li data-value="1" #if(!$paramKind eq 1) class="selected" #end>综合管理</li>
+                                <li data-value="2" #if(!$paramKind eq 2) class="selected" #end>前台服务</li>
+                                <li data-value="3" #if(!$paramKind eq 3) class="selected" #end>工程运行</li>
+                                <li data-value="4" #if(!$paramKind eq 4) class="selected" #end>设备维修</li>
+                                <li data-value="5" #if(!$paramKind eq 5) class="selected" #end>消防管理</li>
+                                <li data-value="6" #if(!$paramKind eq 6) class="selected" #end>交通管理</li>
+                                <li data-value="7" #if(!$paramKind eq 7) class="selected" #end>安全管理</li>
+                                <li data-value="8" #if(!$paramKind eq 8) class="selected" #end>绿化服务</li>
+                                <li data-value="9" #if(!$paramKind eq 9) class="selected" #end>保洁服务</li>
+                                <li data-value="10" #if(!$paramKind eq 10) class="selected" #end>消杀服务</li>
+                                <li data-value="11" #if(!$paramKind eq 11) class="selected" #end>会议服务</li>
+                                <li data-value="12" #if(!$paramKind eq 12) class="selected" #end>特约服务</li>
+                                <li data-value="13" #if(!$paramKind eq 13) class="selected" #end>数据录入</li>
+                                <li data-value="14" #if(!$paramKind eq 14) class="selected" #end>其他</li>
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="" #if(!$paramKind) selected #end>全部</option>
+                            <option value="1" #if(!$paramKind eq 1) selected #end>综合管理</option>
+                            <option value="2" #if(!$paramKind eq 2) selected #end>前台服务</option>
+                            <option value="3" #if(!$paramKind eq 3) selected #end>工程运行</option>
+                            <option value="4" #if(!$paramKind eq 4) selected #end>设备维修</option>
+                            <option value="5" #if(!$paramKind eq 5) selected #end>消防管理</option>
+                            <option value="6" #if(!$paramKind eq 6) selected #end>交通管理</option>
+                            <option value="7" #if(!$paramKind eq 7) selected #end>安全管理</option>
+                            <option value="8" #if(!$paramKind eq 8) selected #end>绿化服务</option>
+                            <option value="9" #if(!$paramKind eq 9) selected #end>保洁服务</option>
+                            <option value="10" #if(!$paramKind eq 10) selected #end>消杀服务</option>
+                            <option value="11" #if(!$paramKind eq 11) selected #end>会议服务</option>
+                            <option value="12" #if(!$paramKind eq 12) selected #end>特约服务</option>
+                            <option value="13" #if(!$paramKind eq 13) selected #end>数据录入</option>
+                            <option value="14" #if(!$paramKind eq 14) selected #end>其他</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item">
+                        <input type="search" placeholder="请输入任务名称" class="input-primary input-x-small input-search" name="name"
+                               value="$!paramName">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="">
+        <div class="table-wrapper">
+            #if($list && $list.size() gt 0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>种类</th>
+                        <th>控制点/设备点数</th>
+                        <th>部门</th>
+                        <th>责任人</th>
+                        <th>完成时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($task in $list)
+                        <tr>
+                            <td>$!task.taskName</td>
+                            <td>$!task.kindFormat</td>
+                            <td>$!task.controlPointCount/$!task.equipmentCount</td>
+                            <td>$!task.departmentName</td>
+                            <td>$!task.employeeName</td>
+                            <td>#if($task.status eq 2) $!DateUtils.formatTimeYMDHM($!task.lastUpdatedDate) #end</td>
+                            <td>
+                                <a href="/admin/assignment/history/detail.html?id=$!task.id"
+                                   class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无任务记录</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var ASSIGNMENT = {
+            init: function () {
+                COMMON.selectBind($('#select-liable-0'), undefined);
+                COMMON.selectBind($('#select-liable-2'), undefined);
+                COMMON.selectBind($('#select-liable-3'), undefined);
+                COMMON.selectBind($('#select-liable-0'), ASSIGNMENT.getEmployeeName);
+            },
+            getEmployeeName: function (PID) {
+                $.ajax({
+                    url: "/department/propertyEmployeeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        departmentId: PID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="employeeId" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">全部</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>全部</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            $('#select-liable-1').html(str).show();
+                            COMMON.selectBind($('#select-liable-1'), undefined);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        };
+
+        ASSIGNMENT.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/assignment/history.html',
+                {
+                    name: '$!paramName',
+                    kind: '$!paramKind',
+                    employeeId: '$!paramEmployeeId',
+                    departmentId: '$!paramDepartmentId',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

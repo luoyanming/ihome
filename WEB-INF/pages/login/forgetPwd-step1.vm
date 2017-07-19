@@ -1,0 +1,180 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>找回密码--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/login.css" />
+#end
+
+<div class="wrapper">
+	<section class="modules-center">
+
+		<h1>找回密码</h1>
+		<div class="tabnav clearfix">
+			<a href="javascript:void(0);" class="tabnav-item link-disable current">1.手机验证</a>	
+			<a href="javascript:void(0);" class="tabnav-item link-disable">2.输入新密码</a>
+		</div>
+
+		<div class="form-part">
+			<div class="input-item">
+				<input type="text" class="input-primary input-null input-mobile" placeholder="请输入手机号码">
+				<i class="icon-delete"></i>
+			</div>
+			<div class="errMsg errMsg-mobile"></div>
+			<div class="input-item clearfix">
+				<input type="text" class="input-primary input-null input-code" maxlength="4" placeholder="请输入验证码" style="width: 308px;">
+				<i class="icon-delete" style="right: 105px;"></i>
+				<a href="javascript:void(0);" class="button-primary-able button-code btn-code" style="width: 80px;">发送</a>
+			</div>
+			<div class="errMsg errMsg-code"></div>
+
+	    	<a href="javascript:void(0);" class="button-primary-able btn-submit">下一步</a>
+		</div>
+
+	    <div class="forget-box">
+	    	<a href="/admin/index.html" class="button-link">返回登录</a>
+	    </div>
+	</section>
+</div>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+	$(function() {
+		var inputMobile = $('.input-mobile'),
+			inputCode = $('.input-code'),
+			btnCode = $('.btn-code'),
+			btnSubmit = $('.btn-submit');
+
+		var FORGETPWD = {
+			init: function() {
+				FORGETPWD.btnCodeBind();
+				FORGETPWD.btnSubmitBind();
+			},
+			btnCodeBind: function() {
+				btnCode.on('click', function() {
+					var mobile = inputMobile.val();
+
+					if(btnCode.hasClass('button-primary-disable')) {
+						return false;
+					}
+					$('.errMsg-mobile').html('');
+
+					if(!COMMON.checkNull(mobile)) {
+						COMMON.errMsg($('.errMsg-mobile'), '手机号码不能为空!');
+						return false;
+					}
+					if(!COMMON.checkMobile(mobile)) {
+						COMMON.errMsg($('.errMsg-mobile'), '手机号码格式不正确!');
+						return false;
+					}
+					$('.errMsg-mobile').html('');
+
+					btnCode.addClass('button-primary-disable');
+
+					$.ajax({
+			            url: "/admin/password/forget/sendSms.html",
+			            dataType:"json",
+			            type:"get",
+			            data: {
+			                mobile: mobile
+			            },
+			            success:function(data) {
+			            	if(data.code != 200) {
+			            		COMMON.errMsg($('.errMsg-mobile'), data.msg);
+			            		btnCode.removeClass('button-primary-disable').html('重发');
+			            	} else {
+			            		COMMON.errMsg($('.errMsg-mobile'), '验证码已发送，请注意查收！');
+
+			            		FORGETPWD.codeTime();
+			            	}
+			            },
+			            error: function() {
+			                COMMON.errMsg($('.errMsg-mobile'), '获取验证码失败，请重试！');
+							btnCode.removeClass('button-primary-disable').html('重发');
+			            }
+			        });
+				});
+			},
+			codeTime: function() {
+				var t = 60;
+
+	        	btnCode.html(t + 's');
+	        	var xf = setInterval(function(){
+	                if(t == 1){
+	                	btnCode.removeClass('button-primary-disable').html('重发');
+	                    clearInterval(xf);
+	                }else{
+	                    t --;
+	                    btnCode.html(t + 's');
+	                }
+	            }, 1000);
+			},
+			btnSubmitBind: function() {
+				btnSubmit.on('click', function() {
+					var mobile = inputMobile.val(),
+						code = inputCode.val();
+
+					if(btnSubmit.hasClass('button-primary-disable')) {
+						return false;
+					}
+					$('.errMsg-mobile').html('');
+					$('.errMsg-code').html('');
+
+					if(!COMMON.checkNull(mobile)) {
+						COMMON.errMsg($('.errMsg-mobile'), '手机号码不能为空!');
+						return false;
+					}
+					if(!COMMON.checkMobile(mobile)) {
+						COMMON.errMsg($('.errMsg-mobile'), '手机号码格式不正确!');
+						return false;
+					}
+					$('.errMsg-mobile').html('');
+					
+					if (!COMMON.checkNull(code)) {
+                        COMMON.errMsg($('.errMsg-code'), '请输入4位验证码!');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(code, true)) {
+                        COMMON.errMsg($('.errMsg-code'), '请输入4位数字!');
+                        return false;
+                    }
+                    if (code.length != 4) {
+                        COMMON.errMsg($('.errMsg-code'), '请填写4位验证码!');
+                        return false;
+                    }
+                    $('.errMsg-code').html('');
+
+					btnSubmit.addClass('button-primary-disable').html('正在验证...');
+
+					$.ajax({
+			            url: "/admin/password/forget/verifySms.html",
+			            dataType:"json",
+			            type:"post",
+			            data: {
+			                mobile: mobile,
+			                code: code
+			            },
+			            success:function(data) {
+			            	if(data.code != 200) {
+			            		COMMON.errMsg($('.errMsg-code'), data.msg);
+			            		btnSubmit.removeClass('button-primary-disable').html('下一步');
+			            	} else {
+                                location.href = '/admin/forgetPwd/step2.html';
+			            	}
+			            },
+			            error: function() {
+			                COMMON.errMsg($('.errMsg-code'), '信息验证失败，请重试！');
+							btnSubmit.removeClass('button-primary-disable').html('下一步');
+			            }
+			        });
+				});
+			}
+		};
+
+		FORGETPWD.init();
+	});
+</script>
+#end

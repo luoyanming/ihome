@@ -1,0 +1,79 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看控制点--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            #if(!$!controlPoint.used)
+                <a href="/admin/data/control/create.html?id=$!controlPoint.id" class="button-primary-able button-grey"
+                   style="margin: 0 26px 0 0;">编辑</a>
+            #end
+        </div>
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/control.html" class="button-link">控制点管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看控制点</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">编码</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!controlPoint.code</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!controlPoint.name</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">地点</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!controlPoint.place</div>
+                </div>
+            </div>
+            
+            #*
+            <div class="form-group clearfix">
+                <div class="group-title">任务表单</div>
+                <div class="group-item clearfix" style="padding: 11px 0;">
+                    <a href="javascript:void(0);" class="button-link link-normal"
+                       style="float: left; margin: 0;">$!controlPoint.formTypeName</a>
+                </div>
+            </div>
+            *#
+
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

@@ -1,0 +1,66 @@
+@import "base/common";
+
+// ==============================================
+// charge
+// ==============================================
+.account{
+	margin-bottom: 25px;
+	padding: 0 40px;
+	background-color: $colorFFF;
+	box-shadow: 0 1px 4px 0 rgba(63,84,101,0.13);
+
+	p{
+		font-size: 14px;
+		line-height: 92px;
+		color: $color333;
+
+		span{
+			margin-left: 35px;
+			font-size: 24px;
+		}
+	}
+
+	.operate-box{
+		float: right;
+		font-size: 0;
+
+		a{
+			display: inline-block;
+			margin-top: 25px;
+		}
+	}
+}
+
+
+// table-payment-no
+#table-payment-no-edit,
+#table-payment-loadin-no-edit{
+	tbody{
+		tr{
+			td{
+				padding-top: 3px !important;
+				padding-bottom: 3px !important;
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

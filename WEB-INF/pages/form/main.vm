@@ -1,0 +1,196 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>表单--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">表单</a>
+    </article>
+
+    <form action="" method="post">
+        <article class="form-condition">
+            <div class="operate-group">
+                <a href="/admin/form/type/create.html" class="button-link button-add">新建表单类型</a>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="formTypeId">
+                        <input type="hidden" name="formTypeId" value="$!formTypeId" class="input-hidden">
+						#if($formTypeId && $!formTypeId gt 0 )
+							#foreach($!formType in $!formTypeList)
+								#if($!formTypeId eq $!formType.id)
+                                    <span class="select-placeholder">$!formType.name</span>
+								#end
+							#end
+						#else
+                            <span class="select-placeholder">全部</span>
+						#end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!formTypeId eq 0) class="selected" #end>全部</li>
+								#foreach($!formType in $!formTypeList)
+                                    <li data-value="$!formType.id" #if($!formTypeId eq $!formType.id)
+                                        class="selected"#end>$!formType.name</li>
+								#end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!formTypeId eq 0) selected #end>全部</option>
+							#foreach($!formType in $!formTypeList)
+                                <option value="$!formType.id" #if($!formTypeId eq $!formType.id)
+                                        selected #end>$!formType.name</option>
+							#end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交人&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" name="formEmployee" value="$!{formEmployee}" placeholder="请输入提交人"
+                               class="input-primary input-x-small">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar"
+                           value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                           placeholder="xxxx年xx月xx日">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>表单ID</th>
+                        <th>表单类型</th>
+                        <th>提交人</th>
+                        <th>部门</th>
+                        <th>提交时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($formItem in $!list)
+                        <tr data-id="$!formItem.id">
+                            <td>$!formItem.id</td>
+                            <td>$!formItem.typeName</td>
+                            <td>$!formItem.employeeInfo.employeeName</td>
+                            <td>$!formItem.employeeInfo.departmentName</td>
+                            <td>$!DateUtils.formatTimeYMDHM($!formItem.createdDate)</td>
+                            <td><a href="/admin/form/detail.html?id=$!formItem.id" class="button-link button-link-small">查看</a></td>
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无表单</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="form-detail">
+    <div class="modal-header">
+        <h1>施工许可证</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="table-text-h">
+            <ul>
+                <li class="clearfix">
+                    <p class="text-left">提交人</p>
+                    <p class="text-right">张某某</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">提交时间</p>
+                    <p class="text-right">2016/12/21 18:03:33</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">施工房间</p>
+                    <p class="text-right">某某苑3幢101</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">施工单位</p>
+                    <p class="text-right">某某单位</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">施工负责人</p>
+                    <p class="text-right">张某某</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">联系电话</p>
+                    <p class="text-right">13948178483</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">起止日期</p>
+                    <p class="text-right">2016/04/15 - 2016/12/15</p>
+                </li>
+                <li class="clearfix">
+                    <p class="text-left">备注</p>
+                    <p class="text-right">无</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        window.FORM = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        FORM.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/form.html',
+                {
+                    formTypeId: '$!formTypeId',
+                    formEmployee: '$!formEmployee',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

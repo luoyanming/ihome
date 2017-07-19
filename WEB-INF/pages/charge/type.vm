@@ -1,0 +1,377 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>收费类型--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/charge.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb clearfix">
+        <a href="javascript:void(0);" class="button-link button-add" style="float: right; margin: 0 16px 0 0; color: #218adb;" id="btn-type-add">新建收费类型</a>
+        <a href="/admin/charge.html" class="button-link">收费</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">收费类型</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-charge-type">
+                    <thead>
+                    <tr>
+                        <th>类型名称</th>
+                        <th>收费标准</th>
+                        <th>关联录入数据</th>
+                        <th>数据类型</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                <tbody>
+					#foreach($chargeType in $list)
+                    <tr data-id="$!chargeType.id">
+                        <td data-name="$!chargeType.name">$!chargeType.name</td>
+                        <td data-standard="$!chargeType.fees" data-unit="$!chargeType.units">$!chargeType.fees/$!chargeType.unitsDesc</td>
+                        <td data-relation="$!chargeType.dataType">
+							#if($!chargeType.dataType gt 0)
+                                是
+							#else
+                                否
+							#end
+                        </td>
+                        <td>$!chargeType.dataTypeDesc</td>
+                        <td>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+							#if($!chargeType.dataType eq 0)
+                                <a href="javascript:void(0);"
+                                   class="button-link button-link-small" onclick="javascript: COMMON.createConfirmation('/charge/type/delete.html?id=$!chargeType.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+							#end
+                        </td>
+                    </tr>
+					#end
+                </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无收费类型</p></div>
+                </div>
+			#end
+        </div>
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="charge-type-modal">
+    <div class="modal-header">
+        <h1>新建收费类型</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content light-overscroll" style="max-height:600px;">
+        <div class="form-part" style="padding-bottom: 40px;">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 260px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入类型名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">收费标准</div>
+                <div class="group-item clearfix">
+                    <div class="input-item" style="float: left; width: 82px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-standard" placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text" style="float: left; margin: 0 10px;">/</div>
+                    <div class="select-box clearfix" style="float: left;">
+                        <div class="select-primary" style="width: 82px;" id="select-unit">
+                            <input type="hidden" name="" value="1" class="input-hidden">
+                            <span class="select-placeholder">次</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    #foreach($unitsTypeItem in $unitsTypeList)
+                                        #if($velocityCount gt 1)
+                                        <li data-value="$!unitsTypeItem.code" #if($velocityCount eq 2) class="selected"#end >$!unitsTypeItem.desc</li>
+                                        #end
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                #foreach($unitsTypeItem in $unitsTypeList)
+                                    #if($velocityCount gt 1)
+                                    <option value="$!{unitsTypeItem.code}" #if($velocityCount eq 2) selected #end >$!unitsTypeItem.desc</option>
+                                    #end
+                                #end
+                            </select>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="errMsg errMsg-standard-unit"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">关联数据录入</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" style="width: 82px;" id="select-relation">
+                            <input type="hidden" name="" value="1" class="input-hidden">
+                            <span class="select-placeholder">是</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="1" class="selected">是</li>
+                                    <li data-value="0">否</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="1" selected>是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="errMsg errMsg-relation"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">数据类型</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-chargeType">
+                        #foreach($dataInputTypeItem in $dataInputTypeList)
+                            #if($velocityCount gt 1)
+                            <label  #if($velocityCount ge 7) style="margin-top: 10px;" #end >
+                                <input name="chargeType" type="radio" value="$!dataInputTypeItem.code" />
+                                <p class="radio-text">$!dataInputTypeItem.desc</p>
+                            </label>
+                            #end
+                        #end
+                    </div>
+                    <div class="errMsg errMsg-chargeType"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" style="margin: 0;">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <div class="errMsg errMsg-submit"></div>
+                </div>
+            </div>
+            
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit" style="float: left; width: 88px; margin: 0 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnTypeAdd = $('#btn-type-add'),
+            tableChargeType = $('#table-charge-type'),
+            btnTypeEdit = tableChargeType.find('.btn-edit');
+
+        var modalMask = $('.modal-mask'),
+            chargeTypeModal = $('#charge-type-modal'),
+            chargeTypeModalTitle = chargeTypeModal.find('.modal-header h1'),
+            inputName = $('#input-name'),
+            inputStandard = $('#input-standard'),
+            selectUnit = $('#select-unit'),
+            selectRelation = $('#select-relation'),
+            radioChargeType = $('#radio-chargeType'),
+            radioChargeTypeWrapper = radioChargeType.parent().parent(),
+            btnModalSubmit = $('.btn-modal-submit');
+
+
+        var CHARGE = {
+            init: function () {
+                COMMON.selectBind($('#select-unit'), undefined);
+                COMMON.selectBind($('#select-relation'), CHARGE.checkRelation);
+                CHARGE.btnTypeAddEditBind();
+                CHARGE.btnModalSubmitBind();
+            },
+            checkRelation: function(RID) {
+                if(RID == 0) {
+                    radioChargeTypeWrapper.hide();
+                } else if(RID == 1) {
+                    radioChargeTypeWrapper.show();
+                }
+            },
+            btnTypeAddEditBind: function() {
+                btnTypeAdd.on('click', function() {
+                    CHARGE.showTypeModal('add', '', undefined, undefined);
+                });
+
+                btnTypeEdit.on('click', function() {
+                    CHARGE.showTypeModal('edit', $(this).parent().parent().attr('data-id'), $(this), $(this).parent().parent().index());
+                });
+            },
+            showTypeModal: function(operate, ID, obj, index) {
+                $('.errMsg-name').html();
+                $('.errMsg-standard-unit').html();
+                $('.errMsg-relation').html();
+                $('.errMsg-chargeType').html();
+                $('.errMsg-submit').html();
+
+                if(operate == 'add') {
+                    chargeTypeModalTitle.html('新建收费类型').attr('data-id', '');
+                    inputName.val('');
+                    inputStandard.val('');
+                    selectUnit.val('');
+
+                    selectUnit.find('.input-hidden').val('1');
+                    selectUnit.find('.select-placeholder').html('次');
+                    selectUnit.find('.select-options ul li.selected').removeClass('selected');
+                    selectUnit.find('.select-options ul li[data-value="1"]').addClass('selected');
+                    selectUnit.find('.select-select option[value="1"]').attr('selected', true);
+
+                    selectRelation.find('.input-hidden').val('1');
+                    selectRelation.find('.select-placeholder').html('是');
+                    selectRelation.find('.select-options ul li.selected').removeClass('selected');
+                    selectRelation.find('.select-options ul li[data-value="1"]').addClass('selected');
+                    selectRelation.find('.select-select option[value="0"]').attr('selected', true);
+
+                    radioChargeTypeWrapper.show();
+
+                    radioChargeType.find('label input[name="chargeType"]:checked').removeAttr('checked');
+                } else if(operate == 'edit') {
+                    chargeTypeModalTitle.html('编辑收费类型').attr('data-id', ID);
+
+                    var currTR = tableChargeType.find('tbody tr').eq(index),
+                        currName = currTR.find('td').eq(0).attr('data-name'),
+                        currStandard = currTR.find('td').eq(1).attr('data-standard'),
+                        currUnit = currTR.find('td').eq(1).attr('data-unit'),
+                        currRelation = currTR.find('td').eq(2).attr('data-relation');
+
+                    inputName.val(currName);
+                    inputStandard.val(currStandard);
+
+                    selectUnit.find('.input-hidden').val(currUnit);
+                    selectUnit.find('.select-options ul li.selected').removeClass('selected');
+                    var unitSelected = selectUnit.find('.select-select option[value="'+ currUnit +'"]');
+                    selectUnit.find('.select-placeholder').html(unitSelected.text());
+                    selectUnit.find('.select-options ul li[data-value="'+ currUnit +'"]').addClass('selected');
+                    unitSelected.attr('selected', true);
+
+                    if(currRelation == 0) {
+                        // 不关联
+                        selectRelation.find('.input-hidden').val('0');
+                        selectRelation.find('.select-placeholder').html('否');
+                        selectRelation.find('.select-options ul li.selected').removeClass('selected');
+                        selectRelation.find('.select-options ul li[data-value="0"]').addClass('selected');
+                        selectRelation.find('.select-select option[value="0"]').attr('selected', true);
+
+                        radioChargeTypeWrapper.hide();
+                    } else {
+                        // 关联
+                        selectRelation.find('.input-hidden').val('1');
+                        selectRelation.find('.select-placeholder').html('是');
+                        selectRelation.find('.select-options ul li.selected').removeClass('selected');
+                        selectRelation.find('.select-options ul li[data-value="1"]').addClass('selected');
+                        selectRelation.find('.select-select option[value="1"]').attr('selected', true);
+
+                        radioChargeTypeWrapper.show();
+
+                        radioChargeType.find('input[name="chargeType"][value="'+ currRelation +'"]').parent().click();
+                    }
+
+                }
+
+                modalMask.fadeIn(200);
+                chargeTypeModal.fadeIn(200);
+            },
+            btnModalSubmitBind: function() {
+                btnModalSubmit.on('click', function() {
+                    var inputNameVal = inputName.val(),
+                        inputStandardVal = inputStandard.val(),
+                        selectUnitVal = selectUnit.find('.input-hidden').val(),
+                        selectRelationVal = selectRelation.find('.input-hidden').val(),
+                        radioChargeTypeVal = '';
+
+                    if(btnModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-name').html();
+                    $('.errMsg-standard-unit').html();
+                    $('.errMsg-relation').html();
+                    $('.errMsg-chargeType').html();
+                    $('.errMsg-submit').html();
+
+                    if(!COMMON.checkNull(inputNameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入类型名称!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if(!COMMON.checkNull(inputStandardVal)) {
+                        COMMON.errMsg($('.errMsg-standard-unit'), '请输入收费标准!');
+                        return false;
+                    }
+                    if(!COMMON.checkPositive(inputStandardVal)) {
+                        COMMON.errMsg($('.errMsg-standard-unit'), '收费标准必须是大于0的数字!');
+                        return false;
+                    }
+                    if(!COMMON.checkNull(selectUnitVal)) {
+                        COMMON.errMsg($('.errMsg-standard-unit'), '请选择收费标准单位!');
+                        return false;
+                    }
+                    $('.errMsg-standard-unit').html('');
+
+                    if(selectRelationVal > 0) {
+                        radioChargeTypeVal = radioChargeType.find('input[name="chargeType"]:checked').val();
+
+                        if(!radioChargeTypeVal) {
+                            COMMON.errMsg($('.errMsg-chargeType'), '请选择数据类型!');
+                            return false;
+                        }
+                        $('.errMsg-chargeType').html('');
+                    } else {
+                        radioChargeTypeVal = selectRelationVal;
+                    }
+
+                    btnModalSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/charge/type/create.html",
+                        dataType:"json",
+                        type:"post",
+                        data: {
+                            id: chargeTypeModalTitle.attr('data-id'),
+                            name: inputNameVal,
+                            fees: inputStandardVal,
+                            units: selectUnitVal,
+                            dataType: radioChargeTypeVal
+                        },
+                        success:function(data) {
+                            if(data.code != 200) {
+                                COMMON.errMsg($('.errMsg-submit'), data.msg);
+                                btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function() {
+                            COMMON.errMsg($('.errMsg-submit'), '保存失败，请重试！');
+                            btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+        CHARGE.init();
+    });
+</script>
+#end

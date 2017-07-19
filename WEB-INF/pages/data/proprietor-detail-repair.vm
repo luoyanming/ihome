@@ -1,0 +1,218 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>报修记录--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/proprietor.html" class="button-link">业主管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看房间</a>
+    </article>
+
+    <div class="tabnav clearfix">
+        <a href="/admin/data/proprietor/detail/baseinfo.html?id=$!roomId" class="tabnav-item">基本信息</a>
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">报修记录</a>
+        <a href="/admin/data/proprietor/detail/payment.html?id=$!roomId" class="tabnav-item">缴费记录</a>
+        <a href="/admin/data/proprietor/detail/dataentry.html?id=$!roomId" class="tabnav-item">数据录入记录</a>
+        <a href="/admin/data/proprietor/detail/visitor.html?id=$!roomId" class="tabnav-item">访客记录</a>
+    </div>
+
+    <div style="padding: 0 50px;">
+        <form action="/admin/data/proprietor/detail/repair.html" method="post">
+            <article class="form-condition">
+                <input type="hidden" name="id" value="$!roomId" class="input-hidden">
+                <div class="condition-group clearfix">
+                    <div class="title">姓名</div>
+                    <div class="search-box clearfix">
+                        <div class="input-item" style="width: 120px;">
+                            <input type="search" placeholder="请输入姓名" class="input-primary input-x-small input-search" name="ownersName" value="$!ownersName">
+                            <i class="icon-delete"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">类型</div>
+                    <div class="select-box clearfix">
+                        <div class="select-primary select-small" id="repairsTypeId">
+                            <input type="hidden" name="repairsTypeId" value="$!repairsTypeId" class="input-hidden">
+							#if($repairsTypeId && $!repairsTypeId gt 0 )
+								#foreach($!repairsType in $!repairsTypeList)
+									#if($!repairsTypeId eq $!repairsType.id)
+                                        <span class="select-placeholder">$!repairsType.name</span>
+									#end
+								#end
+							#else
+                                <span class="select-placeholder">全部</span>
+							#end
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" #if($!repairsTypeId eq 0) class="selected" #end>全部</li>
+									#foreach($!repairsType in $!repairsTypeList)
+                                        <li data-value="$!repairsType.id" #if($!repairsTypeId eq $!repairsType.id)
+                                            class="selected"#end>$!repairsType.name</li>
+									#end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="0" #if($!repairsTypeId eq 0) selected #end>全部</option>
+								#foreach($!repairsType in $!repairsTypeList)
+                                    <option value="$!repairsType.id" #if($!repairsTypeId eq $!repairsType.id)
+                                            selected #end>$!repairsType.name</option>
+								#end
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">状态</div>
+                    <div class="select-box clearfix">
+                        <div class="select-primary select-small" id="repairsStatus">
+                            <input type="hidden" name="repairsStatus" value="$!repairsStatus" class="input-hidden">
+							#if($repairsStatus && $!repairsStatus ne '' )
+								#foreach($!repairsStatusItem in $!repairsStatusList)
+									#if($!repairsStatus eq $!repairsStatusItem.code)
+                                        <span class="select-placeholder">$!repairsStatusItem.desc</span>
+									#end
+								#end
+							#else
+                                <span class="select-placeholder">全部</span>
+							#end
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" #if($!repairsStatus eq '') class="selected" #end>全部</li>
+									#foreach($!repairsStatusItem in $!repairsStatusList)
+                                        <li data-value="$!repairsStatusItem.code" #if($!repairsStatus eq $!repairsStatusItem.code)
+                                            class="selected"#end>$!repairsStatusItem.desc</li>
+									#end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" #if($!repairsStatus eq '') class="selected" #end>全部</option>
+								#foreach($!repairsStatusItem in $!repairsStatusList)
+                                    <option value="$!repairsStatusItem.code" #if($!repairsStatus eq $!repairsStatusItem.code)
+                                            class="selected"#end>$!repairsStatusItem.desc</option>
+								#end
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">提交日期&nbsp;&nbsp;</div>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar"
+                               value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                    </div>
+                    <span class="text"> - </span>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                               placeholder="xxxx年xx月xx日">
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="search-box clearfix">
+                        <input type="submit" value="搜索" class="button-search btn-search"/>
+                    </div>
+                </div>
+            </article>
+        </form>
+
+        <article class="" style="margin-top: 20px;">
+            <div class="table-wrapper">
+				#if($list && $list.size()>0)
+                    <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                        <thead>
+                        <tr>
+                            <th>用户</th>
+                            <th>类型</th>
+                            <th>内容</th>
+                            <th>日期</th>
+                            <th>状态</th>
+                            <th>服务人员</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+							#foreach($repairsVo in $list)
+                            <tr>
+                                <td>$!{repairsVo.ownersInfoVo.ownersName}</td>
+                                <td>$!repairsVo.typeName</td>
+                                <td>$!repairsVo.content</td>
+                                <td>$!DateUtils.formatTimeYMDHM($!repairsVo.createdDate)</td>
+								#if($!{repairsVo.status} eq 0)
+								## 待接单
+                                    <td class="state state-warning">$!repairsVo.statusMsg</td>
+								#elseif($!{repairsVo.status} eq 1)
+								## 待服务
+                                    <td class="state state-warning">$!repairsVo.statusMsg</td>
+								#elseif($!{repairsVo.status} eq 2)
+								## 待确认费用
+                                    <td class="state state-warning">$!repairsVo.statusMsg</td>
+								#elseif($!{repairsVo.status} eq 3)
+								## 待付款
+                                    <td class="state state-warning">$!repairsVo.statusMsg</td>
+								#elseif($!{repairsVo.status} eq 4)
+								## 待评价
+                                    <td>$!repairsVo.statusMsg</td>
+								#elseif($!{repairsVo.status} eq 5)
+								## 已完成
+                                    <td class="state state-already">$!repairsVo.statusMsg</td>
+								#end
+                                <td>$!{repairsVo.employeeInfoVo.employeeName}</td>
+                                <td><a href="/admin/repairs/detail.html?id=$!{repairsVo.id}"
+                                       class="button-link button-link-small">查看</a>
+                                </td>
+                            </tr>
+							#end
+                        </tbody>
+                    </table>
+				#else
+                    <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                        <div class="table-nodata"><p>暂无报修</p></div>
+                    </div>
+				#end
+            </div>
+			#parse("/layout/pagination.vm")
+        </article>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        DATA.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/proprietor/detail/repair.html?id=$!roomId',
+                {
+                    ownersName: '$!ownersName',
+                    repairsTypeId: '$!repairsTypeId',
+                    repairsStatus: '$!repairsStatus',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

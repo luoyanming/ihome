@@ -1,0 +1,115 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>找回密码--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/login.css" />
+#end
+
+<div class="wrapper">
+	<section class="modules-center">
+		<a href="javascript:void(0);" class="button-link button-boss-link link-admin">返回管理后台</a>
+
+		<h1>找回密码</h1>
+		<div class="tabnav tabnav-boss clearfix">
+			<a href="javascript:void(0);" class="tabnav-item link-disable">1.手机验证</a>	
+			<a href="javascript:void(0);" class="tabnav-item link-disable current">2.输入新密码</a>
+		</div>
+
+		<div class="form-part">
+			<input type="hidden" id="mobile" value="$!mobile">
+			<div class="input-item">
+				<input type="password" class="input-primary input-primary-boss input-null input-pwd1" placeholder="请输入新密码">
+				<i class="icon-delete"></i>
+			</div>
+			<div class="errMsg errMsg-pwd1"></div>
+			<div class="input-item">
+				<input type="password" class="input-primary input-primary-boss input-null input-pwd2" placeholder="请确认新密码">
+				<i class="icon-delete"></i>
+			</div>
+			<div class="errMsg errMsg-pwd2"></div>
+
+	    	<a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-submit">完成</a>
+		</div>
+
+
+	    <div class="forget-box">
+	    	<a href="/boss/index.html" class="button-link button-boss-link">返回登录</a>
+	    </div>
+	</section>
+</div>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+	$(function() {
+		var inputPwd1 = $('.input-pwd1'),
+			inputPwd2 = $('.input-pwd2'),
+			btnSubmit = $('.btn-submit');
+
+		var FORGETPWD = {
+			init: function() {
+				FORGETPWD.btnSubmitBind();
+			},
+			btnSubmitBind: function() {
+				btnSubmit.on('click', function() {
+					var pwd1 = inputPwd1.val(),
+						pwd2 = inputPwd2.val();
+
+					if(btnSubmit.hasClass('button-primary-disable')) {
+						return false;
+					}
+					$('.errMsg-pwd1').html('');
+					$('.errMsg-pwd2').html('');
+
+					if(!COMMON.checkNull(pwd1)) {
+						COMMON.errMsg($('.errMsg-pwd1'), '新密码不能为空!');
+						return false;
+					}
+					$('.errMsg-pwd1').html('');
+
+					if(!COMMON.checkNull(pwd2)) {
+						COMMON.errMsg($('.errMsg-pwd2'), '请再次输入新密码!');
+						return false;
+					}
+					$('.errMsg-pwd2').html('');
+
+					if(pwd1 != pwd2) {
+						COMMON.errMsg($('.errMsg-pwd2'), '两次输入的密码不一致!');
+						return false;
+					}
+					$('.errMsg-pwd2').html('');
+
+					btnSubmit.addClass('button-primary-disable button-primary-boss-disable').html('正在修改...');
+					var mobile = $("#mobile").val();
+					$.ajax({
+			            url: "/boss/password/forget/reset.html",
+			            dataType:"json",
+			            type:"post",
+			            data: {
+                            mobile:mobile,
+                            newPassword: pwd1
+			            },
+			            success:function(data) {
+			            	if(data.code != 200) {
+			            		COMMON.errMsg($('.errMsg-pwd2'), data.msg);
+			            		btnSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('完成');
+			            	} else {
+			            		location.href = '/boss/login.html';
+			            	}
+			            },
+			            error: function() {
+			                COMMON.errMsg($('.errMsg-pwd2'), '密码修改失败，请重试！');
+							btnSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('完成');
+			            }
+			        });
+				});
+			}
+		};
+
+		FORGETPWD.init();
+	});
+</script>
+#end

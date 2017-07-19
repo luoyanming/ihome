@@ -1,0 +1,50 @@
+@import "mixin-font";
+@import "mixin-background";
+@import "mixin-position";
+@import "mixin-transform";
+
+// ==============================================
+// icon
+// ==============================================
+.icon-delete{
+	@include position(absolute, 3, 50%, 15px, none, none);
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	@include backgroundImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEWLi4uLi4uMjIyKioqOjo6NjY2Li4uLi4uOjo6Li4uMjIyLi4uPBHklAAAADHRSTlOAAVkMSGtLFmxAXy7khCb1AAAAaUlEQVQI12MQFCwJYHUXFGQQFGMAgkQgYwGIwSXIABQACzEUMGxiYJjCwM7gwKCswGnBwMIQwMBkNLmBgRUkr2jBAAGTjYAEUIrTQlkBKOXAMLmByYiBBajdg4FBiYEdbiDMCoSlcGcAAEpLDuV7PL1HAAAAAElFTkSuQmCC', no-repeat, center, center, 100%, 100%);
+	cursor: default;
+	opacity: 0;
+	@include translate(0, -50%, 0);
+	@include transition(opacity, .2s, ease, 0);
+
+	&:hover{
+		@include backgroundImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEVra2sAAABwcHBtbW1sbGyAgIBxcXFvb290dHRvb28NiGkSAAAACnRSTlOAAFFhbwUbRw41Klc16QAAAGNJREFUCNc9zrEJgDAUhOEfI1o/wV5BrQOS/q2gWSA4glUGyAYu7EMhX3twd4hc2m4iyIlZhdFj3MHAZybxwE3HRPB9oUFxMSstJhR+OWKUvgRv0URWF2lILLDT1cI6UUfrjRfcPg1ffb35SgAAAABJRU5ErkJggg==', no-repeat, center, center, 100%, 100%);
+	}
+}
+
+.btn-delete{
+	@include position(absolute, 3, 50%, -42px, none, none);
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	@include backgroundImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEWLi4uLi4uMjIyKioqOjo6NjY2Li4uLi4uOjo6Li4uMjIyLi4uPBHklAAAADHRSTlOAAVkMSGtLFmxAXy7khCb1AAAAaUlEQVQI12MQFCwJYHUXFGQQFGMAgkQgYwGIwSXIABQACzEUMGxiYJjCwM7gwKCswGnBwMIQwMBkNLmBgRUkr2jBAAGTjYAEUIrTQlkBKOXAMLmByYiBBajdg4FBiYEdbiDMCoSlcGcAAEpLDuV7PL1HAAAAAElFTkSuQmCC', no-repeat, center, center, 100%, 100%);
+	cursor: pointer;
+	@include translate(0, -50%, 0);
+
+	&:hover{
+		@include backgroundImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEVra2sAAABwcHBtbW1sbGyAgIBxcXFvb290dHRvb28NiGkSAAAACnRSTlOAAFFhbwUbRw41Klc16QAAAGNJREFUCNc9zrEJgDAUhOEfI1o/wV5BrQOS/q2gWSA4glUGyAYu7EMhX3twd4hc2m4iyIlZhdFj3MHAZybxwE3HRPB9oUFxMSstJhR+OWKUvgRv0URWF2lILLDT1cI6UUfrjRfcPg1ffb35SgAAAABJRU5ErkJggg==', no-repeat, center, center, 100%, 100%);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

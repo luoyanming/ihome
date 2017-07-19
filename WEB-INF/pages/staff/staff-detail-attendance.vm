@@ -1,0 +1,124 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看员工--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看员工</a>
+    </article>
+
+    <div class="tabnav tabnav-staff clearfix">
+        <a href="/admin/staff/detail/baseinfo.html?employeeId=$!employeeId" class="tabnav-item">基本信息</a>
+        <a href="/admin/staff/detail/assignment.html?employeeId=$!employeeId" class="tabnav-item">任务记录</a>
+        <a href="/admin/staff/detail/warning.html?employeeId=$!employeeId" class="tabnav-item">告警记录</a>
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">考勤记录</a>
+        <a href="/admin/staff/detail/grabform.html?employeeId=$!employeeId" class="tabnav-item">抢单记录</a>
+        <a href="/admin/staff/detail/internalreport.html?employeeId=$!employeeId" class="tabnav-item">内部报事</a>
+    </div>
+
+    <div style="padding: 0 50px;">
+        <form action="/admin/staff/detail/attendance.html?employeeId=$!employeeId" method="post">
+            <article class="form-condition">
+                <div class="condition-group clearfix">
+                    <div class="title">考勤点</div>
+                    <div class="search-box clearfix">
+                        <div class="input-item" style="width: 200px;">
+                            <input type="search" placeholder="请输入考勤点" name="attendancePlace" class="input-primary input-x-small input-search" value="$!attendancePlace">
+                            <i class="icon-delete"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">考勤日期&nbsp;&nbsp;</div>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="startDate" placeholder="xxxx年xx月xx日"
+                               value="$!startDate">
+                    </div>
+                    <span class="text"> - </span>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="endDate" placeholder="xxxx年xx月xx日"
+                               value="$!endDate">
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="search-box clearfix">
+                        <input type="submit" value="搜索" class="button-search btn-search"/>
+                    </div>
+                </div>
+            </article>
+        </form>
+
+        <article class="" style="margin-top: 20px;">
+            <div class="table-wrapper">
+                #if($list && $list.size()>0)
+                    <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                        <thead>
+                        <tr>
+                            <th>考勤点</th>
+                            <th>员工</th>
+                            <th>日期</th>
+                            <th>考勤时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            #foreach($record in $list)
+                            <tr>
+                                <td>$!record.attendancePlaceName</td>
+                                <td>$!record.employeeName</td>
+                                <td>$!record.jobDate</td>
+                                <td>$!record.recordDate</td>
+                            </tr>
+                            #end
+                        </tbody>
+                    </table>
+                #else
+                    <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                        <div class="table-nodata"><p>暂无考勤信息</p></div>
+                    </div>
+                #end
+            </div>
+            #parse("/layout/pagination.vm")
+        </article>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var STAFF = {
+            init: function () {
+
+            }
+        };
+
+        STAFF.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/staff/detail/attendance.html',
+                {
+                    employeeId: '$!employeeId',
+                    attendancePlace: '$!attendancePlace',
+                    startDate: '$!startDate',
+                    endDate: '$!endDate',
+                    pageNo: pageNo
+                });
+    }
+
+</script>
+#end

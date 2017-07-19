@@ -1,0 +1,224 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>首页--i家帮物业项目管理平台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/index.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="module-home home-assignment-warning">
+        <div class="topbar clearfix">
+            <p class="title title-assignment-warning">任务警告</p>
+            <a href="/admin/assignment/warning.html" class="button-link button-link-small">查看全部</a>
+        </div>
+        <div class="table-wrapper">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                <thead>
+                <tr>
+                    <th>任务名称</th>
+                    <th>项目名称</th>
+                    <th>责任人</th>
+                    <th>控制点/设备点</th>
+                    <th>最晚完成时间</th>
+                    <th>告警时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+					#foreach($taskWarn in $taskWarnList)
+						#if($!{velocityCount} eq 6)
+							#break
+						#end
+                    <tr>
+                        <td>$!taskWarn.taskName</td>
+                        <td>$!propertyCompany.projectName</td>
+                        <td>$!taskWarn.employeeName</td>
+                        <td>$!taskWarn.name</td>
+                        <td>#if($taskWarn.finishTime) $DateUtils.formatTimeForHM($taskWarn.finishTime)  #end</td>
+                        <td>#if($taskWarn.createdDate) $DateUtils.formatTimeForHM($taskWarn.createdDate) #end</td>
+                        <td><a href="/admin/assignment/warning/detail.html?id=$!taskWarn.id"
+                               class="button-link button-link-small">查看</a>
+                        </td>
+                    </tr>
+					#end
+				#*<tr>
+					<td>12/21常规保洁任务</td>
+					<td>张某某</td>
+					<td>某某控制点</td>
+					<td>8:30</td>
+					<td>8:31</td>
+					<td><a href="javascript:void(0);" class="button-link button-link-small">查看</a></td>
+				</tr>
+				<tr>
+					<td>12/21常规保洁任务</td>
+					<td>张某某</td>
+					<td>某某控制点</td>
+					<td>8:30</td>
+					<td>8:31</td>
+					<td><a href="javascript:void(0);" class="button-link button-link-small">查看</a></td>
+				</tr>*#
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <div class="home-main clearfix">
+
+        <div class="home-main-right">
+            <article class="module-home home-income">
+                <div class="topbar clearfix">
+                    <p class="title title-income">今日进账</p>
+                    <a href="/admin/charge/balance.html" class="button-link button-link-small">查看全部</a>
+                </div>
+                <div class="table-wrapper" style="min-height: 234px;">
+					#if($todayIncomeList && $todayIncomeList.size() gt 0)
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                            <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>房间</th>
+                                <th>金额</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+								#foreach($accountRecord in $!todayIncomeList)
+                                    #if($!{velocityCount} eq 4)
+                                        #break
+                                    #end
+                                <tr>
+                                    <td>$!accountRecord.chargeTypeName</td>
+                                    <td>
+										#if($accountRecord.roomInfo)
+											$!accountRecord.roomInfo
+										#else
+                                            -
+										#end
+                                    </td>
+                                    <td>¥ $!accountRecord.fees</td>
+                                </tr>
+								#end
+                            </tbody>
+                        </table>
+					#else
+                        <div class="table-nodata"><p>今日无进账</p></div>
+					#end
+                </div>
+            </article>
+
+            <article class="tabnav-home clearfix">
+                <div class="tabnav-item">
+                    <p class="icon icon-complain">投诉</p>
+					#if($!complaintsCount gt 0 )
+                        <a href="/admin/complaints.html" class="button-link button-link-small">$!complaintsCount 条投诉未回复</a>
+					#else
+                        <a href="javascript:void(0);" class="button-link button-link-small button-link-disable">无投诉</a>
+					#end
+                </div>
+                <div class="tabnav-item">
+                    <p class="icon icon-repair">报修</p>
+					#if($!repairsCount gt 0 )
+                        <a href="/admin/repairs.html" class="button-link button-link-small">$!repairsCount 个报修未接单</a>
+					#else
+                        <a href="javascript:void(0);" class="button-link button-link-small button-link-disable">无报修</a>
+					#end
+                </div>
+                <div class="tabnav-item">
+                    <p class="icon icon-form">表单</p>
+					#if($!formCount gt 0 )
+                        <a href="/admin/form.html" class="button-link button-link-small">今天提交 $!formCount 个表单</a>
+					#else
+                        <a href="javascript:void(0);" class="button-link button-link-small button-link-disable">无表单</a>
+					#end
+                </div>
+                <div class="tabnav-item">
+                    <p class="icon icon-report">内部报事</p>
+					#if($!internalReportCount gt 0 )
+                        <a href="/admin/complaints/internalreport.html"
+                           class="button-link button-link-small">$!internalReportCount 个内部报事未完成</a>
+					#else
+                        <a href="javascript:void(0);" class="button-link button-link-small button-link-disable">无内部报事</a>
+					#end
+                </div>
+            </article>
+        </div>
+
+        <div class="home-main-left">
+            <article class="module-home home-assignment-today">
+                <div class="topbar clearfix" style="float: left; width: 100%;">
+                    <p class="title title-assignment-today">今日任务</p>
+                    <a href="/admin/assignment.html" class="button-link button-link-small">查看全部</a>
+                </div>
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 426px;">
+					#if($taskList && $taskList.size()>0)
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                            <thead>
+                            <tr>
+                                <th>任务名称</th>
+                                <th>责任人</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+								#foreach($task in $taskList)
+									#if($!{velocityCount} eq 7)
+										#break
+									#end
+                                <tr>
+                                    <td>$!task.taskName</td>
+                                    <td>$!task.departmentName/$!task.employeeName</td>
+									#if($!task.status eq 0)
+                                        <td>待执行</td>
+									#elseif($!task.status eq 1)
+                                        <td class="state state-ING">执行中</td>
+									#else
+                                        <td class="state state-already">完成</td>
+									#end
+                                    <td>
+										#if($!task.type eq 1)
+                                            <a href="/admin/assignment/generally/detail.html?id=$!task.taskId"
+                                               class="button-link button-link-small">查看</a>
+										#else
+                                            <a href="/admin/assignment/temporary/detail.html?id=$!task.taskId"
+                                               class="button-link button-link-small">查看</a>
+										#end
+                                    </td>
+                                </tr>
+								#end
+							#*<tr>
+								<td>12/21常规保洁任务</td>
+								<td>保洁部/李某某</td>
+								<td class="state state-ING">进行中</td>
+								<td><a href="javascript:void(0);" class="button-link button-link-small">查看</a></td>
+							</tr>
+							<tr>
+								<td>3幢电梯检修任务</td>
+								<td>工程部/张某某</td>
+								<td class="state state-already">已完成</td>
+								<td><a href="javascript:void(0);" class="button-link button-link-small">查看</a></td>
+							</tr>
+							<tr>
+								<td>小区路面清扫</td>
+								<td>保卫部/赵某某</td>
+								<td class="state">未开始</td>
+								<td><a href="javascript:void(0);" class="button-link button-link-small">查看</a></td>
+							</tr>*#
+                            </tbody>
+                        </table>
+					#else
+                        <div class="table-nodata"><p>今日无任务</p></div>
+					#end
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+#end

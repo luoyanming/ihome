@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+    #set($ex=$request.getAttribute("ex"))
+    <title>ERROR</title>
+</head>
+<body style="margin:20px">
+<H2>
+    错误：404
+</H2>
+<hr/>
+<P>
+    <strong>错误描述：</strong>页面没有找到
+</P>
+
+<P>
+    <strong>详细信息：</strong>
+</P>
+</body>
+</html>

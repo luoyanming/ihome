@@ -1,0 +1,244 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>基本信息--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/proprietor.html" class="button-link">业主管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看房间</a>
+    </article>
+
+    <div class="tabnav clearfix">
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">基本信息</a>
+        <a href="/admin/data/proprietor/detail/repair.html?id=$!roomVo.id" class="tabnav-item">报修记录</a>
+        <a href="/admin/data/proprietor/detail/payment.html?id=$!roomVo.id" class="tabnav-item">缴费记录</a>
+        <a href="/admin/data/proprietor/detail/dataentry.html?id=$!roomVo.id" class="tabnav-item">数据录入记录</a>
+        <a href="/admin/data/proprietor/detail/visitor.html?id=$!roomVo.id" class="tabnav-item">访客记录</a>
+    </div>
+
+    <form action="" method="get" class="form-main" style="position: relative;">
+        <input type="hidden" id="roomId" value="$!roomVo.id">
+        <div class="operate-group" style="position: absolute; top:0; right: 50px;">
+            #if(!$!roomVo.used)
+            <a href="/admin/data/proprietor/create.html?id=$!roomVo.id" class="button-primary-able button-grey">编辑</a>
+            #end
+        </div>
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">分区</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!roomVo.buildingName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">楼宇</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!roomVo.buildingCellName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">单元</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!roomVo.buildingUnitName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">房间号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!roomVo.roomNum</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">面积</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!roomVo.area㎡</div>
+                </div>
+            </div>
+
+		#*<div class="form-group clearfix">
+			<div class="group-title">用户评价</div>
+			<div class="group-item">
+				<div class="input-item-text" style="margin-left: 0;">4.3分</div>
+			</div>
+		</div>*#
+
+            <div class="form-group clearfix">
+                <div class="group-title">业主</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="display: block; margin-left: 0;">
+                        <span>$!roomVo.ownersName</span>
+                        <span style="margin-left: 36px;">$!roomVo.ownersMobile</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">业主指定人</div>
+                <div class="group-item" id="assigner">
+					#if($roomVo.ownersUser)
+                        <div class="input-item-text" style="display: block; margin-left: 0;" data-id="$!{roomVo.ownersUser.ownersId}">
+                            <span>$!{roomVo.ownersUser.userName}</span>
+                            <span style="margin-left: 36px;">$!{roomVo.ownersUser.userMobile}</span>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-set-cancle"
+                               style="margin-left: 36px;">取消指定</a>
+                        </div>
+					#else
+                        <div class="tips tips-grey" style="margin-top: 0; line-height: 40px;">当前指定人为空，请从下列用户中设置业主指定人</div>
+					#end
+                    <div class="errMsg errMsg-set"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">用户</div>
+                <div class="group-item">
+					#foreach($roomUserVo in ${roomVo.roomUserVos})
+                        <div class="input-item-text" style="display: block; margin-left: 0;" data-id="$!roomUserVo.ownersId">
+                            <span>$!roomUserVo.userName</span>
+                            <span style="margin-left: 36px;">$!roomUserVo.userMobile</span>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-set-ensure"
+                               style="margin-left: 36px;">设为指定人</a>
+                        </div>
+					#end
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">车辆</div>
+                <div class="group-item">
+					#if($roomVo.carList && $roomVo.carList.size()>0)
+						#foreach($car in $roomVo.carList)
+                            <div class="input-item-text" style="margin-left: 0;">$!car.num &nbsp;</div>
+						#end
+					#end
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">车位</div>
+                <div class="group-item">
+					#if($roomVo.carportList && $roomVo.carportList.size()>0)
+						#foreach($carport in $roomVo.carportList)
+                            <div class="input-item-text" style="display: block; margin-left: 0;">
+                                <span>$!carport.place</span>
+								#if($!carport.type eq 0)
+                                    <span style="margin-left: 36px;">自有产权</span>
+								#else
+                                    <span style="margin-left: 36px;">公有产权</span>
+								#end
+                            </div>
+						#end
+					#end
+				#*<div class="input-item-text" style="display: block; margin-left: 0;">
+					<span>某某苑地下车库358号车位</span>
+					<span style="margin-left: 36px;">自有产权</span>
+				</div>*#
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                DATA.btnSetCancleBind();
+
+                DATA.btnSetEnsureBind();
+            },
+            btnSetCancleBind: function () {
+                var btnSetCancle = $('.btn-set-cancle');
+
+                btnSetCancle.on('click', function () {
+                    var _this = $(this),
+                            ownersId = _this.parent().attr('data-id'),
+                            str = '';
+                    $.ajax({
+                        url: "/room/owners/user/cancel.html",
+                        dataType: "json",
+                        type: "get",
+                        data: {
+                            roomId: $('#roomId').val(),
+                            ownersId: ownersId
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-set'), data.msg);
+                            } else {
+                                str += '<div class="tips tips-grey" style="margin-top: 0; line-height: 40px;">当前指定人为空，请从下列用户中设置业主指定人</div>';
+                                str += '<div class="errMsg errMsg-set"></div>';
+
+                                $('#assigner').html(str);
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-set'), '取消指定失败，请重试！');
+                        }
+                    });
+                });
+            },
+            btnSetEnsureBind: function () {
+                var btnSetEnsure = $('.btn-set-ensure');
+
+                btnSetEnsure.on('click', function () {
+                    var _this = $(this),
+                            ownersId = _this.parent().attr('data-id'),
+                            name = _this.parent().find('span').eq(0).html(),
+                            mobile = _this.parent().find('span').eq(1).html(),
+                            str = '';
+
+                    $.ajax({
+                        url: "/room/owners/user/set.html",
+                        dataType: "json",
+                        type: "get",
+                        data: {
+                            roomId: $('#roomId').val(),
+                            ownersId: ownersId
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-set'), data.msg);
+                            } else {
+                                // str += '<div class="tips tips-grey" style="margin-top: 0; line-height: 40px;">当前指定人为空，请从下列用户中设置业主指定人</div>';
+                                str += '<div class="input-item-text" style="display: block; margin-left: 0;" data-id="1">';
+                                str += '<span>' + name + '</span>';
+                                str += '<span style="margin-left: 36px;">' + mobile + '</span>';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-set-cancle" style="margin-left: 36px;">取消指定</a>';
+                                str += '</div>';
+                                str += '<div class="errMsg errMsg-set"></div>';
+
+                                $('#assigner').html(str);
+                                DATA.btnSetCancleBind();
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-set'), '指定人设置失败，请重试！');
+                        }
+                    });
+                });
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

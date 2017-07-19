@@ -1,0 +1,248 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>访客--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">访客</a>
+    </article>
+
+    <div class="visitor-container">
+        <!-- <div class="common-title fs14">数据统计&nbsp;&nbsp;|&nbsp;&nbsp;<span class="col-333">访客</span></div> -->
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日访客情况</div>
+                <div class="clearfix">
+                    <div class="pull-left left-container">
+                        <div class="fs14">更新时间：$!currentTime</div>
+                    </div>
+                    <div class="pull-left visitor_count" id="visitor_count" style="width: 90%; height:300px; float: right"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-content">
+            <div class="common-text fs14">访客明细</div>
+            <form action="" method="get">
+                <article class="form-condition">
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">日期&nbsp;&nbsp;</div>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStarInt" value="$!{createdDateStarInt}" placeholder="xxxx年xx月xx日">
+                        </div>
+                        <span class="text"> - </span>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEndInt" value="$!{createdDateEndInt}" placeholder="xxxx年xx月xx日">
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="bottom-detail clearfix">
+                <div class="table" style="width: 100%;">
+                    <article class="">
+                        <div class="table-wrapper">
+                            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                                <thead>
+									#if($list && $list.size()>0)
+                                <tr>
+                                    <th>日期</th>
+                                    <th>到访姓名</th>
+                                    <th>到访业主</th>
+                                    <th>到访人数</th>
+                                    <th>车辆</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+										#foreach($item in $list)
+                                <tr>
+                                    <td>$!DateUtils.formatTimeInSecond($item.createdDate)</td>
+                                    <td>$item.name</td>
+                                    <td>$item.ownersRoomVo.ownersName</td>
+                                    <td>$item.num</td>
+                                    <td>$item.plateNumber</td>
+                                </tr>
+										#end
+                                </tbody>
+                            </table>
+							#else 
+								<div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无数据</p></div>
+									#end
+                        </div>
+						#parse("/layout/pagination.vm")
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+
+			STATISTICS.getVisitorData();
+		},
+		getVisitorData: function() {
+			 $.ajax({
+	             url: "/visitor/todayVisitorNumber.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data;
+
+	            		STATISTICS.visitorChartBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		visitorChartBind: function(vArr) {
+			var myChart = echarts.init(document.getElementById('visitor_count'));
+
+            //时间轴
+            var _timeLine = [];
+
+            for(var i = 1 ; i < 25 ; i++) {
+                if(i < 10) {
+                    _timeLine.push("0"+i+":00")
+                }else{
+                    _timeLine.push(i+":00")
+                }
+            }
+
+            //参数设置
+
+            var option = {
+                tooltip: {    //提示框组件
+                    trigger: 'axis', //鼠标跟随可以显示不同时刻的状态
+                    axisPointer :{
+                        type: "none"   //没有指示线
+                    }
+                },
+
+                legend: {     //图例组件
+                    data: ['访客人数'],
+                    x:'right'
+                },
+
+                grid: {       //直角坐标系内绘图网格
+    //                left: '3%',
+    //                right: '4%',
+    //                bottom: '3%',
+                    containLabel: true
+                },
+
+                toolbox: {     //工具栏
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+
+                xAxis: {       //直角坐标系 grid 中的 x 轴
+                    axisLabel: {
+                        show: true,
+                        rotate : 40,  //文字倾斜
+                        textStyle: {
+                            color: '#8f8f8f'  //X轴字体颜色
+                        }
+                    },
+                    axisLine: {
+                        show: true,
+                        lineStyle:{
+                            color:'#a3a3a3'  //X轴颜色
+                        }
+                    },
+                    splitLine : {
+                        show:false  //无横向分割线
+                    },
+                    type: 'category',
+                    boundaryGap: false,
+                    data : _timeLine
+                },
+
+                yAxis: {       //直角坐标系 grid 中的 y 轴
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+
+                    splitLine : {
+                        show:true,
+                        lineStyle: {
+                            color: '#e5e5e5',
+                            type: 'dotted',
+                            width: 2
+                        }
+                    },
+
+                    axisLabel: {
+                        show : true,
+                        textStyle: {
+                            color: '#8f8f8f'  //Y轴字体颜色
+                        }
+                    }
+                },
+
+                series: [      //系列列表
+                    {
+                        name: '访客人数',
+                        type: 'line',
+                        itemStyle : {
+                            normal : {
+                                color:'#51acfd',  //交汇远点颜色
+                                lineStyle:{
+                                    color:'#badffc',  //折线颜色
+                                    width:5
+                                }
+                            }
+                        },
+                        data: vArr
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+		}
+	};
+
+	STATISTICS.init();
+});
+//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/statistics/visitor.html',
+                {
+                    createdDateStarInt: '$!createdDateStarInt',
+                    createdDateEndInt: '$!createdDateEndInt',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

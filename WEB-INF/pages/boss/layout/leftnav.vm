@@ -1,0 +1,17 @@
+<nav class="leftnav">
+    <div class="logo logo-boss">i家帮系统后台</div>
+    <ul class="deep-overscroll">
+        <li>
+            <a href="/boss/signup.html" class="navitem navitem-signup #if($bossMenu && $!bossMenu eq 0) current active#end">入驻申请</a>
+        </li>
+        <li>
+            <a href="/boss/project.html" class="navitem navitem-project #if($bossMenu && $!bossMenu eq 1) current active#end">项目列表</a>
+        </li>
+        <li>
+            <a href="/boss/cash.html" class="navitem subnav navitem-cash #if($bossMenu && $!bossMenu gt 1) current active#end">提现申请</a>
+            <div class="subnav-list">
+                <a href="/boss/cash/history.html" class="subnavitem #if($bossMenu && $!bossMenu eq 3) current active#end">提现记录</a>
+            </div>
+        </li>
+    </ul>
+</nav>

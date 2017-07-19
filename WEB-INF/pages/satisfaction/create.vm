@@ -1,0 +1,217 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>满意度调查--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/satisfaction.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/satisfaction.html" class="button-link">满意度调查</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">发布调查</a>
+    </article>
+
+    <form action="" method="get" class="form-main" style="margin-top: 20px;">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入调查名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">有效期</div>
+                <div class="group-item">
+                    <div class="input-item" style="display: inline-block; width: auto;">
+                        <input type="text" class="input-primary input-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'date-end\')}'})" name="" placeholder="xxxx年xx月xx日" id="date-start">
+                    </div>
+                    <span class="text"> - </span>
+                    <div class="input-item" style="display: inline-block; width: auto; margin: 0;">
+                        <input type="text" class="input-primary input-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'date-start\')}'})" name="" placeholder="xxxx年xx月xx日" id="date-end">
+                    </div>
+                    <div class="errMsg errMsg-date"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">选择题</div>
+                <div class="group-item">
+                    <div id="choice-list">
+                        <div class="input-item" style="width: 360px;">
+                            <input type="text" class="input-primary input-small input-null" name="" placeholder="请输入问题">
+                            <i class="btn-delete"></i>
+                        </div>
+                    </div>
+                    <div class="tips tips-grey">选择题的可选项均为“满意”和“不满意”</div>
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add" id="btn-add-choice">添加选择题</a>
+                    </div>
+                    <div class="errMsg errMsg-choice"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">填空题</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-fill" placeholder="请输入问题">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="tips tips-grey">填空题仅能存在一个，如果不需要请清空本输入框</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" style="margin-top: 0;">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <div class="errMsg errMsg-submit"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit" style="float: left; width: 200px; margin: 0 0 0 0;">创建</a>
+                    <a href="/admin/satisfaction.html" class="button-link" style="float: left; margin: 15px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var inputName = $('#input-name'),
+            dateStart = $('#date-start'),
+            dateEnd = $('#date-end'),
+            choiceList = $('#choice-list'),
+            btnAddChoice = $('#btn-add-choice'),
+            inputFill = $('#input-fill'),
+            btnSubmit = $('.btn-submit');
+
+        var SATISFACTION = {
+            init: function () {
+                SATISFACTION.btnAddChoiceBind();
+                SATISFACTION.btnDelChoiceBind();
+                SATISFACTION.btnSubmitBind();
+            },
+            btnAddChoiceBind: function() {
+                btnAddChoice.on('click', function() {
+                    var str = '';
+                    str += '<div class="input-item" style="width: 360px;">';
+                    str += '<input type="text" class="input-primary input-small input-null" name="" placeholder="请输入问题">';
+                    str += '<i class="btn-delete"></i>';
+                    str += '</div>';
+
+                    choiceList.append(str);
+                    SATISFACTION.btnDelChoiceBind();
+                });
+            },
+            btnDelChoiceBind: function() {
+                var btnDel = choiceList.find('.btn-delete');
+
+                btnDel.unbind('click');
+                btnDel.on('click', function() {
+                    if(choiceList.find('.input-item').length == 1) {
+                        return false;
+                    }
+
+                    $(this).parent().remove();
+                });
+            },
+            btnSubmitBind: function() {
+                btnSubmit.on('click', function() {
+                    var inputNameVal = inputName.val(),
+                        dateStartVal = dateStart.val(),
+                        dateEndVal = dateEnd.val(),
+                        choiceListStr = '';
+                        inputFillVal = inputFill.val();
+
+                    if(btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+                    $('.errMsg-date').html('');
+                    $('.errMsg-choice').html('');
+                    $('.errMsg-submit').html('');
+
+                    if(!COMMON.checkNull(inputNameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入调查名称!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if(!COMMON.checkNull(dateStartVal)) {
+                        COMMON.errMsg($('.errMsg-date'), '请选择调查开始日期!');
+                        return false;
+                    }
+                    if(!COMMON.checkNull(dateEndVal)) {
+                        COMMON.errMsg($('.errMsg-date'), '请选择调查结束日期!');
+                        return false;
+                    }
+                    $('.errMsg-date').html('');
+
+                    var choiceListArr = [],
+                        choiceItem = choiceList.find('.input-item');
+                    for(var i = 0; i < choiceItem.length; i++) {
+                        var _val = choiceItem.eq(i).find('input').val();
+                        if(_val) {
+                            choiceListArr.push(_val);
+                        }
+                    }
+                    choiceListStr = choiceListArr.join(',');
+                    if(!COMMON.checkNull(choiceListStr)) {
+                        COMMON.errMsg($('.errMsg-choice'), '请填写选择题!');
+                        return false;
+                    }
+                    $('.errMsg-choice').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+
+                    $.ajax({
+                        url: "/satisfaction/publish.html",
+                        dataType:"json",
+                        type:"post",
+                        data: {
+                            name: inputNameVal,
+                            dateStart: dateStartVal,
+                            dateEnd: dateEndVal,
+                            choiceList: choiceListStr,
+                            fill: inputFillVal
+                        },
+                        success:function(data) {
+                            if(data.code != 200) {
+                                COMMON.errMsg($('.errMsg-submit'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/satisfaction.html';
+                            }
+                        },
+                        error: function() {
+                            COMMON.errMsg($('.errMsg-submit'), '创建失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            }
+        };
+
+        SATISFACTION.init();
+    });
+</script>
+#end

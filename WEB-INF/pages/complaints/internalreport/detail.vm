@@ -1,0 +1,152 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看报事--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/complaints.html" class="button-link">投诉报事</a>
+        <span class="separate">|</span>
+        <a href="/admin/complaints/internalreport.html" class="button-link">内部报事</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看报事</a>
+    </article>
+
+    <form action="/admin/complaints/internalreport/process.html" method="post" class="form-main">
+        <div class="form-part">
+            <input type="hidden" name="id" value="$!internalReportVo.id" class="input-hidden">
+            <div class="form-group clearfix">
+                <div class="group-title">提交人</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">$!internalReportVo.propertyEmployeeRoleVo.employeeName
+                        / $!internalReportVo.propertyEmployeeRoleVo.departmentName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">提交时间</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">$!DateUtils.formatTimeYMDHM($!internalReportVo.createdDate)</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">内容</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0; line-height: 28px; padding: 6px 0;">$!internalReportVo.content</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">图片</div>
+                <div class="group-item clearfix">
+                    #if($!internalReportVo.photo1Url ne '')
+                        <div class="upload-box" style="float: left;">
+                            <div class="upload-image">
+                                <img src="$!internalReportVo.photo1Url" class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                        </div>
+                    #end
+                    #if($!internalReportVo.photo2Url ne '')
+                        <div class="upload-box" style="float: left;">
+                            <div class="upload-image">
+                                <img src="$!internalReportVo.photo2Url" class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                        </div>
+                    #end
+                    #if($!internalReportVo.photo3Url ne '')
+                        <div class="upload-box" style="float: left;">
+                            <div class="upload-image">
+                                <img src="$!internalReportVo.photo3Url" class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                        </div>
+                    #end
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">状态</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" id="status" style="width: 108px;">
+                            <input type="hidden" name="status" value="$!internalReportVo.status" class="input-hidden">
+                            <span class="select-placeholder">$!internalReportVo.statusMsg</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    #foreach($statusItem in $statusList)
+                                        <li data-value="$!statusItem.code" #if($!statusItem.code eq $!internalReportVo.status)
+                                            class="selected" #end>$!statusItem.desc</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                #foreach($statusItem in $statusList)
+                                    <option value="$!statusItem.code" #if($!statusItem.code eq $!internalReportVo.status)
+                                            selected #end>$!statusItem.desc</option>
+                                #end
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            #if($internalReportVo.processEmployeeId && $internalReportVo.processEmployeeId gt 0)
+                <div class="form-group clearfix">
+                    <div class="group-title">处理人</div>
+                    <div class="group-item">
+                        <div class="input-item-text"
+                             style="margin-left: 0; line-height: 28px; padding: 6px 0;">$!processEmployee.employeeName / $!processEmployee.departmentName</div>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <div class="group-title">处理时间</div>
+                    <div class="group-item">
+                        <div class="input-item-text"
+                             style="margin-left: 0; line-height: 28px; padding: 6px 0;">$!DateUtils.formatTimeYMDHM($!internalReportVo.lastUpdatedDate)</div>
+                    </div>
+                </div>
+            #end
+
+            #if($!internalReportVo.status ne 2)
+                <div class="form-group clearfix">
+                    <div class="group-title">&nbsp;</div>
+                    <div class="group-item">
+                        <input type="submit" value="保存" class="button-primary-able btn-submit"
+                               style="float: left; width: 200px; margin: 20px 0 0 0;"/>
+                        <a href="/admin/complaints/internalreport.html" class="button-link"
+                           style="float: left; margin: 35px 0 0 60px;">取消</a>
+                    </div>
+                </div>
+            #end
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

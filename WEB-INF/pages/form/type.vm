@@ -1,0 +1,85 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>表单类型--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb clearfix">
+        <a href="/admin/form/type/create.html" class="button-link button-add"
+           style="float: right; margin: 0 16px 0 0; color: #218adb;">新建表单类型</a>
+        <a href="/admin/form.html" class="button-link">表单</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">表单类型</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>类型名称</th>
+                        <th>类型说明</th>
+                        <th>字段数量</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                <tbody>
+                    #foreach($formType in $list)
+                    <tr>
+                        <td>$!formType.name</td>
+                        <td>$!formType.description</td>
+                        <td>$!formType.count</td>
+                        #if($!formType.used)
+                            <td><span title="已经关联使用,不允许修改">禁止操作</span></td>
+                        #else
+                            <td>
+                                <a href="/admin/form/type/create.html?id=$!{formType.id}"
+                                   class="button-link button-link-small">编辑</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="javascript:void(0);"
+                                   class="button-link button-link-small" onclick="javascript: COMMON.createConfirmation('/form/deleteFormType.html?id=$!{formType.id}', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                            </td>
+                        #end
+                    </tr>
+                    #end
+                </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无表单类型</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var FORM = {
+            init: function () {
+
+            }
+        };
+
+        FORM.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/form/type.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

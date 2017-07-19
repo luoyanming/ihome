@@ -1,0 +1,506 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新增控制点--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/machine.html" class="button-link">设备管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">新增设备</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" id="equipmentId" value="$!equipment.id"/>
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">编码</div>
+            <div class="group-item">
+            <div class="input-item-text" style="margin-left: 0;">
+                #if($!equipment.id>0)
+                    <input type="hidden" id="code" value="$!equipment.code"/>$!equipment.code</div>
+                #else
+                    <input type="hidden" id="code" value="$!code"/>$!code</div>
+                #end
+                <div class="errMsg errMsg-code"></div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="group-title">名称</div>
+            <div class="group-item">
+                <div class="input-item" style="width: 360px;">
+                    <input type="text" class="input-primary input-small input-null" id="name" placeholder="请输入设备名称"
+                           value="$!equipment.name">
+                    <i class="icon-delete"></i>
+                </div>
+                <div class="errMsg errMsg-name"></div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="group-title">类别</div>
+            <div class="group-item">
+                <div class="select-box clearfix">
+                    <div class="select-primary" id="select-category">
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($list && $list.size()>0)
+                                    #foreach($type in $list)
+                                        <li data-value="$!type.id" #if($!equipment.equipmentTypeId==$!type.id)
+                                            class="selected"  #end>$!type.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <input type="hidden" name="" class="input-hidden" value="$!equipment.equipmentTypeId">
+                        <span class="select-placeholder">#if($!equipment.equipmentTypeName) $!equipment.equipmentTypeName #else
+                            全部  #end</span>
+                        <select class="select-select">
+                            #if($list && $list.size()>0)
+                                #foreach($type in $list)
+                                    <option value="$!type.id" #if($!equipment.equipmentTypeId==$!type.id)
+                                            selected  #end>$!type.name</option>
+                                #end
+                            #else
+                                <option value="" selected>暂无</option>
+                            #end
+                        </select>
+                    </div>
+                </div>
+                <div class="errMsg errMsg-category"></div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="group-title">状态</div>
+            <div class="group-item">
+                <div class="select-box clearfix">
+                    <div class="select-primary" id="select-state">
+                        <input type="hidden" name="" class="input-hidden" value="$!equipment.status">
+                        <span class="select-placeholder">#if($!equipment.status eq 0) 正常 #else 异常  #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!equipment.status eq 0) class="selected"  #end>正常</li>
+                                <li data-value="1" #if($!equipment.status eq 1) class="selected"  #end>异常</li>
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!equipment.status eq 0) selected  #end>正常</option>
+                            <option value="1" #if($!equipment.status eq 1) selected  #end>异常</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="errMsg errMsg-state"></div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="group-title">品牌</div>
+            <div class="group-item">
+                <div class="input-item" style="width: 360px;">
+                    <input type="text" class="input-primary input-small input-null" id="brand" placeholder="请输入品牌"
+                           value="$!equipment.brand">
+                    <i class="icon-delete"></i>
+                </div>
+                <div class="errMsg errMsg-brand"></div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="group-title">型号</div>
+            <div class="group-item">
+                <div class="input-item" style="width: 360px;">
+                    <input type="text" class="input-primary input-small input-null" id="model" placeholder="请输入型号"
+                           value="$!equipment.model">
+                    <i class="icon-delete"></i>
+                </div>
+                <div class="errMsg errMsg-model"></div>
+            </div>
+        </div>
+
+        <div id="category-field">
+            #if($equipment.fieldDataList && $equipment.fieldDataList.size()>0)
+                #foreach($fieldData in $equipment.fieldDataList)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!fieldData.fieldName</div>
+                        <div class="group-item">
+                            <div class="input-item" style="width: 360px;">
+                                <input type="text" class="input-primary input-small input-null" id="$!fieldData.fieldId" placeholder="请输入"+$!fieldData.fieldName+" " value="$!fieldData.fieldValue">
+                                <i class="icon-delete"></i>
+                            </div>
+                            <div class="errMsg errMsg-a"></div>
+                        </div>
+                    </div>
+                #end
+            #end
+        ##	<div class="form-group clearfix">
+        ##		<div class="group-title">字段A</div>
+        ##		<div class="group-item">
+        ##			<div class="input-item" style="width: 360px;">
+        ##				<input type="text" class="input-primary input-small input-null" id="" placeholder="请输入字段A">
+        ##				<i class="icon-delete"></i>
+        ##			</div>
+        ##			<div class="errMsg errMsg-a"></div>
+        ##		</div>
+        ##	</div>
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="group-title">地点</div>
+            <div class="group-item">
+                <div class="input-item" style="width: 360px;">
+                    <input type="text" class="input-primary input-small input-null" id="addr" placeholder="请输入地点"
+                           value="$!equipment.place">
+                    <i class="icon-delete"></i>
+                </div>
+                <div class="errMsg errMsg-addr"></div>
+            </div>
+        </div>
+        
+        #*
+        <div class="form-group clearfix">
+            <div class="group-title">检修表单</div>
+            <div class="group-item clearfix" style="padding: 11px 0;">
+            ##	<a href="javascript:void(0);" class="button-link link-normal" style="float: left; margin: 0;" data-id="1">某某检修表单</a>
+                #if($!equipment.id gt 0 && $!equipment.formTypeId gt 0)
+                    <a href="javascript:void(0);" class="button-link link-normal" id="btn-form-select"
+                       style="float: left; margin: 0;" data-id="$!equipment.formTypeId">$!equipment.formTypeName</a>
+                #elseif($!equipment.id gt 0 && $!equipment.formTypeId eq 0)
+                    <a href="javascript:void(0);" class="button-link button-link-small" id="btn-form-select"
+                       style="float: left;" data-id="$!equipment.formTypeId">选择表单</a>
+                #else
+                    <a href="javascript:void(0);" class="button-link button-link-small" id="btn-form-select"
+                       style="float: left;" data-id="$!equipment.formTypeId">选择表单</a>
+                #end
+                <a href="/admin/form/type/create.html" class="button-link button-link-small"
+                   style="float: left; margin-left: 45px;">创建新表单</a>
+                <div class="clearfix"></div>
+                <div class="errMsg errMsg-form"></div>
+            </div>
+        </div>
+        *#
+
+        <div class="form-group clearfix">
+            <div class="group-title">&nbsp;</div>
+            <div class="group-item">
+                <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                   style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+                <a href="/admin/data/machine.html" class="button-link"
+                   style="float: left; margin: 35px 0 0 60px;">取消</a>
+            </div>
+        </div>
+        </div>
+    </form>
+</section>
+
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="form-select-modal">
+    <div class="modal-header">
+        <h1>选择表单</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content" style="padding: 0;">
+        <article class="form-condition" style="padding: 0 16px;">
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item">
+                        <input type="search" placeholder="请输入表单名称" class="input-primary input-x-small input-search">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+
+        <div class="table-wrapper light-overscroll" style="min-height: 250px; max-height: 350px;">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small">
+                <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>说明</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                ##	<tr>
+				##		<td>某某类型表单1</td>
+				##		<td>某某类型表单说明说明说明说明说明</td>
+				##		<td>
+				##			<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>
+				##		</td>
+				##	</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnFormSelect = $('#btn-form-select'),
+                modalMask = $('.modal-mask'),
+                formSelectModal = $('#form-select-modal'),
+                inputSearch = formSelectModal.find('.input-search'),
+                btnSearch = formSelectModal.find('.btn-search'),
+                formTableMain = formSelectModal.find('.table-primary tbody'),
+                btnSubmit = $('.btn-submit');
+
+        window.DATA = {
+            init: function () {
+                // DATA.getFormTableData();
+                // DATA.btnFormSelectBind();
+                // DATA.btnSearchBind();
+
+                COMMON.selectBind($('#select-category'), DATA.getFieldList);
+                COMMON.selectBind($('#select-state'), undefined);
+
+                DATA.btnSubmitBind();
+            },
+            getFormTableData: function (searchStr) {
+                // 正常的时候searchStr传undefined，搜索的时候searchStr有值
+                $.ajax({
+                    url: "/form/formTypeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        name: searchStr
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            // COMMON.errMsg($('.errMsg-search'), data.msg);
+                        } else {
+                            if(data.list.length == 0) {
+                                formSelectModal.find('.table-primary').hide();
+                                formSelectModal.find('.table-primary').before('<div class="table-nodata"><p>暂无相关数据</p></div>');
+                                return false;
+                            }
+
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr data-id="' + data.list[i].id + '">';
+                                str += '<td>' + data.list[i].name + '</td>';
+                                str += '<td>' + data.list[i].description + '</td>';
+                                str += '<td>';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>';
+                                str += '</td>';
+                                str += '</tr>';
+                            }
+                            formSelectModal.find('.table-nodata').remove();
+                            formSelectModal.find('.table-primary').show();
+                            formTableMain.html(str);
+
+                            DATA.btnSelectBind();
+                        }
+                    },
+                    error: function () {
+                        // COMMON.errMsg($('.errMsg-search'), '搜索失败，请重试！');
+                    }
+                });
+            },
+            btnSelectBind: function () {
+                var btnSelect = formTableMain.find('.btn-select');
+
+                btnSelect.unbind('click');
+                btnSelect.on('click', function () {
+                    var title = $(this).parent().parent().find('td').eq(0).html(),
+                            id = $(this).parent().parent().attr('data-id');
+
+                    btnFormSelect.removeClass('button-link-small').addClass('link-normal').html(title).attr('data-id', id).css('margin', 0);
+                    modalMask.fadeOut(200);
+                    formSelectModal.fadeOut(200);
+                });
+            },
+            btnFormSelectBind: function () {
+                btnFormSelect.on('click', function () {
+                    inputSearch.val('');
+                    $('.errMsg-search').html('');
+                    modalMask.fadeIn(200);
+                    formSelectModal.fadeIn(200);
+                });
+            },
+            btnSearchBind: function () {
+                btnSearch.on('click', function () {
+                    var searchVal = inputSearch.val();
+
+                    DATA.getFormTableData(searchVal);
+                });
+            },
+            getFieldList: function (cateID) {
+                $('.errMsg-category').html('');
+                $.ajax({
+                    url: "/equipment/equipmentTypeFieldList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        equipmentTypeId: cateID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-category'), data.msg);
+                        } else {
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<div class="form-group clearfix">';
+                                str += '<div class="group-title">' + data.list[i].name + '</div>';
+                                str += '<div class="group-item">';
+                                str += '<div class="input-item" style="width: 360px;">';
+                                if (data.list[i].mustInput == 0) {
+                                    str += '<input type="text" class="input-primary input-small input-null" id="' + data.list[i].id + '" data-must="0" placeholder="请输入' + data.list[i].name + '">';
+                                } else {
+                                    str += '<input type="text" class="input-primary input-small input-null" id="' + data.list[i].id + '" data-must="1" placeholder="请输入' + data.list[i].name + ' (选填)">';
+                                }
+                                str += '<i class="icon-delete"></i>';
+                                str += '</div>';
+                                str += '<div class="errMsg errMsg-' + data.list[i].id + '"></div>';
+                                str += '</div>';
+                                str += '</div>';
+                            }
+
+                            $('#category-field').html(str);
+                            COMMON.iconDeleteBind();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-category'), '获取该类别字段失败，请刷新页面重试！');
+                    }
+                });
+            },
+            btnSubmitBind: function () {
+                btnSubmit.on('click', function () {
+                    var code = $('#code').val(),
+                            name = $('#name').val(),
+                            category = $('#select-category').find('.input-hidden').val(),
+                            state = $('#select-state').find('.input-hidden').val(),
+                            brand = $('#brand').val(),
+                            model = $('#model').val(),
+                            addr = $('#addr').val();
+                            // formID = btnFormSelect.attr('data-id');
+
+                    $('.errMsg-name').html('');
+                    $('.errMsg-category').html('');
+                    $('.errMsg-brand').html('');
+                    $('.errMsg-model').html('');
+                    $('.errMsg-addr').html('');
+                    // $('.errMsg-form').html('');
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+
+                    if (!COMMON.checkNull(name)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入设备名称!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if (!COMMON.checkNull(category)) {
+                        COMMON.errMsg($('.errMsg-category'), '请选择类别!');
+                        return false;
+                    }
+                    $('.errMsg-category').html('');
+
+                    if (!COMMON.checkNull(brand)) {
+                        COMMON.errMsg($('.errMsg-brand'), '请选择品牌!');
+                        return false;
+                    }
+                    $('.errMsg-brand').html('');
+
+                    if (!COMMON.checkNull(model)) {
+                        COMMON.errMsg($('.errMsg-model'), '请选择型号!');
+                        return false;
+                    }
+                    $('.errMsg-model').html('');
+
+                    var fieldItem = $('#category-field .form-group'),
+                            fieldArr = [],
+                            fieldStr = '';
+                    for (var i = 0; i < fieldItem.length; i++) {
+                        var fieldValue = fieldItem.eq(i).find('.group-item .input-primary').val(),
+                                fieldId = fieldItem.eq(i).find('.group-item .input-primary').attr('id'),
+                                fieldTitle = fieldItem.eq(i).find('.group-title').html(),
+                                fieldMust = fieldItem.eq(i).find('.group-item .input-primary').attr('data-must');
+
+                        if (fieldMust == 0) {
+                            if (!COMMON.checkNull(fieldValue)) {
+                                COMMON.errMsg($('.errMsg-' + fieldId), '请输入' + fieldTitle + '!');
+                                return false;
+                            }
+                            $('.errMsg-' + fieldId).html('');
+                        }
+
+                        fieldArr.push({fieldId: fieldId, fieldValue: fieldValue});
+                    }
+                    fieldStr = JSON.stringify(fieldArr);
+
+                    if (!COMMON.checkNull(addr)) {
+                        COMMON.errMsg($('.errMsg-addr'), '请输入地点!');
+                        return false;
+                    }
+                    $('.errMsg-addr').html('');
+
+                    // if (!COMMON.checkNull(formID)) {
+                    //     COMMON.errMsg($('.errMsg-form'), '请选择表单!');
+                    //     return false;
+                    // }
+                    // $('.errMsg-form').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+
+                    var equipmentId = $("#equipmentId").val();
+                    if (equipmentId == null || equipmentId == undefined || equipmentId == '') {
+                        equipmentId = 0;
+                    }
+                    $.ajax({
+                        url: "/equipment/saveEquipment.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: equipmentId,
+                            code: code,
+                            equipmentTypeId: category,
+                            name: name,
+                            place: addr,
+                            brand: brand,
+                            status: state,
+                            model: model,
+                            // formTypeId: formID,
+                            fieldStr: fieldStr
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-form'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/data/machine.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-form'), '新增失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

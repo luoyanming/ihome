@@ -1,0 +1,157 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>数据录入记录--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/proprietor.html" class="button-link">业主管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看房间</a>
+    </article>
+
+    <div class="tabnav clearfix">
+        <a href="/admin/data/proprietor/detail/baseinfo.html?id=$!roomId" class="tabnav-item">基本信息</a>
+        <a href="/admin/data/proprietor/detail/repair.html?id=$!roomId" class="tabnav-item">报修记录</a>
+        <a href="/admin/data/proprietor/detail/payment.html?id=$!roomId" class="tabnav-item">缴费记录</a>
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">数据录入记录</a>
+        <a href="/admin/data/proprietor/detail/visitor.html?id=$!roomId" class="tabnav-item">访客记录</a>
+    </div>
+
+    <div style="padding: 0 50px;">
+        <form action="/admin/data/proprietor/detail/dataentry.html" method="post">
+            <article class="form-condition">
+                <input type="hidden" name="id" value="$!roomId" class="input-hidden">
+                <div class="condition-group clearfix">
+                    <div class="title">类型</div>
+                    <div class="select-box clearfix">
+                        <div class="select-primary select-small" id="">
+                            <input type="hidden" name="enterType" class="input-hidden" value="$!enterType">
+                            <span class="select-placeholder">#if($!enterType) $!enterTypeFormat #else 全部 #end</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">全部</li>
+                                    <li data-value="1" #if($!enterType eq 1) class="selected" #end>电表</li>
+                                    <li data-value="2" #if($!enterType eq 2) class="selected" #end>水表</li>
+                                    <li data-value="3" #if($!enterType eq 3) class="selected" #end>燃气表</li>
+                                    <li data-value="4" #if($!enterType eq 4) class="selected" #end>空调表</li>
+                                    <li data-value="5" #if($!enterType eq 5) class="selected" #end>暖气表</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>全部</option>
+                                <option value="1" #if($!enterType eq 1) checked #end>电表</option>
+                                <option value="2" #if($!enterType eq 2) checked #end>水表</option>
+                                <option value="3" #if($!enterType eq 3) checked #end>燃气表</option>
+                                <option value="4" #if($!enterType eq 4) checked #end>空调表</option>
+                                <option value="5" #if($!enterType eq 5) checked #end>暖气表</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">提交日期&nbsp;&nbsp;</div>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar"
+                               value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                    </div>
+                    <span class="text"> - </span>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                               placeholder="xxxx年xx月xx日">
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="search-box clearfix">
+                        <input type="submit" value="搜索" class="button-search btn-search"/>
+                    </div>
+                </div>
+            </article>
+        </form>
+
+        <article class="" style="margin-top: 20px;">
+            <div class="table-wrapper">
+                #if($list && $list.size()>0)
+                    <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>录入日期</th>
+                            <th>读数</th>
+                           #* <th>操作</th>*#
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            #foreach($task in $!list)
+                            <tr>
+                                <td>$!task.taskName</td>
+                                <td>$!task.enterTypeFormat</td>
+                                <td>$!DateUtils.formatTimeYMDHM($!task.taskRoomData.createdDate)</td>
+                                <td>$!task.taskRoomData.currentData</td>
+                                #*<td><a href="/admin/charge/form/detail.html?id=$!{chargeBill.id}"
+                                       class="button-link button-link-small">查看</a></td>*#
+                            </tr>
+                            #end
+                       #*
+                        <tr>
+                            <td>2016/12/02燃气录入任务</td>
+                            <td>燃气表</td>
+                            <td>2016/10/23</td>
+                            <td>423.1</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>*#
+                        </tbody>
+                    </table>
+                #else
+                    <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                        <div class="table-nodata"><p>暂无录入记录</p></div>
+                    </div>
+                #end
+            </div>
+            #parse("/layout/pagination.vm")
+        </article>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        DATA.init();
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/proprietor/detail/dataentry.html?id=$!roomId',
+                {
+                    enterType: '$!enterType',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

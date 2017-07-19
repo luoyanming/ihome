@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<tools xhtml="true">
+    <toolbox scope="application">
+        <tool key="StringUtils" class="org.apache.commons.lang.StringUtils"></tool>
+        <tool key="DateUtils" class="com.tianchuang.utils.date.DateUtils"></tool>
+        <tool key="NumberUtils" class="com.tianchuang.utils.NumberUtils"></tool>
+    </toolbox>
+</tools>

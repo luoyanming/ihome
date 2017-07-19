@@ -1,0 +1,104 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>入驻申请--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/boss/layout/header.vm")
+#parse("/boss/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">入驻申请</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>项目名称</th>
+                        <th>项目地址</th>
+                        <th>法人</th>
+                        <th>手机号</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($project in $list)
+                        <tr>
+                            <td>$!project.projectName</td>
+                            <td>$!project.projectAddress</td>
+                            <td>$!project.name</td>
+                            <td>$!project.mobile</td>
+                            <td>
+                                #if($!project.status lt 1)
+                                    <a href="/boss/signup/detail.html?id=$!project.id"
+                                       class="button-link button-boss-link button-link-small">审批</a>
+                                #else
+                                    &nbsp;
+                                #end
+                            </td>
+
+                        </tr>
+                        #end
+                    #*<tr>
+                        <td>某某项目</td>
+                        <td>某某地点</td>
+                        <td>张某某</td>
+                        <td>13575458744</td>
+                        <td>
+                            <a href="/boss/signup/detail.html" class="button-link button-boss-link button-link-small">审批</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>某某项目</td>
+                        <td>某某地点</td>
+                        <td>张某某</td>
+                        <td>13575458744</td>
+                        <td>
+                            <a href="/boss/signup/detail.html" class="button-link button-boss-link button-link-small">审批</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>某某项目</td>
+                        <td>某某地点</td>
+                        <td>张某某</td>
+                        <td>13575458744</td>
+                        <td>
+                            <a href="/boss/signup/detail.html" class="button-link button-boss-link button-link-small">审批</a>
+                        </td>
+                    </tr>*#
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无入住申请</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/boss/layout/pagination.vm")
+    </article>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/boss/signup.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

@@ -1,0 +1,343 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看收费单--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/charge.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+	##  当且仅当还有用户没有缴费时显示编辑按钮
+		#if($!{detailVo.totalCount} gt $!{detailVo.paidCount})
+            <div class="operate-group" style="float: right;">
+                <a href="/admin/charge/form/edit.html?id=$!{detailVo.id}" class="button-primary-able button-grey"
+                   style="display: inline-block; margin: 0 26px 0 0;">编辑</a>
+            </div>
+		#end
+        <a href="/admin/charge.html" class="button-link">收费</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看收费单</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!detailVo.name</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!detailVo.chargeType.name</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">收费标准</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">
+                        ¥ $!{detailVo.chargeType.feesDesc}/$!{detailVo.chargeType.unitsDesc}</div>
+                </div>
+            </div>
+			#if($!detailVo.type eq 2)
+			## 关联数据录入,显示关联任务
+                <div class="form-group clearfix">
+                    <div class="group-title">数据录入任务</div>
+                    <div class="group-item" style="padding: 6px 0;">
+						#foreach($taskName in $!detailVo.taskNameList)
+                            <div class="input-item-text"
+                                 style="display:block; margin-left: 0; line-height: 28px;">$!taskName</div>
+						#end
+                    </div>
+                </div>
+			#end
+
+            <div class="form-group clearfix">
+                <div class="group-title">应缴</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!{detailVo.totalCount}户/￥$!{detailVo.totalFees}</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">实缴</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!{detailVo.paidCount}
+                        户/￥ #if($detailVo.paidFees)$!{detailVo.paidFees} #else 0.00 #end</div>
+                </div>
+            </div>
+			#if($!detailVo.type eq 2)
+			## 关联数据录入
+				#if(${detailVo.unpayItems} && ${detailVo.unpayItems.size()} gt 0)
+                    <div class="form-group clearfix">
+                        <div class="group-title">未缴清单</div>
+                        <div class="group-item">
+                            <div class="table-wrapper table-wrapper-nobg">
+                                <table cellpadding="0" cellspacing="0" width="100%"
+                                       class="table-primary table-primary-small table-noborder" id="table-payment-no">
+                                    <thead>
+                                    <tr>
+                                        <th>房间</th>
+                                        <th>本期读数</th>
+                                        <th>上期读数</th>
+                                        <th>用量</th>
+                                        <th>金额</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+										#foreach($billItem in $!{detailVo.unpayItems})
+                                        <tr data-id="$!billItem.id" data-fees="$!billItem.fees">
+                                            <td><a href="javascript:void(0);"
+                                                   class="button-link button-link-small">$!{billItem.buildingName}$!{billItem.buildingCellName}$!{billItem.buildingUnitName}$!{billItem.roomNum}</a>
+                                            </td>
+                                            <td>$!billItem.currentData</td>
+                                            <td>$!billItem.lastData</td>
+                                            <td>$!billItem.dosageData</td>
+                                            <td>$!billItem.fees</td>
+                                            <td><a href="javascript:void(0);"
+                                                   class="button-link button-link-small btn-pay">线下缴费</a></td>
+                                        </tr>
+										#end
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+				#end
+				#if(${detailVo.paidItems} && ${detailVo.paidItems.size()} gt 0)
+                    <div class="form-group clearfix">
+                        <div class="group-title">已缴清单</div>
+                        <div class="group-item">
+                            <div class="table-wrapper table-wrapper-nobg">
+                                <table cellpadding="0" cellspacing="0" width="100%"
+                                       class="table-primary table-primary-small table-noborder">
+                                    <thead>
+                                    <tr>
+                                        <th>房间</th>
+                                        <th>本期读数</th>
+                                        <th>上期读数</th>
+                                        <th>用量</th>
+                                        <th>金额</th>
+                                        <th>实缴</th>
+                                        <th>线下缴费</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+										#foreach($billItem in $!{detailVo.paidItems})
+                                        <tr data-id="$!billItem.id">
+                                            <td><a href="javascript:void(0);"
+                                                   class="button-link button-link-small">$!{billItem.buildingName}$!{billItem.buildingCellName}$!{billItem.buildingUnitName}$!{billItem.roomNum}</a>
+                                            </td>
+                                            <td>$!billItem.currentData</td>
+                                            <td>$!billItem.lastData</td>
+                                            <td>$!billItem.dosageData</td>
+                                            <td>$!billItem.fees</td>
+                                            <td>$!billItem.cashFees</td>
+                                            <td class="state state-already">#if($!billItem.payStatus eq 2) 是 #else 否 #end</td>
+                                        </tr>
+										#end
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+				#end
+			#else
+			## 普通收费
+				#if(${detailVo.unpayItems} && ${detailVo.unpayItems.size()} gt 0)
+                    <div class="form-group clearfix">
+                        <div class="group-title">未缴清单</div>
+                        <div class="group-item">
+                            <div class="table-wrapper table-wrapper-nobg">
+                                <table cellpadding="0" cellspacing="0" width="100%"
+                                       class="table-primary table-primary-small table-noborder" id="table-payment-no">
+                                    <thead>
+                                    <tr>
+                                        <th>房间</th>
+                                        <th>金额</th>
+                                        <th>说明</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+										#foreach($billItem in $!{detailVo.unpayItems})
+                                        <tr data-id="$!billItem.id" data-fees="$!billItem.fees">
+                                            <td><a href="javascript:void(0);"
+                                                   class="button-link button-link-small">$!{billItem.buildingName}$!{billItem.buildingCellName}$!{billItem.buildingUnitName}$!{billItem.roomNum}</a>
+                                            </td>
+                                            <td>$!billItem.fees</td>
+                                            <td>$!billItem.description</td>
+                                            <td><a href="javascript:void(0);"
+                                                   class="button-link button-link-small btn-pay">线下缴费</a></td>
+                                        </tr>
+										#end
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+				#end
+
+				#if(${detailVo.paidItems} && ${detailVo.paidItems.size()} gt 0)
+                    <div class="form-group clearfix">
+                        <div class="group-title">已缴清单</div>
+                        <div class="group-item">
+                            <div class="table-wrapper table-wrapper-nobg">
+                                <table cellpadding="0" cellspacing="0" width="100%"
+                                       class="table-primary table-primary-small table-noborder">
+                                    <thead>
+                                    <tr>
+                                        <th>房间</th>
+                                        <th>金额</th>
+                                        <th>实缴</th>
+                                        <th>说明</th>
+                                        <th>线下缴费</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+										#foreach($billItem in $!{detailVo.paidItems})
+                                        <tr data-id="$!billItem.id">
+                                            <td><a href="javascript:void(0);"
+                                                   class="button-link button-link-small">$!{billItem.buildingName}$!{billItem.buildingCellName}$!{billItem.buildingUnitName}$!{billItem.roomNum}</a>
+                                            </td>
+                                            <td>$!billItem.fees</td>
+                                            <td>$!billItem.cashFees</td>
+                                            <td>$!billItem.description</td>
+                                            <td class="state state-already">#if($!billItem.payStatus eq 2) 是 #else 否 #end</td>
+                                        </tr>
+										#end
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+				#end
+			#end
+        </div>
+    </form>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="payment-modal">
+    <div class="modal-header">
+        <h1>线下缴费</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content light-overscroll">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">应缴</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="price-pay">¥ 0</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">实缴</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 260px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-actual" placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-actual"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var tablePaymentNo = $('#table-payment-no'),
+                modalMask = $('.modal-mask'),
+                paymentModal = $('#payment-modal'),
+                paymentModalTitle = paymentModal.find('.modal-header h1'),
+                pricePay = $('#price-pay'),
+                inputActual = $('#input-actual'),
+                btnModalSubmit = $('.btn-modal-submit');
+
+        var CHARGE = {
+            init: function () {
+                CHARGE.btnPayBind();
+
+                CHARGE.btnModalSubmitBind();
+            },
+            btnPayBind: function () {
+                var btnPay = tablePaymentNo.find('.btn-pay');
+
+                btnPay.on('click', function () {
+                    paymentModalTitle.attr('data-id', $(this).parent().parent().attr('data-id'));
+
+                    pricePay.html('￥ ' + $(this).parent().parent().attr('data-fees'));
+                    inputActual.val('');
+                    $('.errMsg-actual').html('');
+
+                    modalMask.fadeIn(200);
+                    paymentModal.fadeIn(200);
+                });
+            },
+            btnModalSubmitBind: function () {
+                btnModalSubmit.on('click', function () {
+                    var id = paymentModalTitle.attr('data-id'),
+                            actual = inputActual.val();
+
+                    if (btnModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-actual').html('');
+
+                    if (!COMMON.checkNull(actual)) {
+                        COMMON.errMsg($('.errMsg-actual'), '请输入实缴金额!');
+                        return false;
+                    }
+                    $('.errMsg-actual').html('');
+
+                    btnModalSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/charge/pay/offline.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: id,
+                            actual: actual
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-actual'), data.msg);
+                                btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-actual'), '保存失败，请重试！');
+                            btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+        CHARGE.init();
+    });
+</script>
+#end

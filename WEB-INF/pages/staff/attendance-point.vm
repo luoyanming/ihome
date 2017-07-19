@@ -1,0 +1,238 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>考勤点管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="javascript:void(0);" class="button-link button-download"
+               style="margin: 0 26px 0 0; color: #218adb;">二维码批量下载</a>
+            <a href="javascript:void(0);" class="button-link button-add" style="margin: 0 26px 0 0; color: #218adb;"
+               id="btn-add-attendance">新建考勤点</a>
+        </div>
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="/admin/staff/attendance.html" class="button-link">考勤管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">考勤点管理</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-attendance">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>说明</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($attendancePlace in $list)
+                        <tr data-id="$!attendancePlace.id" data-url="/attachment/viewImg.html?attachmentId=$!attendancePlace.qrcode">
+                            <td>$!attendancePlace.name</td>
+                            <td>$!attendancePlace.explains</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="javascript:void(0);"
+                                   class="button-link button-link-small" onclick="javascript: COMMON.createConfirmation('/attendance/deleteAttendancePlace.html?id=$!attendancePlace.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                            </td>
+                        </tr>
+                        #end
+                    #*<tr>
+                        <td>某某点一</td>
+                        <td>说明文字说明文字</td>
+                        <td>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="javascript:void(0);" class="button-link button-link-small">删除</a>
+                        </td>
+                    </tr>*#
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无考勤点信息</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="attendance-modal">
+    <div class="modal-header">
+        <h1>新建考勤点</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入考勤点名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">位置</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-intro"
+                               placeholder="请输入考勤点位置">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-intro"></p>
+                    <a href="javascript:void(0);" class="button-link button-download"
+                       id="btn-modal-code-download" target="_blank">二维码下载</a>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var tableAttendance = $('#table-attendance'),
+                btnAdd = $('#btn-add-attendance'),
+                btnEdit = tableAttendance.find('tbody .btn-edit');
+
+        var modalMask = $('.modal-mask'),
+                attendanceModal = $('#attendance-modal'),
+                modalTitle = attendanceModal.find('.modal-header h1'),
+                inputModalName = $('#input-modal-name'),
+                inputModalIntro = $('#input-modal-intro'),
+                btnModalSubmit = $('.btn-modal-submit'),
+                btnModalCodeDownload = $('#btn-modal-code-download');
+
+
+        var STAFF = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+
+                STAFF.btnAddEditBind();
+
+                STAFF.btnModalSubmitBind();
+            },
+            btnAddEditBind: function () {
+                btnAdd.on('click', function () {
+                    STAFF.showAttendanceModal('add', undefined, undefined);
+                });
+
+                btnEdit.on('click', function () {
+                    STAFF.showAttendanceModal('edit', $(this), $(this).parent().parent().index());
+                });
+            },
+            showAttendanceModal: function (operate, obj, index) {
+                $('.errMsg-modal-name').html('');
+                $('.errMsg-modal-intro').html('');
+
+                if (operate == 'add') {
+                    modalTitle.html('新建考勤点').attr('data-index', '');
+                    modalTitle.attr('data-id', '');
+                    inputModalName.val('');
+                    inputModalIntro.val('');
+                    btnModalCodeDownload.hide();
+                } else if (operate == 'edit') {
+                    modalTitle.html('编辑考勤点').attr('data-index', index);
+                    modalTitle.attr('data-id', obj.parent().parent().attr('data-id'));
+
+                    var currTR = obj.parent().parent();
+                    inputModalName.val(currTR.find('td').eq(0).html());
+                    inputModalIntro.val(currTR.find('td').eq(1).html());
+
+                    btnModalCodeDownload.attr('href', obj.parent().parent().attr('data-url')).show();
+                }
+
+                modalMask.fadeIn(200);
+                attendanceModal.fadeIn(200);
+            },
+            btnModalSubmitBind: function () {
+                btnModalSubmit.on('click', function () {
+                    var inputModalNameVal = inputModalName.val(),
+                            inputModalIntroVal = inputModalIntro.val();
+
+                    if (btnModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-name').html('');
+                    $('.errMsg-modal-intro').html('');
+
+                    if (!COMMON.checkNull(inputModalNameVal)) {
+                        COMMON.errMsg($('.errMsg-modal-name'), '请输入考勤点名称');
+                        return false;
+                    }
+                    $('.errMsg-modal-name').html('');
+
+                    if (!COMMON.checkNull(inputModalIntroVal)) {
+                        COMMON.errMsg($('.errMsg-modal-intro'), '请输入考勤点说明');
+                        return false;
+                    }
+                    $('.errMsg-modal-intro').html('');
+
+                    btnModalSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/attendance/saveAttendancePlace.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: modalTitle.attr('data-id'),
+                            name: inputModalNameVal,
+                            explains: inputModalIntroVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-intro'), data.msg);
+                                btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-intro'), '保存失败，请重试！');
+                            btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+
+        STAFF.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/staff/attendance/point.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

@@ -1,0 +1,157 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>数据统计--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="javascript:void(0);" class="button-link button-link-disable">今日数据</a>
+    </article>
+    <div class="dataStatistics-container">
+        <div class="top-content">
+            <div class="left-content">
+                <div class="fs14 common-text">今日进账</div>
+                <div class="clearfix">
+                    <div class="pull-left fs36">¥ $!todayIncome<a href="statistics/income.html" class="pull-right" style="margin-left: 75px;">查看详细</a></div>
+                </div>
+            </div>
+            <div class="right-content">
+                <div class="fs14 common-text pull-left">今日任务</div>
+                <div class="flex-a pull-left">
+                    <div class="text-center">
+                        <div class="fs36 col-333">$!needToBeDone</div>
+                        <div class="fs14 common-text">已安排</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs36 col-green">$!processing</div>
+                        <div class="fs14 common-text">进行中</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs36 col-orange">$!done</div>
+                        <div class="fs14 common-text">已完成</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs36 col-red">$!warn</div>
+                        <div class="fs14 common-text">告警</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">今日其他数据</div>
+            <div id="canvas" style="width:100%;height: 450px;"></div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			STATISTICS.getData();
+		},
+		getData: function() {
+			 $.ajax({
+	             url: "/statistics/index.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.chartBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		chartBind: function(arr) {
+			var myChart = echarts.init(document.getElementById('canvas'));
+		    var option = {
+		        xAxis : [
+		            {
+		                type : 'category',
+		                data : ["业主访问数", "员工访问数", "报修数", "投诉数", "内部报事数", "访客数"],
+		                axisLabel: {
+		                    show: true,
+		                    textStyle: {
+		                        color: '#888'  //X轴字体颜色
+		                    }
+		                },
+		                axisLine: {
+		                    show: true,
+		                    lineStyle:{
+		                        color:'#8C8C8C'  //X轴颜色
+		                    }
+		                },
+		                splitLine : {
+		                    show:false  //无横向分割线
+		                }
+		            }
+		        ],
+		        color:['rgba(80,172,252,0.80)','rgba(80,172,252,0.80)','rgba(80,172,252,0.80)','rgba(80,172,252,0.80)','rgba(80,172,252,0.80)','rgba(80,172,252,0.80)'],
+		        yAxis: {       //直角坐标系 grid 中的 y 轴
+		            type: 'value',
+		            axisLine: {
+		                show: false
+		            },
+		            splitLine : {
+		                show:true,
+		                lineStyle: {
+		                    color: '#DEDEDE',
+		                    type: 'dashed',
+		                    width: 1
+		                }
+		            },
+		            axisLabel: {
+		                show : true,
+		                textStyle: {
+		                    color: '#888'  //Y轴字体颜色
+		                }
+		            }
+		        },
+		        tooltip: {
+		            show : true
+		        },
+		        series : [
+		            {
+		                type:'bar',
+		                data: arr,
+		                barWidth:'60',
+		                itemStyle: {
+		                    normal: {
+		                        label: {
+		                            show: true,
+		                            position: 'top',
+		                            formatter: '{c}',
+		                            textStyle: {
+		                                color: '#666'
+		                            }
+		                        }
+		                    }
+		                }
+		            }
+		        ]
+		    };
+		    myChart.setOption(option);
+		}
+	};
+
+	STATISTICS.init();
+});
+</script>
+#end

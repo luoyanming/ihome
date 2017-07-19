@@ -1,0 +1,113 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>满意度调查--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/satisfaction.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">满意度调查</a>
+    </article>
+
+    <form action="" method="post">
+        <article class="form-condition">
+            <div class="operate-group">
+                <a href="/admin/satisfaction/create.html" class="button-link button-add">发布调查</a>
+            </div>
+            
+            <div class="condition-group clearfix">
+                <div class="title">标题&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" placeholder="请输入标题" class="input-primary input-x-small" value="$!paramTitle" name="paramTitle">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">发布日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramStartDate" value="$!{paramStartDate}" placeholder="xxxx年xx月xx日">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramEndDate" value="$!{paramEndDate}" placeholder="xxxx年xx月xx日">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+			
+			
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>反馈数</th>
+                        <th>有效期</th>
+                        <th>发布时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+					#foreach($item in $list)
+                    <tr>
+                        <td>$!item.eiqVo.title</td>
+                        <td>$!item.count</td>
+                        <td>$!DateUtils.formatTimeInSecond($item.eiqVo.startDate) - $!DateUtils.formatTimeInSecond($item.eiqVo.endDate)</td>
+                        <td>$!DateUtils.formatTimesInSecond($!item.eiqVo.createdDate)</td>
+                        <td><a href="/admin/satisfaction/detail.html?eiqId=$!item.eiqVo.id" class="button-link button-link-small">查看</a></td>
+                    </tr>
+					#end
+                </tbody>
+            </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无调查问卷</p></div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var SATISFACTION = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        SATISFACTION.init();
+    });
+	//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/satisfaction.html',
+                {
+                    paramTitle: '$!paramTitle',
+                    paramStartDate: '$!paramStartDate',
+                    paramEndDate: '$!paramEndDate',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

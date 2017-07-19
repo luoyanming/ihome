@@ -1,0 +1,147 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>发布通知--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/notification.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/notification.html" class="button-link">通知</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">发布通知</a>
+    </article>
+
+    <form action="" method="get" class="form-main" style="margin-top: 20px;">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入通知公告名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-category" data-text="">
+                        <label>
+                            <input name="notification" type="radio" value="2"/>
+                            <p class="radio-text">管理通知</p>
+                        </label>
+                        <label>
+                            <input name="notification" type="radio" value="1"/>
+                            <p class="radio-text">通知公告</p>
+                        </label>
+                    </div>
+                    <div class="errMsg errMsg-category"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">内容</div>
+                <div class="group-item">
+                    <textarea class="textarea-primary" placeholder="请输入通知公告内容" id="input-description"
+                              style="height: 300px;"></textarea>
+                    <div class="errMsg errMsg-description"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                       style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+                    <a href="/admin/notification.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var inputName = $('#input-name'),
+                radioCategory = $('#radio-category'),
+                inputDescription = $('#input-description'),
+                btnSubmit = $('.btn-submit');
+
+        var NOTIFICATION = {
+            init: function () {
+                NOTIFICATION.btnSubmitBind();
+            },
+            btnSubmitBind: function () {
+                btnSubmit.on('click', function () {
+                    var inputNameVal = inputName.val(),
+                            radioCategoryVal = radioCategory.find('input[name="notification"]:checked').val(),
+                            inputDescriptionVal = inputDescription.val();
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+                    $('.errMsg-category').html('');
+                    $('.errMsg-description').html('');
+
+                    if (!COMMON.checkNull(inputNameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入通知公告名称!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if (!COMMON.checkNull(radioCategoryVal)) {
+                        COMMON.errMsg($('.errMsg-category'), '请选择类型!');
+                        return false;
+                    }
+                    $('.errMsg-category').html('');
+
+                    if (!COMMON.checkNull(inputDescriptionVal)) {
+                        COMMON.errMsg($('.errMsg-description'), '请输入通知公告内容!');
+                        return false;
+                    }
+                    $('.errMsg-description').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+
+                    $.ajax({
+                        url: "/notification/publish.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            title: inputNameVal,
+                            type: radioCategoryVal,
+                            content: inputDescriptionVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-description'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/notification.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-description'), '创建失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            }
+        };
+
+        NOTIFICATION.init();
+    });
+</script>
+#end

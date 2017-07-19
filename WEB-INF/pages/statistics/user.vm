@@ -1,0 +1,393 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>用户--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">用户</a>
+    </article>
+
+    <div class="user-container">
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日访问用户数</div>
+                <div class="fs14 col-999">(业主+员工)</div>
+                <div class="clearfix">
+                    <div class="pull-left left-container">
+                        <div class="fs24" style="margin-top: 35px">$!todayCount</div>
+                        <div class="fs14">更新时间：$!currentTime</div>
+                    </div>
+                    <div class="pull-left" id="line"></div>
+                </div>
+            </div>
+            <div class="right-content pull-right">
+                <div class="fs14 common-text">昨日访问用户数</div>
+                <div class="fs14 col-999">(业主+员工)</div>
+                <div class="fs24">$!yesterdayCount</div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">明细记录</div>
+            <form action="" method="get">
+                <article class="form-condition">
+                    <div class="condition-group clearfix">
+                        <div class="title">用户类型</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="typeId" style="min-width: 120px;">
+                                <input type="hidden" name="typeId" value="$!typeId" class="input-hidden">
+											<span class="select-placeholder">
+											#if($!typeId eq 1)
+												业主
+											#elseif($!typeId eq 2)
+												员工
+											#else
+												全部
+											#end
+										</span>
+								
+								
+								
+								
+								<div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!typeId eq 0)class="selected"#end>全部</li>
+                                        <li data-value="1"#if($!typeId eq 1)class="selected"#end>业主</li>
+                                        <li data-value="2"#if($!typeId eq 2)class="selected"#end>员工</li>
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    <option value="0" #if($!typeId eq 0)selected#end>全部</option>
+                                    <option value="1"#if($!typeId eq 1)selected#end>业主</option>
+                                    <option value="2"#if($!typeId eq 2)selected#end>员工</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">收费时间&nbsp;&nbsp;</div>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStartInt" value="$!createdDateStartInt" placeholder="xxxx年xx月xx日">
+                        </div>
+                        <span class="text"> - </span>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEndInt" value="$!createdDateEndInt" placeholder="xxxx年xx月xx日">
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="bottom-detail clearfix">
+                <div class="lines" id="lines"></div>
+                <article class="">
+                    <div class="table-wrapper">
+								#if($result && $result.size()>0)
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                            <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>用户类型</th>
+                                <th>访问用户数</th>
+                                <th>访问次数</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+								#foreach($item in $result)
+                            <tr>
+                                <td>$item.date</td>
+                                <td>#if($typeId eq 1)业主
+									#elseif($typeId eq 2)员工
+									#else 全部
+									#end							
+								</td>
+                                <td>$item.userNumber</td>
+                                <td>$item.checkingInNumber</td>
+                            </tr>
+							#end
+                            </tbody>
+                        </table>
+						#else
+						<div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无数据</p></div>
+							#end
+                    </div>
+					#parse("/layout/pagination.vm")
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+
+			STATISTICS.getUserData();
+			STATISTICS.getBalanceData();
+		},
+		getUserData: function() {
+			 $.ajax({
+	             url: "/checking/todayStatisticsList.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.userChartBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		getBalanceData: function() {
+			 $.ajax({
+	             url: "/checking/checkingStatisticsList.html",
+	             dataType:"json",
+	             type:"post",
+	             data: {
+	                typeId: '$!typeId',
+                    createdDateStartInt: '$!createdDateStartInt',
+                    createdDateEndInt: '$!createdDateEndInt'
+	             },
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var balanceChartArr1 = data.data.userNumber,balanceChartArr2 = data.data.checkingInNumber,balanceChartArr3 = data.data.dateNum;
+	            		STATISTICS.balanceChartBind(balanceChartArr1, balanceChartArr2,balanceChartArr3);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		userChartBind: function(uArr) {
+			var myChart = echarts.init(document.getElementById('line'));
+
+	        var timeDate = [];
+	        var j;
+	        for(var i = 1; i<25; i++){
+	            if(i<10){
+	                j = "0"+i+":00";
+	            } else {
+	                j = i+":00";
+	            }
+	            timeDate.push(j);
+
+	        }
+
+	        //参数设置
+
+	        option = {
+	            tooltip: {    //提示框组件
+	                trigger: 'axis', //鼠标跟随可以显示不同时刻的状态
+	                axisPointer :{
+	                    type: "none"   //没有指示线
+	                }
+	            },
+	            grid:{
+	                x:'80',
+	                y:'20',
+	                y2:'80',
+	                x2:'40'
+	            },
+	            xAxis: {       //直角坐标系 grid 中的 x 轴
+	                axisLabel: {
+	                    show: true,
+	                    rotate : 40,  //文字倾斜
+	                    textStyle: {
+	                        color: '#888'  //X轴字体颜色
+	                    }
+	                },
+	                axisLine: {
+	                    show: true,
+	                    lineStyle:{
+	                        color:'#8C8C8C'  //X轴颜色
+	                    }
+	                },
+	                splitLine : {
+	                    show:false  //无横向分割线
+	                },
+	                data: timeDate
+	            },
+	            yAxis: {       //直角坐标系 grid 中的 y 轴
+	                type: 'value',
+	                axisLine: {
+	                    show: false
+	                },
+	                splitLine : {
+	                    show:true,
+	                    lineStyle: {
+	                        color: '#DEDEDE',
+	                        type: 'dashed',
+	                        width: 1
+	                    }
+	                },
+	                axisLabel: {
+	                    show : true,
+	                    textStyle: {
+	                        color: '#888'  //Y轴字体颜色
+	                    }
+	                }
+	            },
+	            series: [      //系列列表
+	                {
+	                    type: 'line',
+	                    name : "访问数",
+	                    itemStyle : {
+	                        normal : {
+	                            color:'#51ADFD',  //交汇远点颜色
+	                            lineStyle:{
+	                                color:'rgba(80,171,253,0.40)',  //折线颜色
+	                                width:3
+	                            }
+	                        }
+	                    },
+	                    data: uArr
+	                }
+	            ]
+	        };
+	        myChart.setOption(option);   //参数设置方法
+		},
+		balanceChartBind: function(bArr1, bArr2 , bArr3) {
+			var myChart = echarts.init(document.getElementById('lines'));
+	        var dateNum = [];
+	        var d;
+	        for(var i = 0; i<bArr3.length; i++){
+	            dateNum.push(bArr3[i]);
+	        }
+	        var linesOption = {
+	            tooltip : {
+	                trigger: 'item',
+	                axisPointer :{
+	                    type: "none"   //没有指示线
+	                }
+	            },
+	            legend: {
+	                data:['访问用户数','访问次数'],
+	                x:'right'
+	            },
+	            calculable : true,
+	            xAxis : [
+	                {
+	                    type : 'category',
+	                    boundaryGap : false,
+	                    data : dateNum,
+	                    axisLabel: {
+	                        show: true,
+	                        rotate : 40,  //文字倾斜
+	                        textStyle: {
+	                            color: '#888'  //X轴字体颜色
+	                        }
+	                    },
+	                    axisLine: {
+	                        show: true,
+	                        lineStyle:{
+	                            color:'#8C8C8C'  //X轴颜色
+	                        }
+	                    },
+	                    splitLine : {
+	                        show:false  //无横向分割线
+	                    }
+	                }
+	            ],
+
+	            yAxis : [
+	                {
+	                    type : 'value',
+	                    axisLine: {
+	                        show: false
+	                    },
+	                    splitLine : {
+	                        show:true,
+	                        lineStyle: {
+	                            color: '#DEDEDE',
+	                            type: 'dotted',
+	                            width: 1
+	                        }
+	                    },
+	                    axisLabel: {
+	                        show : true,
+	                        textStyle: {
+	                            color: '#888'  //Y轴字体颜色
+	                        }
+	                    }
+	                }
+	            ],
+	            series : [
+	                {
+	                    name:'访问用户数',
+	                    type:'line',
+	                    stack: '总量',
+	                    itemStyle : {
+	                        normal : {
+	                            color:'#51ADFD',  //交汇远点颜色
+	                            lineStyle:{
+	                                color:'rgba(80,171,253,0.40)',  //折线颜色
+	                                width:3
+	                            }
+	                        }
+	                    },
+	                    data: bArr1
+	                },
+	                {
+	                    name:'访问次数',
+	                    type:'line',
+	                    stack: '总量',
+	                    itemStyle : {
+	                        normal : {
+	                            color:'#FFA944',  //交汇远点颜色
+	                            lineStyle:{
+	                                color:'rgba(255,168,67,0.40)',  //折线颜色
+	                                width:3
+	                            }
+	                        }
+	                    },
+	                    data: bArr2
+	                }
+	            ]
+	        };
+	        myChart.setOption(linesOption);   //参数设置方法
+		}
+	};
+
+	STATISTICS.init();
+});
+
+//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/statistics/user.html',
+                {
+                    typeId: '$!typeId',
+                    createdDateStartInt: '$!createdDateStartInt',
+                    createdDateEndInt: '$!createdDateEndInt',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

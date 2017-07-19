@@ -1,0 +1,467 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>业主管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/attachment/template/download.html?fileName=owners.xlsx" class="button-link button-download" style="margin: 0 26px 0 0; color: #218adb;">模板下载</a>
+            <a href="/room/exportFile.html" class="button-link button-download" style="margin: 0 26px 0 0; color: #218adb;">数据下载</a>
+            <a href="javascript:void(0);" class="button-link button-upload" style="margin: 0 26px 0 0; color: #218adb;" id="btn-file-upload">数据导入</a>
+            <a href="/admin/data/proprietor/create.html" class="button-link button-add"
+               style="margin: 0 26px 0 0; color: #218adb;">添加业主</a>
+        </div>
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">业主管理</a>
+    </article>
+
+    <form action="/admin/data/proprietor.html" method="post">
+        <article class="form-condition">
+            <div class="condition-group clearfix">
+                <div class="title">房间</div>
+                <div class="select-box clearfix">
+                    #if($buildingId)
+                        <div class="select-primary select-small" id="buildingId">
+                            <input type="hidden" name="buildingId" value="$!buildingId" class="input-hidden">
+                            #if($!buildingId gt 0 )
+                                #foreach($!item in $!buildingList)
+                                    #if($!buildingId eq $!item.id)
+                                        <span class="select-placeholder">$!item.name</span>
+                                    #end
+                                #end
+                            #else
+                                <span class="select-placeholder">全部</span>
+                            #end
+
+
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" #if($!buildingId eq 0) class="selected" #end>全部</li>
+                                    #foreach($!item in $!buildingList)
+                                        <li data-value="$!item.id" #if($!buildingId eq $!item.id)
+                                            class="selected"#end>$!item.name</li>
+                                    #end
+                                </ul>
+                            </div>
+
+
+                            <select class="select-select">
+                                <option value="0" #if($!buildingId eq 0) selected #end>全部</option>
+                                #foreach($!item in $!buildingList)
+                                    <option value="$!item.id" #if($!buildingId eq $!item.id)
+                                            selected #end>$!item.name</option>
+                                #end
+                            </select>
+                        </div>
+
+                    #else
+                        <div class="select-primary select-small" id="buildingId">
+                            <input type="hidden" name="buildingId" value="$!buildingId" class="input-hidden">
+                            <span class="select-placeholder">全部</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" class="selected">全部</li>
+                                    #foreach($!item in $!buildingList)
+                                        <li data-value="$!item.id">$!item.name</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="0" selected>全部</option>
+                                #foreach($!item in $!buildingList)
+                                    <option value="$!item.id">$!item.name</option>
+                                #end
+                            </select>
+                        </div>
+                    #end
+
+                    #if($buildingCellId && $!buildingCellId gt 0)
+                        <div class="select-primary select-small" id="select-building">
+                            <input type="hidden" name="buildingCellId" value="$!buildingCellId" class="input-hidden">
+                            #foreach($!item in $!buildingCellList)
+                                #if($!buildingCellId eq $!item.value)
+                                    <span class="select-placeholder">$!item.name</span>
+                                #end
+                            #end
+
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" #if($!buildingCellId eq 0) class="selected" #end>全部</li>
+                                    #foreach($!item in $!buildingCellList)
+                                        <li data-value="$!item.value" #if($!buildingCellId eq $!item.value)
+                                            class="selected"#end>$!item.name</li>
+                                    #end
+                                </ul>
+                            </div>
+
+
+                            <select class="select-select">
+                                <option value="0" #if($!buildingCellId eq 0) selected #end>全部</option>
+                                #foreach($!item in $!buildingCellList)
+                                    <option value="$!item.value" #if($!buildingCellId eq $!item.value)
+                                            selected #end>$!item.name</option>
+                                #end
+                            </select>
+                        </div>
+
+                    #else
+                        <div class="select-primary select-small" id="select-building" style="display: none;">
+                        </div>
+                    #end
+
+                    #if($buildingUnitId && $!buildingUnitId gt 0)
+                        <div class="select-primary select-small" id="select-unit">
+                            <input type="hidden" name="buidingUnitId" value="$!buildingUnitId" class="input-hidden">
+                            #foreach($!item in $!buildingUnitList)
+                                #if($!buildingUnitId eq $!item.value)
+                                    <span class="select-placeholder">$!item.name</span>
+                                #end
+                            #end
+
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" #if($!buildingUnitId eq 0) class="selected" #end>全部</li>
+                                    #foreach($!item in $!buildingUnitList)
+                                        <li data-value="$!item.value" #if($!buildingUnitId eq $!item.value)
+                                            class="selected"#end>$!item.name</li>
+                                    #end
+                                </ul>
+                            </div>
+
+
+                            <select class="select-select">
+                                <option value="0" #if($!buildingUnitId eq 0) selected #end>全部</option>
+                                #foreach($!item in $!buildingUnitList)
+                                    <option value="$!item.value" #if($!buildingUnitId eq $!item.value)
+                                            selected #end>$!item.name</option>
+                                #end
+                            </select>
+                        </div>
+
+                    #else
+                        <div class="select-primary select-small" id="select-unit" style="display: none;">
+                        </div>
+                    #end
+
+                    #if($roomId && $!roomId gt 0)
+                        <div class="select-primary select-small" id="select-room">
+                            <input type="hidden" name="roomId" value="$!roomId" class="input-hidden">
+                            #foreach($!item in $!roomNumberList)
+                                #if($!roomId eq $!item.value)
+                                    <span class="select-placeholder">$!item.name</span>
+                                #end
+                            #end
+
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="0" #if($!roomId eq 0) class="selected" #end>全部</li>
+                                    #foreach($!item in $!roomNumberList)
+                                        <li data-value="$!item.value" #if($!roomId eq $!item.value)
+                                            class="selected"#end>$!item.name</li>
+                                    #end
+                                </ul>
+                            </div>
+
+
+                            <select class="select-select">
+                                <option value="0" #if($!roomId eq 0) selected #end>全部</option>
+                                #foreach($!item in $!roomNumberList)
+                                    <option value="$!item.value" #if($!roomId eq $!item.value)
+                                            selected #end>$!item.name</option>
+                                #end
+                            </select>
+                        </div>
+                    #else
+                        <div class="select-primary select-small" id="select-room" style="display: none;">
+                        </div>
+                    #end
+                </div>
+            </div>
+        #*<div class="condition-group clearfix">
+            <div class="title">车辆</div>
+            <div class="select-box clearfix">
+                <div class="select-primary select-small" id="">
+                    <input type="hidden" name="" class="input-hidden">
+                    <span class="select-placeholder">全部</span>
+                    <div class="select-options light-overscroll">
+                        <ul>
+                            <li data-value="" class="selected">全部</li>
+                            <li data-value="1">1辆</li>
+                            <li data-value="2">2辆</li>
+                        </ul>
+                    </div>
+                    <select class="select-select">
+                        <option value="" selected>全部</option>
+                        <option value="1">1辆</option>
+                        <option value="2">2辆</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="condition-group clearfix">
+            <div class="title">车位</div>
+            <div class="select-box clearfix">
+                <div class="select-primary select-small" id="">
+                    <input type="hidden" name="" class="input-hidden">
+                    <span class="select-placeholder">全部</span>
+                    <div class="select-options light-overscroll">
+                        <ul>
+                            <li data-value="" class="selected">全部</li>
+                            <li data-value="1">1个</li>
+                            <li data-value="2">2个</li>
+                        </ul>
+                    </div>
+                    <select class="select-select">
+                        <option value="" selected>全部</option>
+                        <option value="1">1个</option>
+                        <option value="2">2个</option>
+                    </select>
+                </div>
+            </div>
+        </div>*#
+            <div class="condition-group clearfix">
+                <div class="title">手机号&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" name="ownersMobile" value="$!{ownersMobile}" placeholder="请输入手机号"
+                               class="input-primary input-x-small">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">姓名&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" name="ownersName" value="$!{ownersName}" placeholder="请输入姓名"
+                               class="input-primary input-x-small">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size() gt 0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>分区</th>
+                        <th>楼宇</th>
+                        <th>单元</th>
+                        <th>房间号</th>
+                        <th>面积</th>
+                        <th>业主姓名</th>
+                        <th>手机号</th>
+                        <th>用户</th>
+                        <th>车辆</th>
+                        <th>车位</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($!proprietor in $list)
+                        <tr>
+                            <td>$!proprietor.buildingName</td>
+                            <td>$!proprietor.buildingCellName</td>
+                            <td>$!proprietor.buildingUnitName</td>
+                            <td>$!proprietor.roomNum</td>
+                            <td>$!proprietor.area</td>
+                            <td>$!proprietor.ownersName</td>
+                            <td>$!proprietor.ownersMobile</td>
+                            <td>$!proprietor.userCount</td>
+                            <td>$!proprietor.carCount</td>
+                            <td>$!proprietor.carportCount</td>
+                            <td>
+                                <a href="/admin/data/proprietor/detail/baseinfo.html?id=$!{proprietor.id}"
+                                   class="button-link button-link-small">查看</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                #if($!proprietor.used)
+                                    &nbsp;
+                                #else
+                                    <a href="javascript:void(0);" class="button-link button-link-small btn-del"
+                                       onclick="javascript: COMMON.createConfirmation('/room/deleteRoom.html?id=$!proprietor.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                                #end
+                            </td>
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无业主</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+                COMMON.selectBind($('#buildingId'), undefined);
+                COMMON.selectBind($('#select-building'), undefined);
+                COMMON.selectBind($('#select-unit'), undefined);
+                COMMON.selectBind($('#buildingId'), DATA.getSelectBuildingData);
+                COMMON.selectBind($('#select-building'), DATA.getSelectUnitData);
+                COMMON.selectBind($('#select-unit'), DATA.getSelectRoomData);
+                COMMON.fileUploadBind('/room/importExcel.html');
+            },
+            getSelectBuildingData: function (AID) {
+                $.ajax({
+                    url: "/charge/buildingCellList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingId: AID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="buildingCellId" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="0" class="selected">全部</li>';
+                            for (var i = 0; i < data.data.length; i++) {
+                                str += '<li data-value="' + data.data[i].value + '">' + data.data[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="0" selected>全部</option>';
+                            for (var j = 0; j < data.data.length; j++) {
+                                str += '<option value="' + data.data[j].value + '">' + data.data[j].name + '</option>';
+                            }
+                            str += '</select>';
+                            $('#select-building').html(str).show();
+                            $('#select-unit').html('').hide();
+                            $('#select-room').html('').hide();
+                            COMMON.selectBind($('#select-building'), DATA.getSelectUnitData);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            getSelectUnitData: function (BID) {
+                $.ajax({
+                    url: "/charge/buildingUnitList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingCellId: BID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="buildingUnitId" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="0" class="selected">全部</li>';
+                            for (var i = 0; i < data.data.length; i++) {
+                                str += '<li data-value="' + data.data[i].value + '">' + data.data[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="0" selected>全部</option>';
+                            for (var j = 0; j < data.data.length; j++) {
+                                str += '<option value="' + data.data[j].value + '">' + data.data[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            $('#select-unit').html(str).show();
+                            $('#select-room').html('').hide();
+                            COMMON.selectBind($('#select-unit'), DATA.getSelectRoomData);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            getSelectRoomData: function (UID) {
+                $.ajax({
+                    url: "/charge/buildingRoomNumberList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingUnitId: UID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="roomId" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="0" class="selected">全部</li>';
+                            for (var i = 0; i < data.data.length; i++) {
+                                str += '<li data-value="' + data.data[i].value + '">' + data.data[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="0" selected>全部</option>';
+                            for (var j = 0; j < data.data.length; j++) {
+                                str += '<option value="' + data.data[j].value + '">' + data.data[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            $('#select-room').html(str).show();
+                            COMMON.selectBind($('#select-room'), undefined);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        };
+
+        DATA.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/proprietor.html',
+                {
+                    buildingId: '$!buildingId',
+                    buildingCellId: '$!buildingCellId',
+                    buildingUnitId: '$!buildingUnitId',
+                    roomId: '$!roomId',
+                    ownersMobile: '$!ownersMobile',
+                    ownersName: '$!ownersName',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

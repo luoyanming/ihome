@@ -1,0 +1,19 @@
+<header class="header clearfix">
+    <a href="javascript:void(0);" class="btn-leftnav">
+        <span></span>
+        <span></span>
+        <span></span>
+    </a>
+    <div class="header-right clearfix">
+        <div class="warning">
+            #if($!validDay lt 15 )
+                您的项目授权即将于$!DateUtils.formatTimeInSecond($!validDate)到期，请及时联系续签，谢谢！
+            #end
+        </div>
+        <div class="userinfo">
+            <p class="button-link button-link-small link-disable user-name">$!propertyManager.mobile</p>
+            <a href="/admin/editPwd.html" class="button-link button-link-small btn-editPwd">修改资料</a>
+            <a href="/admin/logout.html" class="button-link button-link-small btn-logout">退出</a>
+        </div>
+    </div>
+</header>

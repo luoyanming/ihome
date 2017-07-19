@@ -1,0 +1,1767 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>创建常规任务--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/assignment.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/assignment.html" class="button-link">任务</a>
+        <span class="separate">|</span>
+        <a href="/admin/assignment/generally.html" class="button-link">常规任务</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">创建常规任务</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" id="assignmentID" value="$!task.id">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-assignment-name"
+                               placeholder="请输入任务名称" value="$!task.name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-assignment-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">种类</div>
+                <div class="group-item">
+                    #if($task.kind)
+                    ##	编辑
+                        <div class="radio-hidden-item" id="radio-category" data-text="$!task.kindFormat">
+                            <label>
+                                <input name="category" type="radio" value="$!task.kind" checked/>
+                                <p class="radio-text">$!task.kindFormat</p>
+                            </label>
+                        </div>
+                    #else
+                        <div class="radio-hidden-item" id="radio-category" data-text="">
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="1"/>
+                                <p class="radio-text">综合管理</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="2"/>
+                                <p class="radio-text">前台服务</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="3"/>
+                                <p class="radio-text">工程运行</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="4"/>
+                                <p class="radio-text">设备维修</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="5"/>
+                                <p class="radio-text">消防管理</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="6"/>
+                                <p class="radio-text">交通管理</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="7"/>
+                                <p class="radio-text">安全管理</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="8"/>
+                                <p class="radio-text">绿化服务</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="9"/>
+                                <p class="radio-text">保洁服务</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="10"/>
+                                <p class="radio-text">消杀服务</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="11"/>
+                                <p class="radio-text">会议服务</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="12"/>
+                                <p class="radio-text">特约服务</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="13"/>
+                                <p class="radio-text">数据录入</p>
+                            </label>
+                            <label style="margin-bottom: 10px;">
+                                <input name="category" type="radio" value="14"/>
+                                <p class="radio-text">其他</p>
+                            </label>
+                        </div>
+                    #end
+                    <div class="errMsg errMsg-category"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">频率</div>
+                <div class="group-item">
+                    #if($task.kind)
+                        <div class="input-item-text" style="margin-left: 0;">$!task.frequency天一次</div>
+                    #else
+                        <div class="radio-hidden-item" id="radio-frequency">
+                            <label>
+                                <input name="frequency" type="radio" value="1"/>
+                                <p class="radio-text">每日一次</p>
+                            </label>
+                            <label>
+                                <input name="frequency" type="radio" value="7"/>
+                                <p class="radio-text">每周一次</p>
+                            </label>
+                            <label>
+                                <input name="frequency" type="radio" value="14"/>
+                                <p class="radio-text">两周一次</p>
+                            </label>
+                            <label>
+                                <input name="frequency" type="radio" value="30"/>
+                                <p class="radio-text">每月一次</p>
+                            </label>
+                            <label>
+                                <input name="frequency" type="radio" value=""/>
+                                <p class="radio-text">每<input type="text" class="input-underline" placeholder="N">天一次
+                                </p>
+                            </label>
+                        </div>
+                    #end
+                ##	编辑
+                ##	<div class="input-item-text" style="margin-left: 0;">15天一次</div>
+
+                    <div class="errMsg errMsg-frequency"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">周六周日</div>
+                <div class="group-item">
+                <div class="radio-hidden-item" id="radio-week">
+                    #if($task.id)
+                        <label>
+                            <input name="week" type="radio" value="$!task.includeWeek" checked/>
+                            #if($!task.includeWeek eq 1)
+                                <p class="radio-text">包括</p>
+                            #else
+                                <p class="radio-text">不包括</p>
+                            #end
+                        </label>
+                    #else
+                        <label>
+                            <input name="week" type="radio" value="0"/>
+                            <p class="radio-text">不包括</p>
+                        </label>
+                        <label>
+                            <input name="week" type="radio" value="1"/>
+                            <p class="radio-text">包括</p>
+                        </label>
+                    </div>
+                        <div class="errMsg errMsg-week"></div>
+                    #end
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">开始日期</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-datepicker input-datepicker-long"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})"
+                               placeholder="xxxx年xx月xx日"
+                               id="input-date-start" value="$!task.startDate">
+                    </div>
+                    <div class="tips tips-grey">系统将从填写的日期开始，按指定的频率自动创建任务</div>
+
+                ##	编辑
+                ##	<div class="input-item-text" style="margin-left: 0;">2016-08-10</div>
+
+                    <div class="errMsg errMsg-date-start"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">执行时间</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'HH:mm'})" name=""
+                               placeholder="xx时xx分" id="input-date-implement" value="$!task.executeTime">
+                    </div>
+                    <div class="errMsg errMsg-date-implement"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">循环次数</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 72px;">
+                        <input type="text" class="input-primary input-small input-null" placeholder="N" id="input-loop"
+                               value="$!task.loopCount">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text">次</div>
+
+                ##	编辑
+                ##	<div class="input-item" style="width: 72px;">
+                ##		<input type="text" class="input-primary input-small input-null" placeholder="N" id="input-loop" value="100">
+                ##		<i class="icon-delete"></i>
+                ##	</div>
+                ##	<div class="input-item-text">次 （已循环50次）</div>
+
+                    <div class="errMsg errMsg-loop"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">责任人</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" id="select-liable-1">
+                            <input type="hidden" name="" class="input-hidden" value="$!task.departmentId">
+                            <span class="select-placeholder">#if($task.departmentName) $task.departmentName #else
+                                请选择 #end</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    #if($departmentList && $departmentList.size()>0)
+                                        <li data-value="">请选择</li>
+                                        #foreach($department in $departmentList)
+                                            <li data-value="$!department.id" #if($!task.departmentId==$!department.id)
+                                                class="selected" #end>$!department.name</li>
+                                        #end
+                                    #else
+                                        <li data-value="" class="selected">暂无</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                #if($departmentList && $departmentList.size()>0)
+                                    <option value="">请选择</option>
+                                    #foreach($department in $departmentList)
+                                        <option value="$!department.id" #if($!task.departmentId==$!department.id)
+                                                selected #end>$!department.name</option>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </select>
+                        </div>
+
+                        <div class="select-primary" id="select-liable-2" #if(!$task.id) style="display: none" #end>
+                            <input type="hidden" name="" class="input-hidden" value="$!task.propertyEmployeeId">
+                            <span class="select-placeholder">#if($task.employeeName) $task.employeeName #else
+                                请选择 #end</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    #if($employeeList && $employeeList.size()>0)
+                                        <li data-value="">请选择</li>
+                                        #foreach($employee in $employeeList)
+                                            <li data-value="$!employee.employeeId" #if($!task.propertyEmployeeId==$!employee.employeeId)
+                                                class="selected" #end>$!employee.employeeName</li>
+                                        #end
+                                    #else
+                                        <li data-value="" class="selected">暂无</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                #if($employeeList && $employeeList.size()>0)
+                                    <option value="">请选择</option>
+                                    #foreach($employee in $employeeList)
+                                        <option value="$!employee.id" #if($!task.propertyEmployeeId==$!employee.employeeId)
+                                                selected #end>$!employee.employeeName</option>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </select>
+                        </div>
+                    </div>
+                    <div class="errMsg errMsg-liable"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">是否公开</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" id="select-public">
+                            <input type="hidden" name="" class="input-hidden" value="$!task.publicity">
+                            <span class="select-placeholder">#if($!task.publicity==1)是 #elseif($!task.publicity==2)
+                                否 #else 是否公开 #end</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" #if(!$!task.publicity) class="selected" #end>是否公开</li>
+                                    <li data-value="1" #if($!task.publicity==1) class="selected" #end>是</li>
+                                    <li data-value="2" #if($!task.publicity==2) class="selected" #end>否</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" #if(!$!task.publicity) selected #end 是否公开
+                                </option>
+                                <option value="1" #if($!task.publicity==1) selected #end>是</option>
+                                <option value="2" #if($!task.publicity==2) selected #end>否</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="errMsg errMsg-public"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">任务说明</div>
+                <div class="group-item">
+                    <textarea class="textarea-primary" placeholder="请输入任务说明"
+                              id="input-description">$!task.explains</textarea>
+                    <div class="errMsg errMsg-description"></div>
+                </div>
+            </div>
+
+            #if($!task.kind!=13)
+                <div id="category-others" #if(!$task.id) style="display: none" #end>
+                    <div class="form-group clearfix">
+                        <div class="group-title">控制/设备点</div>
+                        <div class="group-item">
+                            <div class="table-wrapper">
+                                <table cellpadding="0" cellspacing="0" width="100%"
+                                       class="table-primary table-primary-small" id="table-control">
+                                    <thead>
+                                    <tr>
+                                        <th>名称</th>
+                                        <th>地点</th>
+                                        <th>最晚完成时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        #if($task.equipmentVoList && $task.equipmentVoList.size()>0)
+                                            #foreach($equipment in $task.equipmentVoList)
+                                                #if($equipment.type eq 1)
+                                                <tr class="machine" data-id="$!equipment.id">
+                                                    <td>$!equipment.name</td>
+                                                    <td>$!equipment.place</td>
+                                                    <td data-date="$!equipment.day"
+                                                        data-time="$!equipment.time">#if($!equipment.day eq 1) 当天
+                                                    #elseif($!equipment.day eq 2) 第二天 #else
+                                                        第$!equipment.day天 #end $!equipment.time 之前
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0);"
+                                                           class="button-link button-link-small btn-edit">编辑</a>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <a href="javascript:void(0);"
+                                                           class="button-link button-link-small btn-del">删除</a>
+                                                    </td>
+                                                </tr>
+                                                #end
+                                            #end
+
+                                            #foreach($controlPoint in $task.equipmentVoList)
+                                                #if($controlPoint.type eq 0)
+                                                <tr class="control" data-id="$!controlPoint.id">
+                                                    <td>$!controlPoint.name</td>
+                                                    <td>$!controlPoint.place</td>
+                                                    <td data-date="$!controlPoint.day"
+                                                        data-time="$!controlPoint.time">#if($!controlPoint.day eq 1) 当天
+                                                    #elseif($!controlPoint.day eq 2) 第二天 #else
+                                                        第$!controlPoint.day天 #end $!controlPoint.time 之前
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:void(0);"
+                                                           class="button-link button-link-small btn-edit">编辑</a>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <a href="javascript:void(0);"
+                                                           class="button-link button-link-small btn-del">删除</a>
+                                                    </td>
+                                                </tr>
+                                                #end
+                                            #end
+                                        #end
+                                    #*<tr class="control" data-id="1">
+                                        <td>某某楼东边岗亭</td>
+                                        <td>小区东半区32幢东边</td>
+                                        <td data-date="11" data-time="14:10">当天14:10之前</td>
+                                        <td>
+                                            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                                        </td>
+                                    </tr>*#
+                                    ##	<tr class="machine" data-id="2">
+                                    ##		<td>某某楼东边岗亭</td>
+                                    ##		<td>小区东半区32幢东边</td>
+                                    ##		<td data-date="2" data-time="11:00">第二天11:00之前</td>
+                                    ##		<td>
+                                    ##			<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                                    ##			&nbsp;&nbsp;&nbsp;&nbsp;
+                                    ##			<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                                    ##		</td>
+                                    ##	</tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="btn-box">
+                                <a href="javascript:void(0);" class="button-link button-add btn-add-control">添加控制点</a>
+                                <a href="javascript:void(0);" class="button-link button-add btn-add-machine"
+                                   style="margin-left: 25px;">添加设备点</a>
+                            </div>
+
+                            <div class="errMsg errMsg-control"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <div class="group-title">表单</div>
+                        <div class="group-item">
+                            <div class="table-wrapper">
+                                <table cellpadding="0" cellspacing="0" width="100%"
+                                       class="table-primary table-primary-small" id="table-formtype">
+                                    <thead>
+                                    <tr>
+                                        <th>名称</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        #if($task.formTypeVoList && $task.formTypeVoList.size() gt 0)
+                                            #foreach($formTypeVo in $task.formTypeVoList)
+                                            <tr data-id="$!formTypeVo.formTypeId">
+                                                <td>$!formTypeVo.formTypeName</td>
+                                                <td>
+                                                    <a href="javascript:void(0);"
+                                                       class="button-link button-link-small btn-del">删除</a>
+                                                </td>
+                                            </tr>
+                                            #end
+                                        #end
+                                    ##    <tr data-id="1">
+                                    ##        <td>AAAAAAAAAA表单</td>
+                                    ##        <td>
+                                    ##            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                                    ##        </td>
+                                    ##    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="btn-box">
+                                <a href="javascript:void(0);" class="button-link button-add btn-add-formtype">添加表单</a>
+                            </div>
+
+                            <div class="errMsg errMsg-formtype"></div>
+                        </div>
+                    </div>
+                </div>
+            #end
+            #if(!$task.id||$!task.kind eq 13)
+                <div id="category-dataentry" #if(!$task.id) style="display: none" #end>
+                    <div class="form-group clearfix">
+                        <div class="group-title">录入类型</div>
+                        <div class="group-item">
+                            <div class="radio-hidden-item" id="radio-enterCategory">
+                                <label>
+                                    <input name="enterCategory" type="radio" value="1" #if($!task.enterType==1)
+                                           checked #end/>
+                                    <p class="radio-text">电表</p>
+                                </label>
+                                <label>
+                                    <input name="enterCategory" type="radio" value="2" #if($!task.enterType==2)
+                                           checked #end/>
+                                    <p class="radio-text">水表</p>
+                                </label>
+                                <label>
+                                    <input name="enterCategory" type="radio" value="3" #if($!task.enterType==3)
+                                           checked #end/>
+                                    <p class="radio-text">燃气表</p>
+                                </label>
+                                <label>
+                                    <input name="enterCategory" type="radio" value="4" #if($!task.enterType==4)
+                                           checked #end/>
+                                    <p class="radio-text">空调表</p>
+                                </label>
+                                <label>
+                                    <input name="enterCategory" type="radio" value="5" #if($!task.enterType==5)
+                                           checked #end/>
+                                    <p class="radio-text">暖气表</p>
+                                </label>
+                            </div>
+                            <div class="errMsg errMsg-enterCategory"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <div class="group-title">分区/楼宇</div>
+                        <div class="group-item">
+                            <div class="building-box" id="building">
+                                #if($buildingList && $buildingList.size()>0)
+                                    #foreach($building in $buildingList)
+                                        <div class="building-list">
+                                            <div class="list-item list-item-big #if($task.id&&$!building.used)list-item-selected#end">$!building.name</div>
+                                            #foreach($buildingCell in $building.cellList)
+                                                <div class="list-item #if($task.id&&$!buildingCell.used)list-item-selected#end"
+                                                     data-id="$!buildingCell.id">$!buildingCell.name</div>
+                                            #end
+                                        </div>
+                                    #end
+                                #end
+                            </div>
+                            <div class="errMsg errMsg-building"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <div class="group-title">最晚完成时间</div>
+                        <div class="group-item">
+                            <div class="radio-hidden-item" id="input-date-latest-date">
+                                <label>
+                                    <input name="dateline" type="radio" value="1" #if($!task.finishDay eq 1)
+                                           checked #end/>
+                                    <p class="radio-text">当天</p>
+                                </label>
+                                <label>
+                                    <input name="dateline" type="radio" value="2" #if($!task.finishDay eq 2)
+                                           checked #end/>
+                                    <p class="radio-text">第二天</p>
+                                </label>
+                                <label>
+                                    <input name="dateline" type="radio" value="3" #if($!task.finishDay eq 3)
+                                           checked #end/>
+                                    <p class="radio-text">第三天</p>
+                                </label>
+                                <label>
+                                    <input name="dateline" type="radio" #if($task.finishDay && $!task.finishDay gt 3)
+                                           value="$!task.finishDay"
+                                           checked #end/>
+                                    <p class="radio-text">第<input type="text" class="input-underline"
+                                                                  placeholder="N" #if($task.finishDay && $!task.finishDay gt 3)
+                                                                  value="$!task.finishDay" #end>天
+                                    </p>
+                                </label>
+                            </div>
+                            <div class="input-item" style="width: 150px; margin-top: 10px;">
+                                <input type="text" class="input-primary input-small input-null"
+                                       onclick="WdatePicker({dateFmt:'HH:mm'})"
+                                       id="input-date-latest-time"
+                                       placeholder="请输入具体时间点" #if($task.finishTime)
+                                       value="$DateUtils.formatTimeForHM($task.finishTime)" #end>
+                                <i class="icon-delete"></i>
+                            </div>
+                            <div class="errMsg errMsg-date-latest"></div>
+                        </div>
+                    </div>
+                </div>
+            #end
+            <div class="form-group clearfix" style="margin-top: 0;">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <div class="errMsg errMsg-submit"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" style="margin-top: 0;">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                       style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+                    <a href="/admin/assignment/generally.html" class="button-link"
+                       style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="control-add-modal">
+    <div class="modal-header">
+        <h1>添加控制点</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content" style="padding: 0;">
+        <article class="form-condition" style="padding: 0 16px;">
+            <div class="operate-group">
+                <a href="javascript:void(0);" class="button-link button-link-small" id="btn-modal-control-add-all"
+                   style="margin-left: 0;">全部添加</a>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">编码</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="search" placeholder="设备编码" class="input-primary input-x-small"
+                               id="input-modal-control-code">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 220px;">
+                        <input type="search" placeholder="请输入控制点名称" class="input-primary input-x-small input-search"
+                               id="input-modal-control-name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <a href="javascript:void(0);" class="button-search btn-search" id="btn-modal-control-search">搜索</a>
+                </div>
+            </div>
+            <div class="errMsg errMsg-modal-control-search"></div>
+        </article>
+
+        <div class="table-wrapper light-overscroll" style="min-height: 300px; max-height: 450px;">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                   id="table-modal-control">
+                <thead>
+                <tr>
+                    <th>编码</th>
+                    <th>名称</th>
+                    <th>地点</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                ##	<tr data-id="1">
+				##		<td>fdkl193839</td>
+				##		<td>控制点1</td>
+				##		<td>地点1</td>
+				##		<td>
+				##			<a href="javascript:void(0);" class="button-link button-link-small btn-select">添加</a>
+				##		</td>
+				##	</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="machine-add-modal">
+    <div class="modal-header">
+        <h1>添加设备点</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content" style="padding: 0;">
+        <article class="form-condition" style="padding: 0 16px;">
+            <div class="operate-group">
+                <a href="javascript:void(0);" class="button-link button-link-small" id="btn-modal-machine-add-all"
+                   style="margin-left: 0;">全部添加</a>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">编码</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 90px;">
+                        <input type="search" placeholder="设备编码" class="input-primary input-x-small"
+                               id="input-modal-machine-code">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">类别</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="select-modal-machine-category">
+                        <input type="hidden" name="" class="input-hidden">
+                        <span class="select-placeholder">全部</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($typeList && $typeList.size()>0)
+                                    <li data-value="" class="selected">全部</li>
+                                    #foreach($type in $typeList)
+                                        <li data-value="$!type.id">$!type.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">全部</li>
+                                #end
+                            #*<li data-value="" class="selected">全部</li>
+                            <li data-value="1">电梯</li>
+                            <li data-value="2">消防栓</li>
+                            <li data-value="3">灭火器</li>*#
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($typeList && $typeList.size()>0)
+                                <option value="" selected>全部</option>
+                                #foreach($typeList in $list)
+                                    <option value="$!type.id">$!type.name</option>
+                                #end
+                            #else
+                                <option value="" selected>全部</option>
+                            #end
+                        #*<option value="" selected>全部</option>
+                        <option value="1">电梯</option>
+                        <option value="2">消防栓</option>
+                        <option value="3">灭火器</option>*#
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 170px;">
+                        <input type="search" placeholder="请输入设备名称" class="input-primary input-x-small input-search"
+                               id="input-modal-machine-name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <a href="javascript:void(0);" class="button-search btn-search" id="btn-modal-machine-search">搜索</a>
+                </div>
+            </div>
+            <div class="errMsg errMsg-modal-machine-search"></div>
+        </article>
+
+        <div class="table-wrapper light-overscroll" style="min-height: 300px; max-height: 450px;">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                   id="table-modal-machine">
+                <thead>
+                <tr>
+                    <th>编码</th>
+                    <th>名称</th>
+                    <th>类别</th>
+                    <th>地点</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                ##	<tr>
+				##		<td>fdkl193839</td>
+				##		<td>某某设备</td>
+				##		<td>类别A</td>
+				##		<td>某某地点</td>
+				##		<td>
+				##			<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>
+				##		</td>
+				##	</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="point-modal">
+    <div class="modal-header">
+        <h1>添加控制点</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title" id="point-list-title">已选择控制点</div>
+                <div class="group-item" id="point-list">
+                ##    <a href="javascript:void(0);" class="button-link link-normal" style="float: left; margin: 11px 26px 11px 0;">某某控制点1</a>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">最晚完成时间</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="point-dateline">
+                        <label>
+                            <input name="pointDateline" type="radio" value="1"/>
+                            <p class="radio-text">当天</p>
+                        </label>
+                        <label>
+                            <input name="pointDateline" type="radio" value="2"/>
+                            <p class="radio-text">第二天</p>
+                        </label>
+                        <label>
+                            <input name="pointDateline" type="radio" value="3"/>
+                            <p class="radio-text">第三天</p>
+                        </label>
+                        <label>
+                            <input name="pointDateline" type="radio" value=""/>
+                            <p class="radio-text">第<input type="text" class="input-underline" placeholder="N">天</p>
+                        </label>
+                    </div>
+                    <div class="input-item" style="width: 150px; margin-top: 10px;">
+                        <input type="text" class="input-primary input-small input-null" id="point-dateline-time"
+                               placeholder="请输入具体时间点" onclick="WdatePicker({dateFmt:'HH:mm'})">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-point-dateline"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="form-select-modal">
+    <div class="modal-header">
+        <h1>选择表单</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content" style="padding: 0;">
+        <article class="form-condition" style="padding: 0 16px;">
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item">
+                        <input type="search" placeholder="请输入表单名称" class="input-primary input-x-small input-search">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+
+        <div class="table-wrapper light-overscroll" style="min-height: 250px; max-height: 350px;">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small">
+                <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>说明</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                ##  <tr>
+                ##      <td>某某类型表单1</td>
+                ##      <td>某某类型表单说明说明说明说明说明</td>
+                ##      <td>
+                ##          <a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>
+                ##      </td>
+                ##  </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var inputAssignmentName = $('#input-assignment-name'),
+                radioCategory = $('#radio-category'),
+                radioFrequency = $('#radio-frequency'),
+                radioWeek = $('#radio-week'),
+                inputDateStart = $('#input-date-start'),
+                inputDateImplement = $('#input-date-implement'),
+                inputLoop = $('#input-loop'),
+                selectLiable1 = $('#select-liable-1'),
+                selectLiable2 = $('#select-liable-2'),
+                selectPublic = $('#select-public'),
+                inputDescription = $('#input-description'),
+                btnSubmit = $('.btn-submit');
+
+        var categoryOthers = $('#category-others'),
+                categoryDataentry = $('#category-dataentry');
+
+        var tableControl = $('#table-control'),
+                radioEnterCategory = $('#radio-enterCategory'),
+                building = $('#building'),
+                inputDateLatestDate = $('#input-date-latest-date'),
+                inputDateLatestTime = $('#input-date-latest-time');
+
+        var modalMask = $('.modal-mask'),
+                controlAddModal = $('#control-add-modal'),
+                tableModalControl = $('#table-modal-control');
+
+        var machineAddModal = $('#machine-add-modal'),
+                tableModalMachine = $('#table-modal-machine');
+
+        var pointModal = $('#point-modal'),
+                pointModalTitle = pointModal.find('.modal-header h1'),
+                pointListTitle = $('#point-list-title'),
+                pointList = $('#point-list'),
+                pointDateLine = $('#point-dateline'),
+                pointDatelineTime = $('#point-dateline-time'),
+                btnPointSubmit = pointModal.find('.btn-modal-submit');
+
+        var tableFormtype = $('#table-formtype'),
+                formSelectModal = $('#form-select-modal'),
+                inputFormtypeSearch = formSelectModal.find('.input-search'),
+                btnFormtypeSearch = formSelectModal.find('.btn-search'),
+                formTableMain = formSelectModal.find('.table-primary tbody');
+
+        var ASSIGNMENT = {
+            init: function () {
+                COMMON.selectBind($('#select-public'), undefined);
+                COMMON.selectBind($('#select-modal-machine-category'), undefined);
+                COMMON.selectBind($('#select-liable-1'), ASSIGNMENT.getEmployeeName);
+                COMMON.selectBind($('#select-liable-2'), undefined);
+
+                ASSIGNMENT.inputUnderlineBind();
+                ASSIGNMENT.categoryTabsBind();
+                ASSIGNMENT.buildingBoxBind();
+
+                ASSIGNMENT.btnAddBind();
+                ASSIGNMENT.btnEditBind();
+                ASSIGNMENT.btnDelBind();
+
+                ASSIGNMENT.modalSearchBind();
+
+                ASSIGNMENT.btnFormtypeBind();
+                ASSIGNMENT.btnTableFormtypeDelBind();
+
+                ASSIGNMENT.btnSubmitBind();
+            },
+            inputUnderlineBind: function () {
+                var inputUnderline = $('.input-underline');
+
+                inputUnderline.on('input propertychange', function () {
+                    $(this).parent().parent().find('input[type="radio"]').click().val($(this).val());
+                });
+            },
+            categoryTabsBind: function () {
+                var labelCategory = radioCategory.find('label');
+
+                labelCategory.on('click', function () {
+                    var labelText = $(this).find('.radio-text').html();
+
+                    radioCategory.attr('data-text', labelText);
+
+                    if (labelText == '数据录入') {
+                        categoryOthers.hide();
+                        categoryDataentry.show();
+                    } else {
+                        categoryOthers.show();
+                        categoryDataentry.hide();
+                    }
+                });
+            },
+            buildingBoxBind: function () {
+                var buildingItem = $('.building-box .building-list .list-item'),
+                        buildingInput = $('.building-box .input-hidden');
+
+                buildingItem.on('click', function () {
+                    var _this = $(this);
+
+                    if (_this.hasClass('list-item-big')) {
+                        if (_this.hasClass('list-item-selected')) {
+                            _this.removeClass('list-item-selected');
+                            _this.siblings().removeClass('list-item-selected');
+                        } else {
+                            _this.addClass('list-item-selected');
+                            _this.siblings().addClass('list-item-selected');
+                        }
+                    } else {
+                        if (_this.hasClass('list-item-selected')) {
+                            _this.removeClass('list-item-selected');
+                        } else {
+                            _this.addClass('list-item-selected');
+                            _this.parent().find('.list-item-big').addClass('list-item-selected');
+                        }
+                    }
+                });
+            },
+            modalSearchBind: function () {
+                // control search
+                var inputModalControlCode = $('#input-modal-control-code'),
+                        inputModalControlName = $('#input-modal-control-name'),
+                        btnModalControlSearch = $('#btn-modal-control-search');
+
+                btnModalControlSearch.on('click', function () {
+                    var inputModalControlCodeVal = inputModalControlCode.val(),
+                            inputModalControlNameVal = inputModalControlName.val();
+
+                    // search 获取控制点列表
+                    $.ajax({
+                        url: "/equipment/controlPointList.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            idList: ASSIGNMENT.getAlreadyIDList('control'),
+                            code: inputModalControlCodeVal,
+                            name: inputModalControlNameVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+
+                            } else {
+                                if (data.list.length == 0) {
+                                    tableModalControl.hide().before('<div class="table-nodata"><p>很抱歉，未找到相关数据</p></div>');
+                                    return false;
+                                }
+                                ;
+                                tableModalControl.parent().find('.table-nodata').remove();
+
+                                var str = '';
+                                for (var i = 0; i < data.list.length; i++) {
+                                    str += '<tr data-id="' + data.list[i].id + '">';
+                                    str += '<td>' + data.list[i].code + '</td>';
+                                    str += '<td>' + data.list[i].name + '</td>';
+                                    str += '<td>' + data.list[i].place + '</td>';
+                                    // str += '<td>' + data.list[i].formTypeName + '</td>';
+                                    str += '<td><a href="javascript:void(0);" class="button-link button-link-small btn-select">添加</a></td>';
+                                    str += '</tr>';
+                                }
+                                tableModalControl.show().find('tbody').html(str);
+                                ASSIGNMENT.btnModalAddBind();
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    });
+                });
+
+                // machine search
+                var inputModalMachineCode = $('#input-modal-machine-code'),
+                        inputModalMachineName = $('#input-modal-machine-name'),
+                        selectModalMachineCategory = $('#select-modal-machine-category'),
+                        btnModalMachineSearch = $('#btn-modal-machine-search');
+
+                btnModalMachineSearch.on('click', function () {
+                    var inputModalMachineCodeVal = inputModalMachineCode.val(),
+                            selectModalMachineCategoryVal = selectModalMachineCategory.find('.input-hidden').val(),
+                            inputModalMachineNameVal = inputModalMachineName.val();
+
+                    // 获取设备点列表
+                    $.ajax({
+                        url: "/equipment/equipmentList.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            idList: ASSIGNMENT.getAlreadyIDList('machine'),
+                            code: inputModalMachineCodeVal,
+                            category: selectModalMachineCategoryVal,
+                            name: inputModalMachineNameVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+
+                            } else {
+                                if (data.list.length == 0) {
+                                    tableModalMachine.hide().before('<div class="table-nodata"><p>很抱歉，未找到相关数据</p></div>');
+                                    return false;
+                                }
+                                ;
+                                tableModalMachine.parent().find('.table-nodata').remove();
+
+                                var str = '';
+                                for (var i = 0; i < data.list.length; i++) {
+                                    str += '<tr data-id="' + data.list[i].id + '">';
+                                    str += '<td>' + data.list[i].code + '</td>';
+                                    str += '<td>' + data.list[i].name + '</td>';
+                                    str += '<td>' + data.list[i].equipmentTypeName + '</td>';
+                                    str += '<td>' + data.list[i].place + '</td>';
+                                    // str += '<td>' + data.list[i].formTypeName + '</td>';
+                                    str += '<td><a href="javascript:void(0);" class="button-link button-link-small btn-select">添加</a></td>';
+                                    str += '</tr>';
+                                }
+                                tableModalMachine.show().find('tbody').html(str);
+                                ASSIGNMENT.btnModalAddBind();
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    });
+                });
+            },
+            getEmployeeName: function (PID) {
+                $.ajax({
+                    url: "/department/normal/propertyEmployeeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        departmentId: PID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="" class="input-hidden">';
+                            str += '<span class="select-placeholder">请选择</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">请选择</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>请选择</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            $('#select-liable-2').html(str).show();
+                            COMMON.selectBind($('#select-liable-2'), undefined);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            btnAddBind: function () {
+                $('.btn-add-control').on('click', function () {
+                    modalMask.fadeIn(200);
+                    controlAddModal.fadeIn(200);
+
+                    // 获取控制点列表
+                    $.ajax({
+                        url: "/equipment/controlPointList.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            idList: ASSIGNMENT.getAlreadyIDList('control')
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+
+                            } else {
+                                if (data.list.length == 0) {
+                                    tableModalControl.hide().before('<div class="table-nodata"><p>很抱歉，未找到相关数据</p></div>');
+                                    return false;
+                                }
+                                ;
+                                var str = '';
+                                for (var i = 0; i < data.list.length; i++) {
+                                    str += '<tr data-id="' + data.list[i].id + '">';
+                                    str += '<td>' + data.list[i].code + '</td>';
+                                    str += '<td>' + data.list[i].name + '</td>';
+                                    str += '<td>' + data.list[i].place + '</td>';
+                                    // str += '<td>' + data.list[i].formTypeName + '</td>';
+                                    str += '<td><a href="javascript:void(0);" class="button-link button-link-small btn-select">添加</a></td>';
+                                    str += '</tr>';
+                                }
+                                tableModalControl.find('tbody').html(str);
+                                ASSIGNMENT.btnModalAddBind();
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    });
+                });
+
+                $('.btn-add-machine').on('click', function () {
+                    modalMask.fadeIn(200);
+                    machineAddModal.fadeIn(200);
+
+                    // 获取设备点列表
+                    $.ajax({
+                        url: "/equipment/equipmentList.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            idList: ASSIGNMENT.getAlreadyIDList('machine')
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+
+                            } else {
+                                if (data.list.length == 0) {
+                                    tableModalMachine.hide().before('<div class="table-nodata"><p>很抱歉，未找到相关数据</p></div>');
+                                    return false;
+                                }
+                                ;
+                                var str = '';
+                                for (var i = 0; i < data.list.length; i++) {
+                                    str += '<tr data-id="' + data.list[i].id + '">';
+                                    str += '<td>' + data.list[i].code + '</td>';
+                                    str += '<td>' + data.list[i].name + '</td>';
+                                    str += '<td>' + data.list[i].equipmentTypeName + '</td>';
+                                    str += '<td>' + data.list[i].place + '</td>';
+                                    // str += '<td>' + data.list[i].formTypeName + '</td>';
+                                    str += '<td><a href="javascript:void(0);" class="button-link button-link-small btn-select">添加</a></td>';
+                                    str += '</tr>';
+                                }
+                                tableModalMachine.find('tbody').html(str);
+                                ASSIGNMENT.btnModalAddBind();
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    });
+                });
+            },
+            btnEditBind: function () {
+                var btnEdit = tableControl.find('.btn-edit');
+
+                btnEdit.unbind('click');
+                btnEdit.on('click', function () {
+                    var _type = $(this).parent().parent().attr('class'),
+                            _index = $(this).parent().parent().index();
+
+                    if (_type == 'control') {
+                        ASSIGNMENT.showPointModal('control', 'edit', undefined, _index);
+                    } else if (_type == 'machine') {
+                        ASSIGNMENT.showPointModal('machine', 'edit', undefined, _index);
+                    }
+                });
+            },
+            btnDelBind: function () {
+                var btnDel = tableControl.find('.btn-del');
+
+                btnDel.unbind('click');
+                btnDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+            },
+            getAlreadyIDList: function (type) {
+                var _tr = tableControl.find('tbody tr.' + type),
+                        _arr = [];
+
+                for (var i = 0; i < _tr.length; i++) {
+                    _arr.push(_tr.eq(i).attr('data-id'));
+                }
+
+                return _arr.join(',');
+            },
+            btnModalAddBind: function () {
+                var btnModalControlAdd = tableModalControl.find('.btn-select'),
+                        btnModalControlAddAll = $('#btn-modal-control-add-all'),
+                        btnModalMachineAdd = tableModalMachine.find('.btn-select'),
+                        btnModalMachineAddAll = $('#btn-modal-machine-add-all');
+
+                btnModalControlAdd.unbind('click');
+                btnModalControlAdd.on('click', function () {
+                    var _id = $(this).parent().parent().attr('data-id'),
+                            _name = $(this).parent().parent().find('td').eq(1).html(),
+                            _addr = $(this).parent().parent().find('td').eq(2).html(),
+                            _arr = [];
+                    _arr.push({id: _id, name: _name, addr: _addr});
+                    ASSIGNMENT.showPointModal('control', 'add', JSON.stringify(_arr), undefined);
+                });
+
+                btnModalControlAddAll.unbind('click');
+                btnModalControlAddAll.on('click', function () {
+                    var _tr = tableModalControl.find('tbody tr'),
+                            _arr = [];
+
+                    for (var i = 0; i < _tr.length; i++) {
+                        var _id = _tr.eq(i).attr('data-id'),
+                                _name = _tr.eq(i).find('td').eq(1).html(),
+                                _addr = _tr.eq(i).find('td').eq(2).html();
+
+                        _arr.push({id: _id, name: _name, addr: _addr});
+                    }
+                    ASSIGNMENT.showPointModal('control', 'add', JSON.stringify(_arr), undefined);
+                });
+
+                btnModalMachineAdd.unbind('click');
+                btnModalMachineAdd.on('click', function () {
+                    var _id = $(this).parent().parent().attr('data-id'),
+                            _name = $(this).parent().parent().find('td').eq(1).html(),
+                            _addr = $(this).parent().parent().find('td').eq(3).html(),
+                            _arr = [];
+                    _arr.push({id: _id, name: _name, addr: _addr});
+                    ASSIGNMENT.showPointModal('machine', 'add', JSON.stringify(_arr), undefined);
+                });
+
+                btnModalMachineAddAll.unbind('click');
+                btnModalMachineAddAll.on('click', function () {
+                    var _tr = tableModalMachine.find('tbody tr'),
+                            _arr = [];
+
+                    for (var i = 0; i < _tr.length; i++) {
+                        var _id = _tr.eq(i).attr('data-id'),
+                                _name = _tr.eq(i).find('td').eq(1).html(),
+                                _addr = _tr.eq(i).find('td').eq(3).html();
+
+                        _arr.push({id: _id, name: _name, addr: _addr});
+                    }
+                    ASSIGNMENT.showPointModal('machine', 'add', JSON.stringify(_arr), undefined);
+                });
+            },
+            showPointModal: function (cate, type, string, index) {
+                if (type == 'add') {
+                    if (cate == 'control') {
+                        pointModalTitle.html('添加控制点');
+                        pointListTitle.html('已选择控制点');
+                    } else if (cate == 'machine') {
+                        pointModalTitle.html('添加设备点');
+                        pointListTitle.html('已选择设备');
+                    }
+
+                    var _arr = JSON.parse(string),
+                            str = '';
+                    for (var i = 0; i < _arr.length; i++) {
+                        str += '<a href="javascript:void(0);" class="button-link link-normal button-link-disable" style="float: left; margin: 11px 26px 11px 0;" data-id="' + _arr[i].id + '">' + _arr[i].name + '</a>';
+                    }
+                    pointList.html(str);
+                    btnPointSubmit.attr('data-type', type);
+                    btnPointSubmit.attr('data-cate', cate);
+                    btnPointSubmit.attr('data-string', string);
+                    btnPointSubmit.attr('data-index', undefined);
+                    ASSIGNMENT.btnPointSubmitBind();
+
+                    pointDateLine.find('label input[name="pointDateline"]:checked').attr('checked', false);
+                    pointDateLine.find('label').eq(3).find('.input-underline').val('');
+                    pointDateLine.find('label').eq(3).find('input[name="pointDateline"]').val('');
+                    pointDatelineTime.val('');
+
+                    controlAddModal.fadeOut(100);
+                    machineAddModal.fadeOut(100);
+                    pointModal.fadeIn(200);
+                } else if (type == 'edit') {
+                    if (cate == 'control') {
+                        pointModalTitle.html('编辑控制点');
+                        pointListTitle.html('已选择控制点');
+                    } else if (cate == 'machine') {
+                        pointModalTitle.html('编辑设备点');
+                        pointListTitle.html('已选择设备');
+                    }
+
+                    var _tr = tableControl.find('tbody tr').eq(index),
+                            _id = _tr.attr('data-id'),
+                            _name = _tr.find('td').eq(0).html(),
+                            _date = _tr.find('td').eq(2).attr('data-date'),
+                            _time = _tr.find('td').eq(2).attr('data-time'),
+                            str = '<a href="javascript:void(0);" class="button-link link-normal button-link-disable" style="float: left; margin: 11px 26px 11px 0;" data-id="' + _id + '">' + _name + '</a>';
+                    pointList.html(str);
+                    btnPointSubmit.attr('data-type', type);
+                    btnPointSubmit.attr('data-cate', cate);
+                    btnPointSubmit.attr('data-string', undefined);
+                    btnPointSubmit.attr('data-index', index);
+                    ASSIGNMENT.btnPointSubmitBind();
+
+                    if (_date == 1) {
+                        pointDateLine.find('label').eq(0).click();
+                    } else if (_date == 2) {
+                        pointDateLine.find('label').eq(1).click();
+                    } else if (_date == 3) {
+                        pointDateLine.find('label').eq(2).click();
+                    } else {
+                        pointDateLine.find('label').eq(3).click();
+                        pointDateLine.find('label').eq(3).find('.input-underline').val(_date);
+                        pointDateLine.find('label').eq(3).find('input[name="pointDateline"]').val(_date);
+                    }
+                    pointDatelineTime.val(_time);
+
+                    modalMask.fadeIn(200);
+                    pointModal.fadeIn(200);
+                }
+            },
+            btnPointSubmitBind: function () {
+                btnPointSubmit.unbind('click');
+                btnPointSubmit.on('click', function () {
+                    var type = $(this).attr('data-type'),
+                            cate = $(this).attr('data-cate'),
+                            string = $(this).attr('data-string'),
+                            index = $(this).attr('data-index');
+
+                    $('.errMsg-point-dateline').html('');
+
+                    var datelineVal = $('#point-dateline input[name="pointDateline"]:checked').val(),
+                            pointDatelineTime = $('#point-dateline-time').val();
+                    if (!datelineVal) {
+                        COMMON.errMsg($('.errMsg-point-dateline'), '请选择或输入最晚完成时间！');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(datelineVal)) {
+                        COMMON.errMsg($('.errMsg-point-dateline'), '第几天请输入正整数！');
+                        return false;
+                    }
+                    if (!COMMON.checkNull(pointDatelineTime)) {
+                        COMMON.errMsg($('.errMsg-point-dateline'), '请输入具体时间点！');
+                        return false;
+                    }
+                    $('.errMsg-point-dateline').html('');
+
+                    if (type == 'add') {
+                        var _arr = JSON.parse(string),
+                                str = '';
+                        for (var i = 0; i < _arr.length; i++) {
+                            str += '<tr class="' + cate + '" data-id="' + _arr[i].id + '">';
+                            str += '<td>' + _arr[i].name + '</td>';
+                            str += '<td>' + _arr[i].addr + '</td>';
+                            if (datelineVal == 1) {
+                                str += '<td data-date="' + datelineVal + '" data-time="' + pointDatelineTime + '">当天' + pointDatelineTime + '之前</td>';
+                            } else if (datelineVal == 2) {
+                                str += '<td data-date="' + datelineVal + '" data-time="' + pointDatelineTime + '">第二天' + pointDatelineTime + '之前</td>';
+                            } else if (datelineVal == 3) {
+                                str += '<td data-date="' + datelineVal + '" data-time="' + pointDatelineTime + '">第三天' + pointDatelineTime + '之前</td>';
+                            } else {
+                                str += '<td data-date="' + datelineVal + '" data-time="' + pointDatelineTime + '">第' + datelineVal + '天' + pointDatelineTime + '之前</td>';
+                            }
+                            str += '<td>';
+                            str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                            str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                            str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                            str += '</td>';
+                            str += '</tr>';
+                        }
+                        tableControl.find('tbody').append(str);
+                        ASSIGNMENT.btnEditBind();
+                        ASSIGNMENT.btnDelBind();
+                    } else if (type == 'edit') {
+                        var _td = tableControl.find('tbody tr').eq(index).find('td').eq(2);
+                        if (datelineVal == 1) {
+                            _td.html('当天' + pointDatelineTime + '之前');
+                        } else if (datelineVal == 2) {
+                            _td.html('第二天' + pointDatelineTime + '之前');
+                        } else if (datelineVal == 3) {
+                            _td.html('第三天' + pointDatelineTime + '之前');
+                        } else {
+                            _td.html('第' + datelineVal + '天' + pointDatelineTime + '之前');
+                        }
+                        _td.attr('data-date', datelineVal);
+                        _td.attr('data-time', pointDatelineTime);
+                    }
+
+                    modalMask.fadeOut(200);
+                    pointModal.fadeOut(200);
+                });
+            },
+            btnFormtypeBind: function () {
+                $('.btn-add-formtype').on('click', function () {
+                    ASSIGNMENT.getFormTableData(undefined);
+                });
+            },
+            getFormTableData: function (searchStr) {
+                modalMask.fadeIn(200);
+                formSelectModal.fadeIn(200);
+
+                formSelectModal.find('.table-primary').hide();
+                formSelectModal.find('.table-primary').before('<div class="ajax-loading"><p>正在加载数据...</p></div>');
+
+                // 正常的时候searchStr传undefined，搜索的时候searchStr有值
+                // readyIDStr 提交已选择的 id，搜索结果不予显示
+                $.ajax({
+                    url: "/form/formTypeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        name: searchStr,
+                        readyIDStr: ASSIGNMENT.getFormtypeIDArray()
+                    },
+                    success: function (data) {
+                        $('.ajax-loading').remove();
+
+                        if (data.code != 200) {
+                            formSelectModal.find('.table-primary').hide();
+                            formSelectModal.find('.table-primary').before('<div class="ajax-loading"><p>' + data.msg + '</p></div>');
+                        } else {
+                            if (data.list.length == 0) {
+                                formSelectModal.find('.table-primary').hide();
+                                formSelectModal.find('.table-primary').before('<div class="table-nodata"><p>暂无相关数据</p></div>');
+                                return false;
+                            }
+
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr data-id="' + data.list[i].id + '">';
+                                str += '<td>' + data.list[i].name + '</td>';
+                                str += '<td>' + data.list[i].description + '</td>';
+                                str += '<td>';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>';
+                                str += '</td>';
+                                str += '</tr>';
+                            }
+                            formSelectModal.find('.table-nodata').remove();
+                            formSelectModal.find('.table-primary').show();
+                            formTableMain.html(str);
+
+                            ASSIGNMENT.btnFormtypeModalSearchBind();
+                            ASSIGNMENT.btnFormtypeModalSelectBind();
+                        }
+                    },
+                    error: function () {
+                        // COMMON.errMsg($('.errMsg-search'), '搜索失败，请重试！');
+                    }
+                });
+            },
+            btnFormtypeModalSelectBind: function () {
+                var btnSelect = formTableMain.find('.btn-select');
+
+                btnSelect.unbind('click');
+                btnSelect.on('click', function () {
+                    var title = $(this).parent().parent().find('td').eq(0).html(),
+                            id = $(this).parent().parent().attr('data-id'),
+                            str = '';
+
+                    str += '<tr data-id="' + id + '">';
+                    str += '<td>' + title + '</td>';
+                    str += '<td>';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    str += '</td>';
+                    str += '</tr>';
+
+                    tableFormtype.find('tbody').append(str);
+                    modalMask.fadeOut(200);
+                    formSelectModal.fadeOut(200);
+
+                    ASSIGNMENT.btnTableFormtypeDelBind();
+                });
+            },
+            btnTableFormtypeDelBind: function () {
+                var btnTableFormtypeDel = tableFormtype.find('.btn-del');
+
+                btnTableFormtypeDel.unbind('click');
+                btnTableFormtypeDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+            },
+            btnFormtypeModalSearchBind: function () {
+                btnFormtypeSearch.unbind('click');
+                btnFormtypeSearch.on('click', function () {
+                    var searchVal = inputFormtypeSearch.val();
+
+                    ASSIGNMENT.getFormTableData(searchVal);
+                });
+            },
+            btnSubmitBind: function () {
+                btnSubmit.on('click', function () {
+                    var assignmentID = $('#assignmentID').val(),
+                            assignmentNameVal = inputAssignmentName.val(),
+                            radioCategoryVal = radioCategory.find('input[name="category"]:checked').val(),
+                            radioFrequencyVal = radioFrequency.find('input[name="frequency"]:checked').val(),
+                            radioWeekVal = radioWeek.find('input[name="week"]:checked').val(),
+                            inputDateStartVal = inputDateStart.val(),
+                            inputDateImplementVal = inputDateImplement.val(),
+                            inputLoopVal = inputLoop.val(),
+                            selectLiable1Val = selectLiable1.find('.input-hidden').val(),
+                            selectLiable2Val = selectLiable2.find('.input-hidden').val(),
+                            selectPublicVal = selectPublic.find('.input-hidden').val(),
+                            inputDescriptionVal = inputDescription.val();
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-assignment-name').html('');
+                    $('.errMsg-category').html('');
+                    $('.errMsg-frequency').html('');
+                    $('.errMsg-date-start').html('');
+                    $('.errMsg-date-implement').html('');
+                    $('.errMsg-loop').html('');
+                    $('.errMsg-liable').html('');
+                    $('.errMsg-public').html('');
+                    $('.errMsg-description').html('');
+                    $('.errMsg-control').html('');
+                    $('.errMsg-formtype').html('');
+                    $('.errMsg-enterCategory').html('');
+                    $('.errMsg-building').html('');
+                    $('.errMsg-date-latest').html('');
+                    $('.errMsg-submit').html();
+
+                    if (!COMMON.checkNull(assignmentNameVal)) {
+                        COMMON.errMsg($('.errMsg-assignment-name'), '请输入任务名称!');
+                        return false;
+                    }
+                    $('.errMsg-assignment-name').html('');
+
+                    if (!COMMON.checkNull(assignmentID)) {
+                        // add
+                        if (!radioCategoryVal) {
+                            COMMON.errMsg($('.errMsg-category'), '请选择种类!');
+                            return false;
+                        }
+                        $('.errMsg-category').html('');
+
+                        if (!radioFrequencyVal) {
+                            COMMON.errMsg($('.errMsg-frequency'), '请选择或者输入频率!');
+                            return false;
+                        }
+                        if (!COMMON.checkInit(radioFrequencyVal)) {
+                            COMMON.errMsg($('.errMsg-frequency'), '输入频率请填写正整数!');
+                            return false;
+                        }
+                        $('.errMsg-frequency').html('');
+
+                        if (!radioFrequencyVal) {
+                            COMMON.errMsg($('.errMsg-week'), '请选择是否包括周六周日!');
+                            return false;
+                        }
+                        $('.errMsg-week').html('');
+
+                        if (!COMMON.checkNull(inputDateStartVal)) {
+                            COMMON.errMsg($('.errMsg-date-start'), '请选择开始日期!');
+                            return false;
+                        }
+                        $('.errMsg-date-start').html('');
+
+                        if (!COMMON.checkNull(inputDateImplementVal)) {
+                            COMMON.errMsg($('.errMsg-date-implement'), '请选择执行时间!');
+                            return false;
+                        }
+                        $('.errMsg-date-implement').html('');
+                    }
+
+                    if (!COMMON.checkNull(inputLoopVal)) {
+                        COMMON.errMsg($('.errMsg-loop'), '请输入循环次数!');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(inputLoopVal)) {
+                        COMMON.errMsg($('.errMsg-loop'), '循环次数填写正整数!');
+                        return false;
+                    }
+                    $('.errMsg-loop').html('');
+
+                    if (!COMMON.checkNull(selectLiable1Val)) {
+                        COMMON.errMsg($('.errMsg-liable'), '请选择责任人所在部门!');
+                        return false;
+                    }
+                    if (!COMMON.checkNull(selectLiable2Val)) {
+                        COMMON.errMsg($('.errMsg-liable'), '请选择责任人!');
+                        return false;
+                    }
+                    $('.errMsg-liable').html('');
+
+                    if (!COMMON.checkNull(selectPublicVal)) {
+                        COMMON.errMsg($('.errMsg-public'), '请选择是否公开!');
+                        return false;
+                    }
+                    $('.errMsg-public').html('');
+
+                    if (!COMMON.checkNull(inputDescriptionVal)) {
+                        COMMON.errMsg($('.errMsg-description'), '请输入任务说明!');
+                        return false;
+                    }
+                    $('.errMsg-description').html('');
+
+
+                    var controlStr = ASSIGNMENT.getControlArray(),
+                            formtypeStr = ASSIGNMENT.getFormtypeIDArray(),
+                            enterCategoryVal = radioEnterCategory.find('input[name="enterCategory"]:checked').val(),
+                            buildingStr = '',
+                            inputDateLatestDateVal = inputDateLatestDate.find('input[name="dateline"]:checked').val(),
+                            inputDateLatestTimeVal = inputDateLatestTime.val();
+                    if (radioCategory.attr('data-text') == '数据录入') {
+                        if (!enterCategoryVal) {
+                            COMMON.errMsg($('.errMsg-enterCategory'), '请选择录入类型!');
+                            return false;
+                        }
+                        $('.errMsg-enterCategory').html('');
+
+                        var buildingSelected = $('.building-box .list-item-selected'),
+                                buildingSelectedStr = '',
+                                buildingSelectedArr = [];
+                        for (var i = 0; i < buildingSelected.length; i++) {
+                            var buildingSelectedID = buildingSelected.eq(i).attr('data-id');
+                            if (buildingSelectedID) {
+                                buildingSelectedArr.push(buildingSelectedID);
+                            }
+                        }
+                        buildingStr = buildingSelectedArr.join(',');
+                        if (!buildingStr) {
+                            COMMON.errMsg($('.errMsg-building'), '请选择分区/楼宇!');
+                            return false;
+                        }
+                        $('.errMsg-building').html('');
+
+                        if (!inputDateLatestDateVal) {
+                            COMMON.errMsg($('.errMsg-date-latest'), '请选择或输入最晚完成时间！');
+                            return false;
+                        }
+                        if (!COMMON.checkNull(inputDateLatestTimeVal)) {
+                            COMMON.errMsg($('.errMsg-date-latest'), '请输入具体时间点!');
+                            return false;
+                        }
+                        $('.errMsg-date-latest').html('');
+
+                    } else {
+                        if (!controlStr && !formtypeStr) {
+                            COMMON.errMsg($('.errMsg-formtype'), '控制/设备点或表单至少需要选择一个!');
+                            return false;
+                        }
+                        $('.errMsg-control').html('');
+                    }
+                    //没有选择控制点设备点,清空
+                    if (!controlStr) {
+                        controlStr = '';
+                    }
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+                    $.ajax({
+                        url: "/task/saveTask.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: assignmentID,
+                            name: assignmentNameVal,
+                            kind: radioCategoryVal,
+                            frequency: radioFrequencyVal,
+                            includeWeek: radioWeekVal,
+                            startDate: inputDateStartVal,
+                            executeTime: inputDateImplementVal,
+                            loopCount: inputLoopVal,
+                            departmentId: selectLiable1Val,
+                            employeeId: selectLiable2Val,
+                            publicity: selectPublicVal,
+                            explains: inputDescriptionVal,
+                            controlStr: controlStr,
+                            formtypeStr: formtypeStr,
+                            enterCategoryVal: enterCategoryVal,
+                            buildingStr: buildingStr,
+                            inputDateLatestDateVal: inputDateLatestDateVal,
+                            inputDateLatestTimeVal: inputDateLatestTimeVal,
+                            type: 1
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-submit'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/assignment/generally.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-submit'), '创建失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            },
+            getControlArray: function () {
+                var arr = [],
+                        tableControlItem = tableControl.find('tbody tr');
+
+                if (!tableControlItem || tableControlItem.length == 0) {
+                    return false;
+                }
+
+                var _control = [],
+                        _machine = [];
+                for (var i = 0; i < tableControlItem.length; i++) {
+                    var _tr = tableControlItem.eq(i),
+                            _type = _tr.attr('class'),
+                            _id = _tr.attr('data-id'),
+                            _date = _tr.find('td').eq(2).attr('data-date'),
+                            _time = _tr.find('td').eq(2).attr('data-time');
+
+                    if (_type == 'control') {
+                        _control.push({id: _id, date: _date, time: _time});
+                    } else if (_type == 'machine') {
+                        _machine.push({id: _id, date: _date, time: _time});
+                    }
+                }
+                arr.push({control: _control, machine: _machine});
+
+                return JSON.stringify(arr);
+            },
+            getFormtypeIDArray: function () {
+                var currTR = tableFormtype.find('tbody tr'),
+                        readyIDArr = [];
+
+                for (var i = 0; i < currTR.length; i++) {
+                    var _id = currTR.eq(i).attr('data-id');
+                    readyIDArr.push(_id);
+                }
+
+                return readyIDArr.join(',');
+            }
+        };
+
+        ASSIGNMENT.init();
+    });
+</script>
+#end

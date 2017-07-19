@@ -1,0 +1,265 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>车辆管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">车辆管理</a>
+    </article>
+
+    <article class="form-condition">
+        <div class="operate-group">
+            <a href="/attachment/template/download.html?fileName=car.xlsx" class="button-link button-download">模板下载</a>
+            <a href="/car/exportFile.html" class="button-link button-download">数据下载</a>
+            <a href="javascript:void(0);" class="button-link button-upload" id="btn-file-upload">数据导入</a>
+            <a href="/admin/data/car/create.html" class="button-link button-add" id="btn-create-car">新增车辆</a>
+        </div>
+
+        <form action="/admin/data/car.html" method="post">
+            <div class="condition-group clearfix">
+                <div class="title">车牌号</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="search" placeholder="请输入车牌号" name="carNum"
+                               class="input-primary input-x-small input-search" value="$!paramNum">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+    </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>车牌号</th>
+                        <th>分区</th>
+                        <th>楼宇</th>
+                        <th>单元</th>
+                        <th>房间号</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($car in $list)
+                        <tr>
+                            <td>$!car.num</td>
+                            <td>$!car.buildingName</td>
+                            <td>$!car.buildingCell</td>
+                            <td>$!car.buildingUnit</td>
+                            <td>$!car.roomNum</td>
+                            <td>
+                                <a href="/admin/data/car/create.html?id=$!car.id" class="button-link button-link-small">编辑</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-del"
+                                   onclick="javascript: COMMON.createConfirmation('/car/deleteCar.html?id=$!car.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                            </td>
+                        </tr>
+                        #end
+                    #* <tr>
+                         <td>浙A-12345</td>
+                         <td>某某苑</td>
+                         <td>1幢</td>
+                         <td>1单元</td>
+                         <td>101</td>
+                         <td>
+                             <a href="javascript:void(0);" class="button-link button-link-small">编辑</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                         </td>
+                     </tr>
+                     <tr>
+                         <td>浙A-12345</td>
+                         <td>某某苑</td>
+                         <td>1幢</td>
+                         <td>1单元</td>
+                         <td>101</td>
+                         <td>
+                             <a href="javascript:void(0);" class="button-link button-link-small">编辑</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                         </td>
+                     </tr>*#
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无车辆信息</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="">
+    <div class="modal-header">
+        <h1>新建分区</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">分区名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入分区名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">楼宇</div>
+                <div class="group-item">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small">
+                            <thead>
+                            <tr>
+                                <th>楼宇</th>
+                                <th>单元</th>
+                                <th>楼层</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>1幢</td>
+                                <td>2个单元</td>
+                                <td>15层</td>
+                                <td>
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-link-small btn-type-edit">编辑</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1幢</td>
+                                <td>2个单元</td>
+                                <td>15层</td>
+                                <td>
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-link-small btn-type-edit">编辑</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <a href="javascript:void(0);" class="button-link button-add">新增楼宇</a>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="building">
+    <div class="modal-header">
+        <h1>新建楼宇</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">楼宇</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入楼宇数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">单元</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入单元数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">楼层</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入楼层数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                COMMON.fileUploadBind('/car/importExcel.html');
+            }
+        };
+
+        DATA.init();
+
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/car.html',
+                {
+                    carNum: '$!paramNum',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

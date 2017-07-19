@@ -1,0 +1,238 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看常规任务--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/assignment.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right; width: 230px;">
+            <a href="/task/endTaskLoop.html?id=$!task.id" class="button-primary-able button-blue"
+               style="display: inline-block; margin: 0 26px 0 0;">结束</a>
+            #if($!task.loopStatus eq 0 )
+                <a href="/admin/assignment/generally/create.html?id=$!task.id" class="button-primary-able button-grey"
+                   style="display: inline-block; margin: 0 26px 0 0;">编辑</a>
+            #end
+        </div>
+        <a href="/admin/assignment.html" class="button-link">任务</a>
+        <span class="separate">|</span>
+        <a href="/admin/assignment/generally.html" class="button-link">常规任务</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看常规任务</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.name</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">种类</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.kindFormat</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">频率</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.frequencyFormat</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">开始日期</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.startDate</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">循环次数</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.alreadyCount/$!task.loopCount 次  #if($!task.includeWeek eq 1) (包括周六周日) #else (不包括周六周日) #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">责任人</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.departmentName/$!task.employeeName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">是否公开</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;"> #if($task.publicity && $!task.publicity gt 1)
+                        否
+                    #else
+                        是
+                    #end
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">任务说明</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!task.explains</div>
+                </div>
+            </div>
+
+            #if($!task.kind!=13)
+            ## 常规任务
+                <div class="form-group clearfix">
+                    <div class="group-title">控制/设备点</div>
+                    <div class="group-item">
+                        <div class="table-wrapper table-wrapper-nobg">
+                            <table cellpadding="0" cellspacing="0" width="100%"
+                                   class="table-primary table-primary-small table-noborder">
+                                <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>地点</th>
+                                    <th>最晚完成时间</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    #if($task.equipmentVoList && $task.equipmentVoList.size()>0)
+                                        #foreach($equipment in $task.equipmentVoList)
+                                        <tr>
+                                            <td>$!equipment.name</td>
+                                            <td>$!equipment.place</td>
+                                            <td>$!DateUtils.formatTimeYMDHM($!equipment.finishTime)</td>
+                                        </tr>
+                                        #end
+                                    #end
+                               #* <tr>
+                                    <td>某某楼东边岗亭</td>
+                                    <td>小区东半区32幢东边</td>
+                                    <td>当天14:10之前</td>
+                                </tr>
+                                <tr>
+                                    <td>某某楼东边岗亭</td>
+                                    <td>小区东半区32幢东边</td>
+                                    <td>当天14:10之前</td>
+                                </tr>
+                                <tr>
+                                    <td>某某楼东边岗亭</td>
+                                    <td>小区东半区32幢东边</td>
+                                    <td>当天14:10之前</td>
+                                </tr>*#
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">表单</div>
+                    <div class="group-item">
+                        <div class="table-wrapper table-wrapper-nobg">
+                            <table cellpadding="0" cellspacing="0" width="100%"
+                                   class="table-primary table-primary-small table-noborder">
+                                <thead>
+                                <tr>
+                                    <th>名称</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    #if($task.formTypeVoList && $task.formTypeVoList.size()>0)
+                                        #foreach($formTypeVo in $task.formTypeVoList)
+                                        <tr>
+                                            <td>$!formTypeVo.formTypeName</td>
+                                        </tr>
+                                        #end
+                                    #end
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            #end
+            #if($!task.kind==13)
+            ## 常规录入任务
+                <div class="form-group clearfix">
+                    <div class="group-title">录入类型</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">$!task.enterTypeFormat</div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">分区/楼宇</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">$!task.buildingDetail</div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">完成时间</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">#if($task.finishTime) $!DateUtils.formatTimeYMDHM($!task.finishTime) #end</div>
+                    </div>
+                </div>
+            #end
+
+            <div class="form-group clearfix">
+                <div class="group-title">执行记录</div>
+                <div class="group-item">
+                    <div class="table-wrapper table-wrapper-nobg">
+                        #if($task.recordList && $task.recordList.size()>0)
+                        <table cellpadding="0" cellspacing="0" width="100%"
+                               class="table-primary table-primary-small table-noborder">
+                            <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>责任人</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                    #foreach($record in $task.recordList)
+                                    <tr>
+                                        <td>$!task.name</td>
+                                        <td>$!task.employeeName</td>
+                                        <td>#if($record.executeTime&&$record.executeTime gt 0) $!DateUtils.formatTimeYMDHM($!record.executeTime) #end</td>
+                                        <td>
+                                            <a href="/admin/assignment/history/detail.html?id=$!record.id" class="button-link button-link-small">查看</a>
+                                        </td>
+                                    </tr>
+                                    #end
+                            </tbody>
+                        </table>
+                        #end
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var ASSIGNMENT = {
+            init: function () {
+
+            }
+        };
+
+        ASSIGNMENT.init();
+    });
+</script>
+#end

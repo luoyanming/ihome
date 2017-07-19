@@ -1,0 +1,996 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>楼宇管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/attachment/template/download.html?fileName=building.xlsx" class="button-link button-download"
+               style="margin: 0 26px 0 0; color: #218adb;">模板下载</a>
+            <a href="/building/exportFile.html" class="button-link button-download"
+               style="margin: 0 26px 0 0; color: #218adb;">数据下载</a>
+            <a href="javascript:void(0);" class="button-link button-upload" style="margin: 0 26px 0 0; color: #218adb;"
+               id="btn-file-upload">数据导入</a>
+        </div>
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">楼宇管理</a>
+    </article>
+
+    <article class="">
+        #if($list && $list.size() gt 0)
+            #foreach($building in $list)
+                <div class="area-wrapper" id="area-$!building.id" data-area-id="$!building.id"
+                     data-area-name="$!building.name">
+                    <div class="area-header">
+                        <div class="operate-box">
+                            <a href="javascript:void(0);"
+                               class="button-link button-link-small button-operate-edit">修改</a>
+                            <a href="javascript:void(0);"
+                               class="button-link button-link-small button-operate-delete">删除</a>
+                            <a href="javascript:void(0);" class="button-link button-link-small btn-toggle">展开</a>
+                        </div>
+
+                        <div class="area-info">
+                            <span class="name">$!building.name</span>
+                            <span class="number-building">包含楼宇数：$!building.numberCount</span>
+                            <span class="number-unit">单元(层)数：$!building.unitCount</span>
+                            <span class="number-room">房间数：$!building.roomCount</span>
+                        </div>
+                    </div>
+
+                    <div class="area-content" style="display: none;">
+                        #if($building.buildingCellVoList && $building.buildingCellVoList.size() gt 0)
+                            #foreach($buildingCell in $building.buildingCellVoList)
+                                <div class="building-wrapper" id="building-$!buildingCell.id"
+                                     data-building-id="$!buildingCell.id"
+                                     data-building-name="$!buildingCell.name">
+                                    <div class="building-header">
+                                        <div class="operate-box">
+                                            <a href="javascript:void(0);"
+                                               class="button-link button-link-small button-operate-edit">修改</a>
+                                            <a href="javascript:void(0);"
+                                               class="button-link button-link-small button-operate-delete">删除</a>
+                                            <a href="javascript:void(0);"
+                                               class="button-link button-link-small btn-toggle">展开</a>
+                                        </div>
+
+                                        <div class="building-info">
+                                            <span class="name">$!buildingCell.name</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="building-content" style="display: none;">
+                                        #if($buildingCell.buildingUnitVoList && $buildingCell.buildingUnitVoList.size() gt 0)
+                                            #foreach($buildingUnit in $buildingCell.buildingUnitVoList)
+                                                <div class="unit-wrapper" id="unit-$!buildingUnit.id"
+                                                     data-unit-id="$!buildingUnit.id"
+                                                     data-unit-name="$!buildingUnit.name">
+                                                    <div class="unit-header">
+                                                        <div class="operate-box">
+                                                            <a href="javascript:void(0);"
+                                                               class="button-link button-link-small button-operate-edit">修改</a>
+                                                            <a href="javascript:void(0);"
+                                                               class="button-link button-link-small button-operate-delete">删除</a>
+                                                            <a href="javascript:void(0);"
+                                                               class="button-link button-link-small btn-toggle">展开</a>
+                                                        </div>
+
+                                                        <div class="unit-info">
+                                                            <span class="name">$!buildingUnit.name</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="unit-content">
+
+                                                        <div class="room-wrapper">
+                                                            <div class="room-content clearfix">
+                                                                #if($buildingUnit.buildingRoomVoList && $buildingUnit.buildingRoomVoList.size() gt 0)
+                                                                    #foreach($room in $buildingUnit.buildingRoomVoList)
+                                                                        <div class="room-item" id="room-$!room.id"
+                                                                             data-room-id="$!room.id"
+                                                                             data-room-name="$!room.roomNum">
+                                                                            <span>$!room.roomNum</span>
+                                                                            <a href="javascript:void(0);"
+                                                                               class="button-link button-link-small button-operate-edit">修改</a>
+                                                                            <a href="javascript:void(0);"
+                                                                               class="button-link button-link-small button-operate-delete">删除</a>
+                                                                        </div>
+                                                                    #*<div class="room-item" id="room-2"
+                                                                         data-room-id="2"
+                                                                         data-room-name="102">
+                                                                        <span>102</span>
+                                                                        <a href="javascript:void(0);"
+                                                                           class="button-link button-link-small button-operate-edit">修改</a>
+                                                                        <a href="javascript:void(0);"
+                                                                           class="button-link button-link-small button-operate-delete">删除</a>
+                                                                    </div>*#
+                                                                    #end
+                                                                #end
+                                                                <div class="room-item">
+                                                                    <a href="javascript:void(0);"
+                                                                       class="button-link button-link-small button-add">新增房间</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            #end
+                                        #end
+                                        <div class="unit-create">
+                                            <a href="javascript:void(0);"
+                                               class="button-link button-link-small button-add">新增单元(层)</a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            #end
+                        #end
+                        <div class="building-create">
+                            <a href="javascript:void(0);" class="button-link button-link-small button-add">新增楼宇</a>
+                        </div>
+                    </div>
+                </div>
+            #end
+        #end
+        <div class="area-create">
+            <a href="javascript:void(0);" class="button-link button-link-small button-add">新增分区</a>
+        </div>
+
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+
+## 新增分区 start
+<section class="modal-box modal-box-small" id="area-modal">
+    <div class="modal-header">
+        <h1>新增分区</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">分区名称</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-area"
+                               placeholder="例如：某某苑">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text"></div>
+                    <p class="errMsg errMsg-modal-area"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-small"
+                       id="btn-modal-area-submit">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 新增分区 end
+
+## 新增楼宇 start
+<section class="modal-box modal-box-small" id="building-modal">
+    <div class="modal-header">
+        <h1>新增楼宇</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">楼宇名称</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-building"
+                               placeholder="例如：1幢">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text"></div>
+                    <p class="errMsg errMsg-modal-building"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-small"
+                       id="btn-modal-building-submit">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 新增楼宇 end
+
+## 新增单元 start
+<section class="modal-box modal-box-small" id="unit-modal">
+    <div class="modal-header">
+        <h1>新增单元(层)</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">单元(层)</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-unit"
+                               placeholder="例如：1单元">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text">单元(层)</div>
+                    <p class="errMsg errMsg-modal-unit"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-small"
+                       id="btn-modal-unit-submit">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 新增单元(层) end
+
+## 新增房间 start
+<section class="modal-box modal-box-small" id="room-modal">
+    <div class="modal-header">
+        <h1>新增房间</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">房间号</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-room"
+                               placeholder="例如：1101">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text"></div>
+                    <p class="errMsg errMsg-modal-room"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-small"
+                       id="btn-modal-room-submit">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 新增房间 end
+
+## 删除确认提示框 start
+<section class="modal-box modal-box-small" id="tips-modal" style="width: 400px;">
+    <div class="modal-header">
+        <h1>提示</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part" style="padding-bottom: 40px;">
+            <div class="group-text state state-warning" style="font-size: 16px; text-align: center;">确定要删除 <strong
+                    class="string-text">海创园</strong> 么？
+            </div>
+            <div class="group-btn clearfix" style="margin-top: 40px; text-align: center">
+                <a href="javascript:void(0);" class="button-primary-able button-small btn-tips-modal-ensure"
+                   style="display: inline-block; width: auto; padding: 0 30px;">确认删除</a>
+                <a href="javascript:void(0);" class="button-primary-able button-small btn-tips-modal-cancle"
+                   style="display: inline-block; width: auto; padding: 0 30px; margin: 0 0 0 30px;">取消</a>
+            </div>
+        </div>
+    </div>
+</section>
+## 删除确认提示框 end
+
+## 删除报错提示框 start
+<section class="modal-box modal-box-small" id="errmsg-modal" style="width: 400px;">
+    <div class="modal-header">
+        <h1>错误提示</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part" style="padding-bottom: 40px;">
+            <div class="group-text state state-warning" style="font-size: 16px; text-align: center;">无法删除</div>
+            <div class="group-btn clearfix" style="margin-top: 40px; text-align: center">
+                <a href="javascript:void(0);" class="button-primary-able button-small btn-errmsg-modal-cancle"
+                   style="display: inline-block; width: auto; padding: 0 30px;">我知道了</a>
+            </div>
+        </div>
+    </div>
+</section>
+## 删除报错提示框 end
+
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var modalMask = $('.modal-mask');
+        var areaModal = $('#area-modal'),
+                areaModalTitle = areaModal.find('.modal-header h1'),
+                inputModalArea = $('#input-modal-area'),
+                btnModalAreaSubmit = $('#btn-modal-area-submit');
+        var buildingModal = $('#building-modal'),
+                buildingModalTitle = buildingModal.find('.modal-header h1'),
+                inputModalBuilding = $('#input-modal-building'),
+                btnModalBuildingSubmit = $('#btn-modal-building-submit');
+        var unitModal = $('#unit-modal'),
+                unitModalTitle = unitModal.find('.modal-header h1'),
+                inputModalUnit = $('#input-modal-unit'),
+                btnModalUnitSubmit = $('#btn-modal-unit-submit');
+        var roomModal = $('#room-modal'),
+                roomModalTitle = roomModal.find('.modal-header h1'),
+                inputModalRoom = $('#input-modal-room'),
+                btnModalRoomSubmit = $('#btn-modal-room-submit');
+        var tipsModal = $('#tips-modal'),
+                tipsModalText = tipsModal.find('.state-warning .string-text'),
+                btnTipsModalEnsure = tipsModal.find('.btn-tips-modal-ensure'),
+                btnTipsModalCancle = tipsModal.find('.btn-tips-modal-cancle');
+        var errmsgModal = $('#errmsg-modal'),
+                errmsgModalText = errmsgModal.find('.state-warning'),
+                btnErrmsgModalCancle = errmsgModal.find('.btn-errmsg-modal-cancle');
+
+        window.DATA = {
+            init: function () {
+                COMMON.fileUploadBind('/building/importExcel.html');
+
+                DATA.toggleBind();
+
+                DATA.btnOperateBind();
+            },
+            toggleBind: function () {
+                // 分区 toggle
+                var btnAreaToggle = $('.area-header .operate-box .btn-toggle');
+                btnAreaToggle.unbind('click');
+                btnAreaToggle.on('click', function () {
+                    var toggleText = $(this).html(),
+                            areaContent = $(this).parent().parent().parent().find('.area-content'),
+                            buildingToggleBtn = areaContent.find('.building-header .btn-toggle'),
+                            buildingContent = areaContent.find('.building-content');
+
+                    if (toggleText == '展开') {
+                        $(this).html('收起');
+                        buildingToggleBtn.html('展开');
+                        buildingContent.hide();
+                        areaContent.slideDown(200);
+                    } else if (toggleText == '收起') {
+                        $(this).html('展开');
+                        areaContent.slideUp(200);
+                    }
+                });
+
+                // 楼宇 toggle
+                var btnBuildingToggle = $('.building-header .operate-box .btn-toggle');
+                btnBuildingToggle.unbind('click');
+                btnBuildingToggle.on('click', function () {
+                    var toggleText = $(this).html(),
+                            buildingContent = $(this).parent().parent().parent().find('.building-content');
+
+                    if (toggleText == '展开') {
+                        $(this).html('收起');
+                        buildingContent.slideDown(200);
+                    } else if (toggleText == '收起') {
+                        $(this).html('展开');
+                        buildingContent.slideUp(200);
+                    }
+                });
+            },
+            btnOperateBind: function () {
+                var btnAddArea = $('.area-create .button-add'),
+                        btnEditArea = $('.area-header .button-operate-edit'),
+                        btnDelArea = $('.area-header .button-operate-delete');
+                var btnAddBuilding = $('.building-create .button-add'),
+                        btnEditBuilding = $('.building-header .button-operate-edit'),
+                        btnDelBuilding = $('.building-header .button-operate-delete');
+                var btnAddUnit = $('.unit-create .button-add'),
+                        btnEditUnit = $('.unit-header .button-operate-edit'),
+                        btnDelUnit = $('.unit-header .button-operate-delete');
+                var btnAddRoom = $('.room-item .button-add'),
+                        btnEditRoom = $('.room-item .button-operate-edit'),
+                        btnDelRoom = $('.room-item .button-operate-delete');
+
+                btnAddArea.unbind('click');
+                btnAddArea.on('click', function () {
+                    DATA.showAreaModal('add', undefined, $(this));
+                });
+
+                btnEditArea.unbind('click');
+                btnEditArea.on('click', function () {
+                    DATA.showAreaModal('edit', $(this).parent().parent().parent().attr('data-area-id'), $(this));
+                });
+
+                btnDelArea.unbind('click');
+                btnDelArea.on('click', function () {
+                    tipsModalText.attr('data-type', 'area');
+                    tipsModalText.attr('data-id', $(this).parent().parent().parent().attr('data-area-id'));
+                    tipsModalText.html($(this).parent().parent().parent().attr('data-area-name'));
+                    DATA.showTipsModal();
+                });
+
+
+                btnAddBuilding.unbind('click');
+                btnAddBuilding.on('click', function () {
+                    DATA.showBuildingModal('add', undefined, $(this));
+                });
+
+                btnEditBuilding.unbind('click');
+                btnEditBuilding.on('click', function () {
+                    DATA.showBuildingModal('edit', $(this).parent().parent().parent().attr('data-building-id'), $(this));
+                });
+
+                btnDelBuilding.unbind('click');
+                btnDelBuilding.on('click', function () {
+                    tipsModalText.attr('data-type', 'building');
+                    tipsModalText.attr('data-id', $(this).parent().parent().parent().attr('data-building-id'));
+                    tipsModalText.html($(this).parent().parent().parent().attr('data-building-name'));
+                    DATA.showTipsModal();
+                });
+
+
+                btnAddUnit.unbind('click');
+                btnAddUnit.on('click', function () {
+                    DATA.showUnitModal('add', undefined, $(this));
+                });
+
+                btnEditUnit.unbind('click');
+                btnEditUnit.on('click', function () {
+                    DATA.showUnitModal('edit', $(this).parent().parent().parent().attr('data-unit-id'), $(this));
+                });
+
+                btnDelUnit.unbind('click');
+                btnDelUnit.on('click', function () {
+                    tipsModalText.attr('data-type', 'unit');
+                    tipsModalText.attr('data-id', $(this).parent().parent().parent().attr('data-unit-id'));
+                    tipsModalText.html($(this).parent().parent().parent().attr('data-unit-name'));
+                    DATA.showTipsModal();
+                });
+
+
+                btnAddRoom.unbind('click');
+                btnAddRoom.on('click', function () {
+                    DATA.showRoomModal('add', undefined, $(this));
+                });
+
+                btnEditRoom.unbind('click');
+                btnEditRoom.on('click', function () {
+                    DATA.showRoomModal('edit', $(this).parent().attr('data-room-id'), $(this));
+                });
+
+                btnDelRoom.unbind('click');
+                btnDelRoom.on('click', function () {
+                    tipsModalText.attr('data-type', 'room');
+                    tipsModalText.attr('data-id', $(this).parent().attr('data-room-id'));
+                    tipsModalText.html($(this).parent().attr('data-room-name'));
+                    DATA.showTipsModal();
+                });
+            },
+            showAreaModal: function (operate, areaID, obj) {
+                $('.errMsg-modal-area').html('');
+
+                if (operate == 'add') {
+                    areaModalTitle.html('新增分区').attr('data-id', '');
+                    inputModalArea.val('');
+                } else if (operate == 'edit') {
+                    areaModalTitle.html('编辑分区').attr('data-id', areaID);
+                    if (obj.parent().parent().parent().attr('data-area-name') == '没有分区') {
+                        inputModalArea.val('');
+                    }else{
+                        inputModalArea.val(obj.parent().parent().parent().attr('data-area-name'));
+                    }
+                }
+
+                modalMask.fadeIn(200);
+                areaModal.fadeIn(200);
+
+                DATA.btnModalAreaSubmitBind(obj);
+            },
+            showBuildingModal: function (operate, buildingID, obj) {
+                $('.errMsg-modal-building').html('');
+
+                var areaID = '';
+                if (operate == 'add') {
+                    buildingModalTitle.html('新增楼宇').attr('data-id', '');
+                    inputModalBuilding.val('');
+                    areaID = obj.parent().parent().parent().attr('data-area-id');
+                } else if (operate == 'edit') {
+                    buildingModalTitle.html('编辑楼宇').attr('data-id', buildingID);
+                    if (obj.parent().parent().parent().attr('data-building-name') == '没有楼宇') {
+                        inputModalBuilding.val('');
+                    }else{
+                        inputModalBuilding.val(obj.parent().parent().parent().attr('data-building-name'));
+                    }
+                    //inputModalBuilding.val(obj.parent().parent().parent().attr('data-building-name'));
+                    areaID = obj.parent().parent().parent().parent().parent().attr('data-area-id');
+                }
+
+                modalMask.fadeIn(200);
+                buildingModal.fadeIn(200);
+
+
+                DATA.btnModalBuildingSubmitBind(obj, areaID);
+            },
+            showUnitModal: function (operate, unitID, obj) {
+                $('.errMsg-modal-unit').html('');
+
+                var buildingID = '';
+                if (operate == 'add') {
+                    unitModalTitle.html('新增单元(层)').attr('data-id', '');
+                    inputModalUnit.val('');
+                    buildingID = obj.parent().parent().parent().attr('data-building-id');
+                } else if (operate == 'edit') {
+                    unitModalTitle.html('编辑单元(层)').attr('data-id', unitID);
+                    if (obj.parent().parent().parent().attr('data-unit-name') == '没有单元(层)') {
+                        inputModalUnit.val('');
+                    }else{
+                        inputModalUnit.val(obj.parent().parent().parent().attr('data-unit-name'));
+                    }
+                    //inputModalUnit.val(obj.parent().parent().parent().attr('data-unit-name'));
+                    buildingID = obj.parent().parent().parent().parent().parent().attr('data-building-id');
+                }
+
+                modalMask.fadeIn(200);
+                unitModal.fadeIn(200);
+
+                DATA.btnModalUnitSubmitBind(obj, buildingID);
+            },
+            showRoomModal: function (operate, roomID, obj) {
+                $('.errMsg-modal-room').html('');
+
+                var unitID = '';
+                if (operate == 'add') {
+                    roomModalTitle.html('新增房间').attr('data-id', '');
+                    inputModalRoom.val('');
+                    unitID = obj.parent().parent().parent().parent().parent().attr('data-unit-id');
+                } else if (operate == 'edit') {
+                    roomModalTitle.html('编辑房间').attr('data-id', roomID);
+                    inputModalRoom.val(obj.parent().attr('data-room-name'));
+                    unitID = obj.parent().parent().parent().parent().parent().attr('data-unit-id');
+                }
+
+                modalMask.fadeIn(200);
+                roomModal.fadeIn(200);
+
+                DATA.btnModalRoomSubmitBind(obj, unitID);
+            },
+            btnModalAreaSubmitBind: function (obj) {
+                btnModalAreaSubmit.unbind('click');
+                btnModalAreaSubmit.on('click', function () {
+                    var areaID = areaModalTitle.attr('data-id'),
+                            areaName = inputModalArea.val();
+
+                    if (btnModalAreaSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-area').html('');
+
+                    /*if (!COMMON.checkNull(areaName)) {
+                        COMMON.errMsg($('.errMsg-modal-area'), '请填写分区名称!');
+                        return false;
+                    }
+                    $('.errMsg-modal-area').html('');*/
+
+                    if (areaName == '没有分区') {
+                        areaName = '';
+                    }
+
+                    btnModalAreaSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/building/save.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            buildingId: areaID,
+                            buildingName: areaName
+                        },
+                        success: function (data) {
+                            btnModalAreaSubmit.removeClass('button-primary-disable').html('保存');
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-area'), data.msg);
+                            } else {
+                                modalMask.fadeOut(200);
+                                areaModal.fadeOut(200);
+
+                                if (areaName == '' || areaName == null || areaName == undefined) {
+                                    areaName = "没有分区";
+                                }
+
+                                if (areaID == '') {
+                                    // 新增
+                                    // 需返回 areaId
+                                    //var data = { "data": { areaId: 1 } };
+
+                                    var str = '';
+                                    str += '<div class="area-wrapper" id="area-' + data.data.callbackId + '" data-area-id="' + data.data.callbackId + '" data-area-name="' + areaName + '">';
+                                    str += '<div class="area-header">';
+                                    str += '<div class="operate-box">';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-edit">修改</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-delete">删除</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-toggle">展开</a>';
+                                    str += '</div>';
+                                    str += '<div class="area-info">';
+                                    str += '<span class="name">' + areaName + '</span>';
+                                    str += '<span class="number-building">包含楼宇数：0</span>';
+                                    str += '<span class="number-unit">单元(层)数：0</span>';
+                                    str += '<span class="number-room">房间数：0</span>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '<div class="area-content" style="display: none;">';
+                                    str += '<div class="building-create">';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-add">新增楼宇</a>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '</div>';
+
+                                    obj.parent().before(str);
+
+                                    DATA.init();
+                                } else {
+                                    obj.parent().parent().parent().attr('data-area-name', areaName);
+                                    obj.parent().parent().find('.area-info .name').html(areaName);
+                                }
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-area'), '保存失败，请重试！');
+                            btnModalAreaSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnModalBuildingSubmitBind: function (obj, areaID) {
+                btnModalBuildingSubmit.unbind('click');
+                btnModalBuildingSubmit.on('click', function () {
+                    var buildingID = buildingModalTitle.attr('data-id'),
+                            buildingName = inputModalBuilding.val();
+
+                    if (btnModalBuildingSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-building').html('');
+
+                    /* if (!COMMON.checkNull(buildingName)) {
+                         COMMON.errMsg($('.errMsg-modal-building'), '请填写楼宇名称!');
+                         return false;
+                     }
+                     $('.errMsg-modal-building').html('');*/
+
+                    if (buildingName == '没有楼宇') {
+                        buildingName = '';
+                    }
+
+                    btnModalBuildingSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/building/save/buildingCell.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            //buildingID
+                            buildingId: areaID,
+                            buildingCellId: buildingID,
+                            buildingCellName: buildingName
+                        },
+                        success: function (data) {
+                            btnModalBuildingSubmit.removeClass('button-primary-disable').html('保存');
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-building'), data.msg);
+                            } else {
+                                modalMask.fadeOut(200);
+                                buildingModal.fadeOut(200);
+
+                                if (buildingName == '' || buildingName == null || buildingName == undefined) {
+                                    buildingName = "没有楼宇";
+                                }
+
+                                if (buildingID == '') {
+                                    // 新增
+                                    // 需返回 buildingId, 所在area的楼宇数 buildingNum、单元数 unitNum、房间数 roomNum
+                                    // var data = {"data": {buildingId: 1, buildingNum: 1, unitNum: 3, roomNum: 11}};
+
+                                    var areaInfo = obj.parent().parent().parent().find('.area-header .area-info');
+                                    areaInfo.find('.number-building').html('包含楼宇数：' + data.data.numberCount);
+                                    areaInfo.find('.number-unit').html('单元(层)数：' + data.data.unitCount);
+                                    areaInfo.find('.number-room').html('房间数：' + data.data.roomCount);
+
+                                    var str = '';
+                                    str += '<div class="building-wrapper" id="building-' + data.data.callbackId + '" data-building-id="' + data.data.callbackId + '" data-building-name="' + buildingName + '">';
+                                    str += '<div class="building-header">';
+                                    str += '<div class="operate-box">';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-edit">修改</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-delete">删除</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-toggle">展开</a>';
+                                    str += '</div>';
+                                    str += '<div class="building-info">';
+                                    str += '<span class="name">' + buildingName + '</span>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '<div class="building-content" style="display: none;">';
+                                    str += '<div class="unit-create">';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-add">新增单元(层)</a>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '</div>';
+
+                                    obj.parent().before(str);
+
+                                    DATA.init();
+                                } else {
+                                    obj.parent().parent().parent().attr('data-building-name', buildingName);
+                                    obj.parent().parent().find('.building-info .name').html(buildingName);
+                                }
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-building'), '保存失败，请重试！');
+                            btnModalBuildingSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnModalUnitSubmitBind: function (obj, buildingID) {
+                btnModalUnitSubmit.unbind('click');
+                btnModalUnitSubmit.on('click', function () {
+                    var unitID = unitModalTitle.attr('data-id'),
+                            unitName = inputModalUnit.val();
+
+                    if (btnModalUnitSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-unit').html('');
+
+                    /* if (!COMMON.checkNull(unitName)) {
+                         COMMON.errMsg($('.errMsg-modal-unit'), '请填写单元(层)!');
+                         return false;
+                     }*/
+                    /* if (!COMMON.checkInit(unitName, false)) {
+                         COMMON.errMsg($('.errMsg-modal-unit'), '单元号必须是正整数!');
+                         return false;
+                     }
+                    $('.errMsg-modal-unit').html('');
+                    */
+
+                    if (unitName == '没有单元(层)') {
+                        unitName = '';
+                    }
+
+                    btnModalUnitSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/building/save/buildingUnit.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            buildingCellId: buildingID,
+                            buildingUnitId: unitID,
+                            buildingUnitName: unitName
+                        },
+                        success: function (data) {
+                            btnModalUnitSubmit.removeClass('button-primary-disable').html('保存');
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-unit'), data.msg);
+                            } else {
+                                modalMask.fadeOut(200);
+                                unitModal.fadeOut(200);
+
+                                if (unitName == '' || unitName == null || unitName == undefined) {
+                                    unitName = "没有单元(层)";
+                                }
+                                if (unitID == '') {
+                                    // 新增
+                                    // 需返回 unitId, 所在area的楼宇数 buildingNum、单元数 unitNum、房间数 roomNum
+                                    //var data = {"data": {unitId: 1, buildingNum: 1, unitNum: 3, roomNum: 11}};
+
+                                    var areaInfo = obj.parent().parent().parent().parent().parent().find('.area-header .area-info');
+                                    areaInfo.find('.number-building').html('包含楼宇数：' + data.data.numberCount);
+                                    areaInfo.find('.number-unit').html('单元(层)数：' + data.data.unitCount);
+                                    areaInfo.find('.number-room').html('房间数：' + data.data.roomCount);
+
+                                    var str = '';
+                                    str += '<div class="unit-wrapper" id="unit-' + data.data.callbackId + '" data-unit-id="' + data.data.callbackId + '" data-unit-name="' + unitName + '">';
+                                    str += '<div class="unit-header">';
+                                    str += '<div class="operate-box">';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-edit">修改</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-delete">删除</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-toggle">展开</a>';
+                                    str += '</div>';
+                                    str += '<div class="unit-info">';
+                                    str += '<span class="name">' + unitName + '</span>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '<div class="unit-content">';
+                                    str += '<div class="room-wrapper">';
+                                    str += '<div class="room-content clearfix">';
+                                    str += '<div class="room-item">';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-add">新增房间</a>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '</div>';
+                                    str += '</div>';
+
+                                    obj.parent().before(str);
+
+                                    DATA.init();
+                                } else {
+                                    obj.parent().parent().parent().attr('data-unit-name', unitName);
+                                    obj.parent().parent().find('.unit-info .name').html(unitName);
+                                }
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-unit'), '保存失败，请重试！');
+                            btnModalUnitSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnModalRoomSubmitBind: function (obj, unitID) {
+                btnModalRoomSubmit.unbind('click');
+                btnModalRoomSubmit.on('click', function () {
+                    var roomID = roomModalTitle.attr('data-id'),
+                            roomName = inputModalRoom.val();
+
+                    if (btnModalRoomSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-room').html('');
+
+                    if (!COMMON.checkNull(roomName)) {
+                        COMMON.errMsg($('.errMsg-modal-room'), '请填写房间号!');
+                        return false;
+                    }
+                    $('.errMsg-modal-room').html('');
+
+                    btnModalRoomSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/building/save/room.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            buildingUnitId: unitID,
+                            roomId: roomID,
+                            roomNum: roomName
+                        },
+                        success: function (data) {
+                            btnModalRoomSubmit.removeClass('button-primary-disable').html('保存');
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-room'), data.msg);
+                            } else {
+                                modalMask.fadeOut(200);
+                                roomModal.fadeOut(200);
+
+                                if (roomID == '') {
+                                    // 新增
+                                    // 需返回 roomId, 所在area的楼宇数 buildingNum、单元数 unitNum、房间数 roomNum
+                                    //var data = {"data": {roomId: 1, buildingNum: 1, unitNum: 3, roomNum: 11}};
+
+                                    var areaInfo = obj.parent().parent().parent().parent().parent().parent().parent().parent().parent().find('.area-header .area-info');
+                                    areaInfo.find('.number-building').html('包含楼宇数：' + data.data.numberCount);
+                                    areaInfo.find('.number-unit').html('单元数：' + data.data.unitCount);
+                                    areaInfo.find('.number-room').html('房间数：' + data.data.roomCount);
+
+                                    var str = '';
+                                    str += '<div class="room-item" id="room-' + data.data.callbackId + '" data-room-id="' + data.data.callbackId + '" data-room-name="' + roomName + '">';
+                                    str += '<span>' + roomName + '</span>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-edit">修改</a>';
+                                    str += '<a href="javascript:void(0);" class="button-link button-link-small button-operate-delete">删除</a>';
+                                    str += '</div>';
+
+                                    obj.parent().before(str);
+
+                                    DATA.init();
+                                } else {
+                                    obj.parent().attr('data-room-name', roomName);
+                                    obj.parent().find('span').html(roomName);
+                                }
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-room'), '保存失败，请重试！');
+                            btnModalRoomSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            showTipsModal: function () {
+                modalMask.fadeIn(200);
+                tipsModal.fadeIn(200);
+
+                btnTipsModalEnsure.unbind('click');
+                btnTipsModalEnsure.on('click', function () {
+                    if (btnTipsModalEnsure.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+
+                    btnTipsModalEnsure.html('正在删除...');
+
+                    var type = tipsModalText.attr('data-type'),
+                            id = tipsModalText.attr('data-id'),
+                            ajaxUrl = '';
+
+                    if (type == 'area') { //分区
+                        ajaxUrl = '/building/deleteBuilding.html';
+                    } else if (type == 'building') { //幢
+                        ajaxUrl = '/building/delete/buildingCell.html';
+                    } else if (type == 'unit') { //单元
+                        ajaxUrl = '/building/delete/buildingUnit.html';
+                    } else if (type == 'room') { //房间
+                        ajaxUrl = '/room/deleteRoom.html';
+                    }
+
+                    $.ajax({
+                        url: ajaxUrl,
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: id
+                        },
+                        success: function (data) {
+                            btnTipsModalEnsure.html('确认删除').removeClass('button-primary-disable');
+                            modalMask.fadeOut(200);
+                            tipsModal.fadeOut(200);
+                            if (data.code != 200) {
+                                DATA.showErrMsg(data.msg);
+                            } else {
+                                $('#' + type + '-' + id).remove();
+                            }
+                        },
+                        error: function () {
+                            btnTipsModalEnsure.html('确认删除').removeClass('button-primary-disable');
+                            modalMask.fadeOut(200);
+                            tipsModal.fadeOut(200);
+                            DATA.showErrMsg('删除失败，请重试！');
+                        }
+                    });
+
+                });
+
+                btnTipsModalCancle.unbind('click');
+                btnTipsModalCancle.on('click', function () {
+                    modalMask.fadeOut(200);
+                    tipsModal.fadeOut(200);
+                });
+            },
+            showErrMsg: function (errmsg) {
+                errmsgModalText.html(errmsg);
+                modalMask.fadeIn(200);
+                errmsgModal.fadeIn(200);
+
+                btnErrmsgModalCancle.unbind('click');
+                btnErrmsgModalCancle.on('click', function () {
+                    modalMask.fadeOut(200);
+                    errmsgModal.fadeOut(200);
+                });
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

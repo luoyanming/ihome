@@ -1,0 +1,160 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>收费单记录--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/charge.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/charge.html" class="button-link">收费</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">收费单记录</a>
+    </article>
+
+    <form action="/admin/charge/form.html" method="POST">
+        <article class="form-condition">
+            <div class="condition-group clearfix">
+                <div class="title">名称&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" name="name" value="$!{paramName}" placeholder="请输入收费单名称" class="input-primary input-x-small">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="chargeTypeId" style="min-width: 120px;">
+                        <input type="hidden" name="chargeTypeId" class="input-hidden" value="$!{chargeTypeId}">
+                        #if($chargeTypeId && $chargeTypeId ne 0 )
+                            #foreach($!chargeTypeItem in $!chargeTypeList)
+                                #if($!chargeTypeId eq $!chargeTypeItem.id)
+                                    <span class="select-placeholder">$!chargeTypeItem.name</span>
+                                #end
+                            #end
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!chargeTypeId eq 0)class="selected" #end>全部</li>
+								#foreach($chargeTypeItem in $!chargeTypeList)
+                                    <li data-value="$!chargeTypeItem.id"
+										#if($!chargeTypeId eq $!chargeTypeItem.id)class="selected" #end>$!chargeTypeItem.name</li>
+								#end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!chargeTypeId eq 0)selected#end>全部</option>
+							#foreach($chargeTypeItem in $!chargeTypeList)
+                                <option data-value="$!chargeTypeItem.id"
+										#if($!chargeTypeId eq $!chargeTypeItem.id)selected #end>$!chargeTypeItem.name</option>
+							#end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar" value="$!{paramCreatedDateStar}"
+                           placeholder="xxxx年xx月xx日">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                           placeholder="xxxx年xx月xx日">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>收费单名称</th>
+                        <th>类型</th>
+                        <th>户数</th>
+                        <th>已收户数</th>
+                        <th>应收金额</th>
+                        <th>实收金额</th>
+                        <th>下发日期</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($item in $list)
+                        <tr>
+                            <td>$!item.name</td>
+                            <td>$!item.chargeTypeName</td>
+                            <td>$!item.totalCount</td>
+                            <td>$!item.paidCount</td>
+                            <td>$!item.totalFees</td>
+                            <td>
+								#if($item.paidFees)
+									$!{item.paidFees}
+								#else
+                                    0.00
+								#end
+                            </td>
+                            <td>$!DateUtils.formatTimeInSecond($!item.createdDate)</td>
+                            <td><a href="/admin/charge/form/detail.html?id=$!{item.id}"
+                                   class="button-link button-link-small">查看</a></td>
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无收费单记录</p></div>
+                </div>
+			#end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var CHARGE = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        CHARGE.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/charge/form.html',
+                {
+                    name: '$!paramName',
+                    chargeTypeId: '$!chargeTypeId',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

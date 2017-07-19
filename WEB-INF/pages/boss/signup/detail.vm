@@ -1,0 +1,335 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>入驻申请审批--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/boss/layout/header.vm")
+#parse("/boss/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/boss/signup.html" class="button-link">入驻申请</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">入驻申请审批</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" value="$!project.id" id="signupID">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">项目名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!project.projectName</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">项目地址</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!project.regionsProvName $!project.regionsCityName $!project.regionsTownName $!project.projectAddress</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">物业公司名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!project.companyName</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">委托合同</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-link button-boss-link link-normal" style="float: left;"  onclick="downloadContract($!project.entrustContract);">$!project.entrustContractName</a>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">营业执照</div>
+                <div class="group-item clearfix">
+                    <div class="upload-box" style="float: left;">
+                        <div class="upload-image">
+                            <img src="/attachment/viewImg.html?attachmentId=$!project.businessLicense" class="file-img">
+                            <div class="img-mask"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">身份证号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!project.idCardNo</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">手机号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!project.mobile</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">身份证照片</div>
+                <div class="group-item clearfix">
+                    <div class="upload-box" style="float: left;">
+                        <div class="upload-image">
+                            <img src="/attachment/viewImg.html?attachmentId=$!project.idCardPhotoA" class="file-img">
+                            <div class="img-mask"></div>
+                        </div>
+                        <div class="upload-image">
+                            <img src="/attachment/viewImg.html?attachmentId=$!project.idCardPhotoB" class="file-img">
+                            <div class="img-mask"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            #if($!project.status lt 1)
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-submit" style="float: left; width: 200px; margin: 20px 0 0 0;" id="btn-application-pass">审核通过</a>
+                    <a href="javascript:void(0);" class="button-primary-able button-grey btn-submit" style="float: left; width: 200px; margin: 20px 0 0 25px; height:48px; line-height: 48px; font-size: 18px;" id="btn-application-nopass">审核不通过</a>
+                </div>
+            </div>
+            #end
+        </div>
+    </form>
+</section>
+
+<section class="modal-mask"></section>
+
+## 审核通过 start
+<section class="modal-box" id="pass-modal">
+    <div class="modal-header">
+        <h1>审核通过</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">授权期限</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 110px;">
+                        <input type="text" class="input-primary input-primary-boss input-small input-null" placeholder="xx" maxlength="4" id="input-time-limit">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text">月</div>
+                    <div class="tips tips-grey" id="deadline">到期日期：2018/01/09</div>
+                    <p class="errMsg errMsg-time-limit"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-modal-submit" style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 审核通过 end
+
+## 审核不通过 start
+<section class="modal-box" id="nopass-modal">
+    <div class="modal-header">
+        <h1>审核不通过</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">不通过原因</div>
+                <div class="group-item">
+                    <textarea class="textarea-primary textarea-primary-boss" placeholder="请输入不通过原因" id="input-description"></textarea>
+                    <div class="errMsg errMsg-description"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-modal-submit" style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 审核不通过 end
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnApplicationPass = $('#btn-application-pass'),
+            btnApplicationNopass = $('#btn-application-nopass');
+
+        var modalMask = $('.modal-mask'),
+            passModal = $('#pass-modal'),
+            nopassModal = $('#nopass-modal'),
+            inputTimeLimit = $('#input-time-limit'),
+            deadline = $('#deadline'),
+            inputDescription = $('#input-description'),
+            btnPassModalSubmit = passModal.find('.btn-modal-submit'),
+            btnNopassModalSubmit = nopassModal.find('.btn-modal-submit');
+
+        var SIGNUP = {
+            init: function() {
+                SIGNUP.setDeadline(0);
+
+                SIGNUP.inputTimeLimitBind();
+
+                SIGNUP.btnApplicationPassBind();
+                SIGNUP.btnApplicationNopassBind();
+
+                SIGNUP.btnPassModalSubmitBind();
+                SIGNUP.btnNopassModalSubmitBind();
+            },
+            inputTimeLimitBind: function() {
+                inputTimeLimit.on('input propertychange', function() {
+                    var _this = $(this),
+                        inputVal = _this.val();
+
+                    SIGNUP.setDeadline(inputVal);
+                });
+            },
+            setDeadline: function(num) {
+                var y = '',
+                    m = '',
+                    d = '',
+                    date = new Date();
+
+                if(num) {
+                    date.setMonth(date.getMonth() + parseInt(num));
+                }
+
+                y = date.getFullYear();
+                if((date.getMonth() + 1) < 10) {
+                    m = '0' + (date.getMonth() + 1);
+                } else {
+                    m = (date.getMonth() + 1);
+                }
+                if(date.getDate() < 10) {
+                    d = '0' + date.getDate();
+                } else {
+                    d = date.getDate();
+                }
+
+                deadline.html('到期日期：' + y + '/' + m + '/' + d);
+            },
+            btnApplicationPassBind: function() {
+                btnApplicationPass.on('click', function() {
+                    $('.errMsg-time-limit').html('');
+                    inputTimeLimit.val('');
+
+                    SIGNUP.setDeadline(0);
+
+                    modalMask.fadeIn(200);
+                    passModal.fadeIn(200);
+                });
+            },
+            btnApplicationNopassBind: function() {
+                btnApplicationNopass.on('click', function() {
+                    $('.errMsg-description').html('');
+                    inputDescription.val('');
+
+                    modalMask.fadeIn(200);
+                    nopassModal.fadeIn(200);
+                });
+            },
+            btnPassModalSubmitBind: function() {
+                btnPassModalSubmit.on('click', function() {
+                    var inputTimeLimitVal = inputTimeLimit.val();
+
+                    if(btnPassModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-time-limit').html('');
+
+                    if(!COMMON.checkNull(inputTimeLimitVal)) {
+                        COMMON.errMsg($('.errMsg-time-limit'), '请输入授权期限!');
+                        return false;
+                    }
+                    $('.errMsg-time-limit').html('');
+
+                    btnPassModalSubmit.addClass('button-primary-disable button-primary-boss-disable').html('正在保存...');
+                    var id = $('#signupID').val();
+                    $.ajax({
+                        url: "/boss/approve/project.html",
+                        dataType:"json",
+                        type:"post",
+                        data: {
+                            id:id,
+                            status:1,
+                            month: inputTimeLimitVal
+                        },
+                        success:function(data) {
+                            if(data.code != 200) {
+                                COMMON.errMsg($('.errMsg-time-limit'), data.msg);
+                                btnPassModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                            } else {
+                                location.href = '/boss/signup.html';
+                            }
+                        },
+                        error: function() {
+                            COMMON.errMsg($('.errMsg-time-limit'), '保存失败，请重试！');
+                            btnPassModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnNopassModalSubmitBind: function() {
+                btnNopassModalSubmit.on('click', function() {
+                    var inputDescriptionVal = inputDescription.val();
+
+                    if(btnNopassModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-description').html('');
+
+                    if(!COMMON.checkNull(inputDescriptionVal)) {
+                        COMMON.errMsg($('.errMsg-description'), '请输入不通过原因!');
+                        return false;
+                    }
+                    $('.errMsg-description').html('');
+
+                    btnNopassModalSubmit.addClass('button-primary-disable button-primary-boss-disable').html('正在保存...');
+                    var id = $('#signupID').val();
+                    $.ajax({
+                        url: "/boss/approve/project.html",
+                        dataType:"json",
+                        type:"post",
+                        data: {
+                            id:id,
+                            status:2,
+                            reason: inputDescriptionVal
+                        },
+                        success:function(data) {
+                            if(data.code != 200) {
+                                COMMON.errMsg($('.errMsg-description'), data.msg);
+                                btnNopassModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                            } else {
+                                location.href = '/boss/signup.html';
+                            }
+                        },
+                        error: function() {
+                            COMMON.errMsg($('.errMsg-description'), '保存失败，请重试！');
+                            btnNopassModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+
+        SIGNUP.init();
+    });
+
+    //下载合同
+    function downloadContract(id) {
+        if (id == null || id == '' || id == undefined) {
+            return;
+        }
+        window.open("/boss/download/contract.html?attachmentId=" + id);
+    }
+</script>
+#end

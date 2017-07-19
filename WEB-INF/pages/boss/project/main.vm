@@ -1,0 +1,540 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>项目列表--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/boss/layout/header.vm")
+#parse("/boss/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">项目列表</a>
+    </article>
+
+    <form action="/boss/project.html" method="post">
+        <article class="form-condition">
+            <div class="condition-group clearfix">
+                <div class="title">项目名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 150px;">
+                        <input type="text" placeholder="请输入项目名称" class="input-primary input-primary-boss input-x-small"
+                               name="projectName" value="$!projectName">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">联系人</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 130px;">
+                        <input type="text" placeholder="请输入联系人" class="input-primary input-primary-boss input-x-small"
+                               name="name"
+                               value="$!name">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">手机号</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 130px;">
+                        <input type="text" placeholder="请输入手机号" class="input-primary input-primary-boss input-x-small"
+                               name="mobile" value="$!mobile">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+        #* <div class="condition-group clearfix">
+             <div class="title">员工</div>
+             <div class="select-box clearfix">
+                 <div class="select-primary select-small" id="">
+                     <input type="hidden" name="" class="input-hidden">
+                     <span class="select-placeholder">状态</span>
+                     <div class="select-options light-overscroll">
+                         <ul>
+                             <li data-value="" class="selected">全部</li>
+                             <li data-value="1">电梯</li>
+                             <li data-value="2">消防栓</li>
+                             <li data-value="3">灭火器</li>
+                         </ul>
+                     </div>
+                     <select class="select-select">
+                         <option value="" selected>全部</option>
+                         <option value="1">电梯</option>
+                         <option value="2">消防栓</option>
+                         <option value="3">灭火器</option>
+                     </select>
+                 </div>
+             </div>
+         </div>*#
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search button-search-boss btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-project">
+                    <thead>
+                    <tr>
+                        <th>项目名称</th>
+                        <th>项目地点</th>
+                        <th>申请人</th>
+                        <th>手机号</th>
+                        <th>到期时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($project in $list)
+                        <tr data-id="$!project.id">
+                            <td>$!project.projectName</td>
+                            <td>$!project.projectAddress</td>
+                            <td>$!project.name</td>
+                            <td>$!project.mobile</td>
+                            <td>#if($project.validDate && $!project.validDate gt 0) $!DateUtils.formatTimeYMDHM($!project.validDate) #end</td>
+                            #if($project.validDate && $!project.validDate eq 0)
+                                <td class="state state-warning">$!project.statusFormat</td>
+                                <td><a href="/boss/project/edit.html?id=$!project.id"
+                                       class="button-link button-boss-link button-link-small">编辑</a></td>
+                            #else
+                                #if($!project.enable)
+                                    #if($!project.validDay gt 15 )
+                                        <td>正常</td>
+                                    #elseif($!project.validDay gt 0 && $!project.validDay lt 15)
+                                        <td class="state state-warning">即将到期</td>
+                                    #else
+                                        <td class="state state-warning">已到期</td>
+                                    #end
+                                #else
+                                    <td class="state state-disable">已停用</td>
+                                #end
+                                <td>
+                                    <a href="/boss/project/edit.html?id=$!project.id"
+                                       class="button-link button-boss-link button-link-small">编辑</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-boss-link button-link-small btn-reset">重置密码</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-boss-link button-link-small btn-renew">续签</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    #if(!$!project.enable)
+                                        <a href="/boss/enabled/project.html?id=$!project.id"
+                                           class="button-link button-boss-link button-link-small">启用</a>
+                                    #else
+                                        <a href="/boss/disabled/project.html?id=$!project.id"
+                                           class="button-link button-boss-link button-link-small">停用</a>
+                                    #end
+                                </td>
+                            #end
+                        </tr>
+                        #end
+                    #* <tr data-id="1">
+                         <td>某某项目</td>
+                         <td>某某地点</td>
+                         <td>张某某</td>
+                         <td>13575458744</td>
+                         <td>2016/12/22</td>
+                         <td class="state state-warning">即将到期</td>
+                         <td>
+                             <a href="/boss/project/edit.html" class="button-link button-boss-link button-link-small">编辑</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);"
+                                class="button-link button-boss-link button-link-small btn-reset">重置密码</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-boss-link button-link-small btn-renew">续签</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-boss-link button-link-small">停用</a>
+                         </td>
+                     </tr>
+                     <tr data-id="2">
+                         <td>某某项目</td>
+                         <td>某某地点</td>
+                         <td>张某某</td>
+                         <td>13575458744</td>
+                         <td>2016/12/22</td>
+                         <td>正常</td>
+                         <td>
+                             <a href="/boss/project/edit.html" class="button-link button-boss-link button-link-small">编辑</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);"
+                                class="button-link button-boss-link button-link-small btn-reset">重置密码</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-boss-link button-link-small btn-renew">续签</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-boss-link button-link-small">停用</a>
+                         </td>
+                     </tr>
+                     <tr data-id="3">
+                         <td>某某项目</td>
+                         <td>某某地点</td>
+                         <td>张某某</td>
+                         <td>13575458744</td>
+                         <td>2016/12/22</td>
+                         <td class="state state-disable">已停用</td>
+                         <td>
+                             <a href="/boss/project/edit.html" class="button-link button-boss-link button-link-small">编辑</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);"
+                                class="button-link button-boss-link button-link-small btn-reset">重置密码</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-boss-link button-link-small btn-renew">续签</a>
+                             &nbsp;&nbsp;&nbsp;&nbsp;
+                             <a href="javascript:void(0);" class="button-link button-boss-link button-link-small">停用</a>
+                         </td>
+                     </tr>*#
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无项目</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/boss/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+
+## 续签 start
+<section class="modal-box" id="renew-modal">
+    <div class="modal-header">
+        <h1>续签</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">当前到期日</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="deadline-now">0</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">授权期限</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 110px;">
+                        <input type="text" name="date" class="input-primary input-primary-boss input-small input-null"
+                               placeholder="xx"
+                               maxlength="4" id="input-time-limit">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text">月</div>
+                    <div class="tips tips-grey" id="deadline">到期日期：2018/01/09</div>
+                    <p class="errMsg errMsg-time-limit"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 续签 end
+
+## 重置密码 start
+<section class="modal-box" id="reset-modal">
+    <div class="modal-header">
+        <h1>重置密码</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-item" style="float: initial; margin: 0 auto;">
+                    <div class="input-item">
+                        <input type="password" class="input-primary input-primary-boss input-null" placeholder="请输入原密码"
+                               id="input-pwd">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-pwd"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-item" style="float: initial; margin: 0 auto;">
+                    <div class="input-item">
+                        <input type="password" class="input-primary input-primary-boss input-null" placeholder="请输入新密码"
+                               id="input-pwd1">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-pwd1"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-item" style="float: initial; margin: 0 auto;">
+                    <div class="input-item">
+                        <input type="password" class="input-primary input-primary-boss input-null" placeholder="请确认新密码"
+                               id="input-pwd2">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-pwd2"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-item" style="float: initial; margin: 0 auto;">
+                    <a href="javascript:void(0);" class="button-primary-able button-primary-boss-able btn-modal-submit"
+                       style="margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 重置密码 end
+
+## 重置密码成功 start
+<section class="succ-modal" id="reset-succ-modal">
+    <div class="succ-box">
+        <p>重置成功</p>
+    </div>
+</section>
+## 重置密码成功 end
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var tableProject = $('#table-project'),
+                btnReset = tableProject.find('.btn-reset'),
+                btnRenew = tableProject.find('.btn-renew');
+
+        var modalMask = $('.modal-mask'),
+                renewModal = $('#renew-modal'),
+                renewModalTitle = renewModal.find('.modal-header h1'),
+                deadlineNow = $('#deadline-now'),
+                inputTimeLimit = $('#input-time-limit'),
+                deadline = $('#deadline'),
+                btnRenewModalSubmit = renewModal.find('.btn-modal-submit');
+
+        var resetModal = $('#reset-modal'),
+                resetModalTitle = resetModal.find('.modal-header h1'),
+                inputPwd = $('#input-pwd'),
+                inputPwd1 = $('#input-pwd1'),
+                inputPwd2 = $('#input-pwd2'),
+                btnResetModalSubmit = resetModal.find('.btn-modal-submit');
+
+        var resetSuccModal = $('#reset-succ-modal');
+
+        var PROJECT = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+
+                PROJECT.inputTimeLimitBind();
+                PROJECT.btnRenewBind();
+                PROJECT.btnResetBind();
+
+                PROJECT.btnRenewModalSubmitBind();
+                PROJECT.btnResetModalSubmitBind();
+            },
+            inputTimeLimitBind: function () {
+                inputTimeLimit.on('input propertychange', function () {
+                    var _this = $(this),
+                            inputVal = _this.val();
+
+                    PROJECT.setDeadline(inputVal);
+                });
+            },
+            setDeadline: function (num) {
+                var y = '',
+                        m = '',
+                        d = '',
+                        date = new Date();
+
+                var originalTime = deadlineNow.html();
+                originalTime = new Date(originalTime);
+
+                if (originalTime.getTime() > date.getTime()) {
+                    date = originalTime;
+                }
+
+                if (num) {
+                    date.setMonth(date.getMonth() + parseInt(num));
+                }
+
+                y = date.getFullYear();
+                if ((date.getMonth() + 1) < 10) {
+                    m = '0' + (date.getMonth() + 1);
+                } else {
+                    m = (date.getMonth() + 1);
+                }
+                if (date.getDate() < 10) {
+                    d = '0' + date.getDate();
+                } else {
+                    d = date.getDate();
+                }
+
+                deadline.html('到期日期：' + y + '/' + m + '/' + d);
+            },
+            btnRenewBind: function () {
+                btnRenew.on('click', function () {
+                    $('.errMsg-time-limit').html('');
+                    inputTimeLimit.val('');
+
+                    renewModalTitle.attr('data-id', $(this).parent().parent().attr('data-id'));
+                    deadlineNow.html($(this).parent().parent().find('td').eq(4).html());
+
+                    PROJECT.setDeadline(0);
+
+                    modalMask.fadeIn(200);
+                    renewModal.fadeIn(200);
+                });
+            },
+            btnResetBind: function () {
+                btnReset.on('click', function () {
+                    $('.errMsg-pwd').html('');
+                    $('.errMsg-pwd1').html('');
+                    $('.errMsg-pwd2').html('');
+
+                    renewModalTitle.attr('data-id', $(this).parent().parent().attr('data-id'));
+                    inputPwd.val('');
+                    inputPwd1.val('');
+                    inputPwd2.val('');
+
+                    modalMask.fadeIn(200);
+                    resetModal.fadeIn(200);
+                });
+            },
+            btnRenewModalSubmitBind: function () {
+                btnRenewModalSubmit.on('click', function () {
+                    var inputTimeLimitVal = inputTimeLimit.val();
+
+                    if (btnRenewModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-time-limit').html('');
+
+                    if (!COMMON.checkNull(inputTimeLimitVal)) {
+                        COMMON.errMsg($('.errMsg-time-limit'), '请输入授权期限!');
+                        return false;
+                    }
+                    $('.errMsg-time-limit').html('');
+
+                    btnRenewModalSubmit.addClass('button-primary-disable button-primary-boss-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/boss/sign/project.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: renewModalTitle.attr('data-id'),
+                            month: inputTimeLimitVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-time-limit'), data.msg);
+                                btnRenewModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-time-limit'), '保存失败，请重试！');
+                            btnRenewModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnResetModalSubmitBind: function () {
+                btnResetModalSubmit.on('click', function () {
+                    var inputPwdVal = inputPwd.val(),
+                            inputPwd1Val = inputPwd1.val(),
+                            inputPwd2Val = inputPwd2.val();
+
+                    if (btnResetModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-pwd').html('');
+                    $('.errMsg-pwd1').html('');
+                    $('.errMsg-pwd2').html('');
+
+                    if (!COMMON.checkNull(inputPwdVal)) {
+                        COMMON.errMsg($('.errMsg-pwd'), '请输入原密码!');
+                        return false;
+                    }
+                    $('.errMsg-pwd').html('');
+
+                    if (!COMMON.checkNull(inputPwd1Val)) {
+                        COMMON.errMsg($('.errMsg-pwd1'), '请输入新密码!');
+                        return false;
+                    }
+                    $('.errMsg-pwd1').html('');
+
+                    if (!COMMON.checkNull(inputPwd2Val)) {
+                        COMMON.errMsg($('.errMsg-pwd2'), '请确认新密码!');
+                        return false;
+                    }
+                    if (inputPwd1Val != inputPwd2Val) {
+                        COMMON.errMsg($('.errMsg-pwd2'), '两次输入的新密码不一致!');
+                        return false;
+                    }
+                    $('.errMsg-pwd2').html('');
+
+                    btnResetModalSubmit.addClass('button-primary-disable button-primary-boss-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/boss/reset/company/password.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            propertyCompanyId: renewModalTitle.attr('data-id'),
+                            oldPassword: inputPwdVal,
+                            //pwd1: inputPwd1Val,
+                            newPassword: inputPwd2Val
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-pwd2'), data.msg);
+                                btnResetModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                            } else {
+                                modalMask.hide();
+                                resetModal.hide();
+                                resetSuccModal.fadeIn(200);
+                                btnResetModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+
+                                var resetXF = setTimeout(function () {
+                                    clearTimeout(resetXF);
+                                    resetSuccModal.fadeOut(200);
+                                }, 2000);
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-pwd2'), '保存失败，请重试！');
+                            btnResetModalSubmit.removeClass('button-primary-disable button-primary-boss-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+
+        PROJECT.init();
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/boss/project.html',
+                {
+                    name: '$!name',
+                    mobile: '$!mobile',
+                    projectName: '$!projectName',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

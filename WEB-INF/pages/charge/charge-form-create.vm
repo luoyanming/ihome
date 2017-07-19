@@ -1,0 +1,918 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新建收费单--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/assignment.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/charge.html" class="button-link">收费</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">新建收费单</a>
+    </article>
+
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入收费单名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-chargeType">
+                        #foreach($chargeTypeItem in $chargeTypeList)
+                            #set($dataInput = 0)
+                            #if($!chargeTypeItem.dataType gt 0)
+                                #set($dataInput = 1)
+                            #end
+                            <label style="margin-bottom: 10px;">
+                                <input name="chargeType" type="radio" value="$!chargeTypeItem.id" data-input="$!dataInput" />
+                                <p class="radio-text">$!chargeTypeItem.name</p>
+                            </label>
+                        #end
+                    </div>
+                    <div class="errMsg errMsg-chargeType"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" id="charge-standard-wrapper" style="display: none;">
+                <div class="group-title">收费标准</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin: 0;" id="charge-standard">¥ 2.8 / m³</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" id="checkbox-assignment-wrapper" style="display: none;">
+                <div class="group-title">录入数据任务</div>
+                <div class="group-item">
+                    <div class="checkbox-hidden-item" id="checkbox-assignment" data-text="">
+                    ##    <label style="display: block; width: auto;">
+                    ##        <input name="chargeAssignment" type="checkbox" value="1" />
+                    ##        <p class="checkbox-text">2016年12月1、2、3幢电表数据录入任务</p>
+                    ##    </label>
+                    </div>
+                    <div class="errMsg errMsg-checkbox-assignment"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" id="table-balance-wrapper" style="display: none;">
+                <div class="group-title">收费明细</div>
+                <div class="group-item">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small" id="table-balance">
+                            <thead>
+                                <tr>
+                                    <th>小区</th>
+                                    <th>楼宇</th>
+                                    <th>单元</th>
+                                    <th>房间</th>
+                                    <th>金额</th>
+                                    <th>说明</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            ##    <tr>
+                            ##        <td data-area-id="11">某某苑</td>
+                            ##        <td data-building-id="1115">15幢</td>
+                            ##        <td data-unit-id="111505">5单元</td>
+                            ##        <td data-room-id="1">602</td>
+                            ##        <td data-cash="588">¥ 588</td>
+                            ##        <td>2017物业费收费明细说明</td>
+                            ##        <td>
+                            ##            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                            ##            &nbsp;&nbsp;&nbsp;&nbsp;
+                            ##            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                            ##        </td>
+                            ##    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add btn-add">添加新用户</a>
+                        <a href="/attachment/template/download.html?fileName=charge.xlsx" class="button-link button-download" style="margin-left: 25px;">模板下载</a>
+                        <a href="javascript:void(0);" class="button-link button-upload" style="margin-left: 25px;"  id="btn-file-upload">数据导入</a>
+                    </div>
+
+                    <div class="errMsg errMsg-balance"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" style="margin-top: 0;">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <div class="errMsg errMsg-submit"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit" style="float: left; width: 200px; margin: 0 0 0 0;">创建</a>
+                    <a href="/admin/charge.html" class="button-link" style="float: left; margin: 15px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="people-add-modal">
+    <div class="modal-header">
+        <h1>添加新用户</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content light-overscroll">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">地址</div>
+                <div class="group-item clearfix" style="width: auto;">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" style="width: 110px;" id="select-area">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">请选择</li>
+                                    #foreach($buildingItem in $buildingList)
+                                        <li data-value="$!buildingItem.id">$!buildingItem.name</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>请选择</option>
+                                #foreach($buildingItem in $buildingList)
+                                    <option value="$!buildingItem.id">$!buildingItem.name</option>
+                                #end
+                            </select>
+                        </div>
+                        <div class="select-primary" style="width: 110px;" id="select-building">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">请选择</li>
+                                    <li data-value="1">楼宇1</li>
+                                    <li data-value="2">楼宇2</li>
+                                    <li data-value="3">楼宇3</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>请选择</option>
+                                <option value="1">楼宇1</option>
+                                <option value="2">楼宇2</option>
+                                <option value="3">楼宇3</option>
+                            </select>
+                        </div>
+                        <div class="select-primary" style="width: 130px;" id="select-unit">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">请选择</li>
+                                    <li data-value="1">单元1</li>
+                                    <li data-value="2">单元2</li>
+                                    <li data-value="3">单元3</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>请选择</option>
+                                <option value="1">单元1</option>
+                                <option value="2">单元2</option>
+                                <option value="3">单元3</option>
+                            </select>
+                        </div>
+                        <div class="select-primary" style="width: 110px;" id="select-room">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">请选择</li>
+                                    <li data-value="1">101</li>
+                                    <li data-value="2">102</li>
+                                    <li data-value="3">103</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>请选择</option>
+                                <option value="1">101</option>
+                                <option value="2">102</option>
+                                <option value="3">103</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="errMsg errMsg-modal-addr"></div>
+                </div>
+            </div>
+
+            #*<div class="form-group clearfix">
+                <div class="group-title">房间</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 110px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-room" placeholder="请输入房间号">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-modal-room"></div>
+                </div>
+            </div>*#
+
+            <div class="form-group clearfix">
+                <div class="group-title">金额</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 110px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-cash" placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-modal-cash"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">说明</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 260px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-intro" placeholder="请输入收费说明">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-modal-intro"></div>
+                </div>
+            </div>
+            
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit" style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var inputName = $('#input-name'),
+            radioChargeType = $('#radio-chargeType'),
+            chargeStandardWrapper = $('#charge-standard-wrapper'),
+            chargeStandard = $('#charge-standard'),
+            checkboxAssignmentWrapper = $('#checkbox-assignment-wrapper'),
+            checkboxAssignment = $('#checkbox-assignment'),
+            tableBalanceWrapper = $('#table-balance-wrapper'),
+            tableBalance = $('#table-balance'),
+            btnSubmit = $('.btn-submit');
+
+        var modalMask = $('.modal-mask'),
+            peopleAddModal = $('#people-add-modal'),
+            peopleAddModalTitle = peopleAddModal.find('.modal-header h1'),
+            selectArea = $('#select-area'),
+            selectBuilding = $('#select-building'),
+            selectUnit = $('#select-unit'),
+            selectRoom = $('#select-room'),
+            inputModalRoom = $('#input-modal-room'),
+            inputModalCash = $('#input-modal-cash'),
+            inputModalIntro = $('#input-modal-intro'),
+            btnModalSubmit = $('.btn-modal-submit');
+        
+
+        var CHARGE = {
+            init: function () {
+                COMMON.selectBind($('#select-area'), CHARGE.getBuildingList);
+                COMMON.fileUploadBind('/charge/importExcel.html', CHARGE.getUploadData);
+                CHARGE.radioChargeTypeBind();
+
+                CHARGE.btnAddEditBind();
+
+                CHARGE.btnModalSubmitBind();
+
+                CHARGE.btnSubmitBind();
+            },
+            radioChargeTypeBind: function() {
+                var radioChargeTypeItem = radioChargeType.find('label');
+
+                radioChargeTypeItem.on('click', function() {
+                    var dataInput = $(this).find('input[name="chargeType"]').attr('data-input'),
+                        chargeTypeId = $(this).find('input[name="chargeType"]').val();
+
+                    // 通过类型id取：收费标准、录入数据任务(如果data-input == 1)
+                     $.ajax({
+                         url: "/charge/type/info.html",
+                         dataType:"json",
+                         type:"get",
+                         data: {
+                             chargeTypeId: chargeTypeId,
+                             dataInput: dataInput
+                         },
+                         success:function(data) {
+                             if(data.code != 200) {
+
+                             } else {
+                                chargeStandard.html('¥ '+ data.data.chargeType.feesDesc +' / '+ data.data.chargeType.unitsDesc);
+                                chargeStandardWrapper.show();
+
+                                $('.errMsg-checkbox-assignment').html('');
+                                $('.errMsg-balance').html('');
+                                $('.errMsg-submit').html('');
+
+                                if(dataInput == 1) {
+                                    var str = '';
+                                    data.data.taskRecordVos.forEach(function(element,index,array){
+                                        str += '<label style="display: block; width: auto;">';
+                                        str += '<input name="chargeAssignment" type="checkbox" value="'+ element.id +'" />';
+                                        str += '<p class="checkbox-text">'+ element.taskName +'</p>';
+                                        str += '</label>';
+                                    });
+                                    checkboxAssignment.html(str);
+                                    checkboxAssignmentWrapper.show();
+                                    tableBalanceWrapper.hide();
+                                } else if(dataInput == 0) {
+                                    tableBalanceWrapper.show();
+                                    checkboxAssignmentWrapper.hide();
+                                }
+                             }
+                         },
+                         error: function() {
+                            
+                         }
+                     });
+                });
+            },
+            getBuildingList: function(AID) {
+                if(AID == '') {
+                    selectBuilding.html('').hide();
+                    selectUnit.html('').hide();
+                    return false;
+                }
+
+                 $.ajax({
+                     url: "/building/buildingCellList.html",
+                     dataType:"json",
+                     type:"get",
+                     data: {
+                         buildingId: AID
+                     },
+                     success:function(data) {
+                         if(data.code != 200) {
+                            
+                         } else {
+                            var str = '';
+                            str += '<input type="hidden" name="" class="input-hidden">';
+                            str += '<span class="select-placeholder">请选择</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">请选择</li>';
+                            data.list.forEach(function(element, index, array){
+                                str += '<li data-value="'+ element.id +'">'+ element.name +'</li>';
+                            });
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>请选择</option>';
+                            data.list.forEach(function(element, index, array){
+                                str += '<option value="'+ element.id +'">'+ element.name +'</option>';
+                            });
+                            str += '</select>';
+
+                            selectBuilding.html(str).show();
+                            selectUnit.html('').hide();
+                            selectRoom.html('').hide();
+                            COMMON.selectBind($('#select-building'), CHARGE.getUnitList);
+                         }
+                     },
+                     error: function() {
+                        
+                     }
+                 });
+            },
+            getUnitList: function(BID) {
+                if(BID == '') {
+                    selectUnit.html('').hide();
+                    return false;
+                }
+
+                 $.ajax({
+                     url: "/building/buildingUnitList.html",
+                     dataType:"json",
+                     type:"get",
+                     data: {
+                         buildingCellId: BID
+                     },
+                     success:function(data) {
+                         if(data.code != 200) {
+                            
+                         } else {
+                            var str = '';
+                            str += '<input type="hidden" name="" class="input-hidden">';
+                            str += '<span class="select-placeholder">请选择</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">请选择</li>';
+                            data.list.forEach(function(element, index, array){
+                                str += '<li data-value="'+ element.id +'">'+ element.name +'</li>';
+                            });
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>请选择</option>';
+                            data.list.forEach(function(element, index, array){
+                                str += '<option value="'+ element.id +'">'+ element.name +'</option>';
+                            });
+                            str += '</select>';
+
+                            selectUnit.html(str).show();
+                            selectRoom.html('').hide();
+                            COMMON.selectBind($('#select-unit'), CHARGE.getRoomList);
+                         }
+                     },
+                     error: function() {
+                        
+                     }
+                 });
+            },
+            getRoomList: function(UID) {
+                if(UID == '') {
+                    selectRoom.html('').hide();
+                    return false;
+                }
+
+                 $.ajax({
+                     url: "/room/list.html",
+                     dataType:"json",
+                     type:"get",
+                     data: {
+                        buildingId: selectArea.find('.input-hidden').val(),
+                        buildingCellId: selectBuilding.find('.input-hidden').val(),
+                        buildingUnitId: UID
+                     },
+                     success:function(data) {
+                         if(data.code != 200) {
+                            
+                         } else {
+                            var str = '';
+                            str += '<input type="hidden" name="" class="input-hidden">';
+                            str += '<span class="select-placeholder">请选择</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">请选择</li>';
+                            data.list.forEach(function(element, index, array){
+                                str += '<li data-value="'+ element.id +'">'+ element.num +'</li>';
+                            });
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>请选择</option>';
+                            data.list.forEach(function(element, index, array){
+                                str += '<option value="'+ element.id +'">'+ element.num +'</option>';
+                            });
+                            str += '</select>';
+
+                            selectRoom.html(str).show();
+                            COMMON.selectBind($('#select-room'), undefined);
+                         }
+                     },
+                     error: function() {
+                        
+                     }
+                 });
+            },
+            btnAddEditBind: function() {
+                var btnAdd = tableBalanceWrapper.find('.btn-add'),
+                    btnEdit = tableBalance.find('.btn-edit'),
+                    btnDel = tableBalance.find('.btn-del');
+
+                btnAdd.unbind('click');
+                btnAdd.on('click', function() {
+                    CHARGE.showPeopleAddModal('add', undefined, undefined);
+                });
+
+                btnEdit.unbind('click');
+                btnEdit.on('click', function() {
+                    CHARGE.showPeopleAddModal('edit', $(this), $(this).parent().parent().index());
+                });
+
+                btnDel.unbind('click');
+                btnDel.on('click', function() {
+                    $(this).parent().parent().remove();
+                });
+            },
+            showPeopleAddModal: function(operate, obj, index) {
+                $('.errMsg-modal-addr').html('');
+                $('.errMsg-modal-cash').html('');
+                $('.errMsg-modal-intro').html('');
+
+                if(operate == 'add') {
+                    peopleAddModalTitle.attr('data-index', '');
+
+                    selectArea.find('.input-hidden').val('');
+                    selectArea.find('.select-placeholder').html('请选择');
+                    selectArea.find('.select-options ul li.selected').removeClass('selected');
+                    selectArea.find('.select-options ul li').eq(0).addClass('selected');
+                    selectArea.find('.select-select option').eq(0).attr('selected', true);
+
+                    selectBuilding.html('').hide();
+                    selectUnit.html('').hide();
+                    selectRoom.html('').hide();
+
+                    inputModalCash.val();
+                    inputModalIntro.val();
+                } else if(operate == 'edit') {
+                    peopleAddModalTitle.attr('data-index', index);
+
+                    var currTR = tableBalance.find('tbody tr').eq(index),
+                        currAreaID = currTR.find('td').eq(0).attr('data-area-id'),
+                        currAreaText = currTR.find('td').eq(0).html(),
+                        currBuildingID = currTR.find('td').eq(1).attr('data-building-id'),
+                        currBuildingText = currTR.find('td').eq(1).html(),
+                        currUnitID = currTR.find('td').eq(2).attr('data-unit-id'),
+                        currUnitText = currTR.find('td').eq(2).html(),
+                        currRoomID = currTR.find('td').eq(3).attr('data-room-id'),
+                        currRoomText = currTR.find('td').eq(3).html(),
+                        currCash = currTR.find('td').eq(4).attr('data-cash'),
+                        currIntro = currTR.find('td').eq(5).html();
+
+                    selectArea.find('.input-hidden').val(currAreaID);
+                    selectArea.find('.select-placeholder').html(currAreaText);
+                    selectArea.find('.select-options ul li.selected').removeClass('selected');
+                    selectArea.find('.select-options ul li[data-value="'+ currAreaID +'"]').addClass('selected');
+                    selectArea.find('.select-select option[value="'+ currAreaID +'"]').attr('selected', true);
+
+                    $.ajax({
+                         url: "/building/buildingCellList.html",
+                         dataType:"json",
+                         type:"get",
+                         data: {
+                             buildingId: currAreaID
+                         },
+                         success:function(data) {
+                             if(data.code != 200) {
+                                
+                             } else {
+                                var str = '';
+                                str += '<input type="hidden" name="" class="input-hidden">';
+                                str += '<span class="select-placeholder select-yes">请选择</span>';
+                                str += '<div class="select-options light-overscroll">';
+                                str += '<ul>';
+                                str += '<li data-value="" class="selected">请选择</li>';
+                                data.list.forEach(function(element, index, array){
+                                    str += '<li data-value="'+ element.id +'">'+ element.name +'</li>';
+                                });
+                                str += '</ul>';
+                                str += '</div>';
+                                str += '<select class="select-select">';
+                                str += '<option value="" selected>请选择</option>';
+                                data.list.forEach(function(element, index, array){
+                                    str += '<option value="'+ element.id +'">'+ element.name +'</option>';
+                                });
+                                str += '</select>';
+
+                                selectBuilding.html(str).show();
+                                COMMON.selectBind($('#select-building'), CHARGE.getUnitList);
+
+                                selectBuilding.find('.input-hidden').val(currBuildingID);
+                                selectBuilding.find('.select-placeholder').html(currBuildingText);
+                                selectBuilding.find('.select-options ul li.selected').removeClass('selected');
+                                selectBuilding.find('.select-options ul li[data-value="'+ currBuildingID +'"]').addClass('selected');
+                                selectBuilding.find('.select-select option[value="'+ currBuildingID +'"]').attr('selected', true);
+                             }
+                         },
+                         error: function() {
+                            
+                         }
+                     });
+
+                    $.ajax({
+                         url: "/building/buildingUnitList.html",
+                         dataType:"json",
+                         type:"get",
+                         data: {
+                             buildingCellId: currBuildingID
+                         },
+                         success:function(data) {
+                             if(data.code != 200) {
+                                
+                             } else {
+                                var str = '';
+                                str += '<input type="hidden" name="" class="input-hidden">';
+                                str += '<span class="select-placeholder select-yes">请选择</span>';
+                                str += '<div class="select-options light-overscroll">';
+                                str += '<ul>';
+                                str += '<li data-value="" class="selected">请选择</li>';
+                                data.list.forEach(function(element, index, array){
+                                    str += '<li data-value="'+ element.id +'">'+ element.name +'</li>';
+                                });
+                                str += '</ul>';
+                                str += '</div>';
+                                str += '<select class="select-select">';
+                                str += '<option value="" selected>请选择</option>';
+                                data.list.forEach(function(element, index, array){
+                                    str += '<option value="'+ element.id +'">'+ element.name +'</option>';
+                                });
+                                str += '</select>';
+
+                                selectUnit.html(str).show();
+                                COMMON.selectBind($('#select-unit'), CHARGE.getRoomList);
+
+                                selectUnit.find('.input-hidden').val(currUnitID);
+                                selectUnit.find('.select-placeholder').html(currUnitText);
+                                selectUnit.find('.select-options ul li.selected').removeClass('selected');
+                                selectUnit.find('.select-options ul li[data-value="'+ currUnitID +'"]').addClass('selected');
+                                selectUnit.find('.select-select option[value="'+ currUnitID +'"]').attr('selected', true);
+                             }
+                         },
+                         error: function() {
+                            
+                         }
+                     });
+
+                    $.ajax({
+                         url: "/room/list.html",
+                         dataType:"json",
+                         type:"get",
+                         data: {
+                            buildingId: currAreaID,
+                            buildingCellId: currBuildingID,
+                            buildingUnitId: currUnitID
+                         },
+                         success:function(data) {
+                             if(data.code != 200) {
+                                
+                             } else {
+                                var str = '';
+                                str += '<input type="hidden" name="" class="input-hidden">';
+                                str += '<span class="select-placeholder">请选择</span>';
+                                str += '<div class="select-options light-overscroll">';
+                                str += '<ul>';
+                                str += '<li data-value="" class="selected">请选择</li>';
+                                data.list.forEach(function(element, index, array){
+                                    str += '<li data-value="'+ element.id +'">'+ element.num +'</li>';
+                                });
+                                str += '</ul>';
+                                str += '</div>';
+                                str += '<select class="select-select">';
+                                str += '<option value="" selected>请选择</option>';
+                                data.list.forEach(function(element, index, array){
+                                    str += '<option value="'+ element.id +'">'+ element.num +'</option>';
+                                });
+                                str += '</select>';
+
+                                selectRoom.html(str).show();
+                                COMMON.selectBind($('#select-room'), undefined);
+
+                                selectRoom.find('.input-hidden').val(currRoomID);
+                                selectRoom.find('.select-placeholder').html(currRoomText);
+                                selectRoom.find('.select-options ul li.selected').removeClass('selected');
+                                selectRoom.find('.select-options ul li[data-value="'+ currRoomID +'"]').addClass('selected');
+                                selectRoom.find('.select-select option[value="'+ currRoomID +'"]').attr('selected', true);
+                             }
+                         },
+                         error: function() {
+                            
+                         }
+                     });
+
+                    // inputModalRoom.val(currRoom);
+                    inputModalCash.val(currCash);
+                    inputModalIntro.val(currIntro);
+                }
+
+                modalMask.fadeIn(200);
+                peopleAddModal.fadeIn(200);
+            },
+            btnModalSubmitBind: function() {
+                btnModalSubmit.on('click', function() {
+                    $('.errMsg-modal-addr').html('');
+                    $('.errMsg-modal-cash').html('');
+                    $('.errMsg-modal-intro').html('');
+
+                    var selectAreaID = selectArea.find('.input-hidden').val(),
+                        selectAreaText = selectArea.find('.select-placeholder').html(),
+                        selectBuildingID = selectBuilding.find('.input-hidden').val(),
+                        selectBuildingText = selectBuilding.find('.select-placeholder').html(),
+                        selectUnitID = selectUnit.find('.input-hidden').val(),
+                        selectUnitText = selectUnit.find('.select-placeholder').html(),
+                        selectRoomID = selectRoom.find('.input-hidden').val(),
+                        selectRoomText = selectRoom.find('.select-placeholder').html(),
+                        inputModalCashVal = inputModalCash.val(),
+                        inputModalIntroVal = inputModalIntro.val(),
+                        index = peopleAddModalTitle.attr('data-index');
+
+                    if(selectAreaID == undefined || !selectAreaID) {
+                        COMMON.errMsg($('.errMsg-modal-addr'), '请选择小区！');
+                        return false;
+                    }
+                    $('.errMsg-modal-addr').html('');
+                    
+                    if(selectBuildingID == undefined || !selectBuildingID) {
+                        COMMON.errMsg($('.errMsg-modal-addr'), '请选择楼宇！');
+                        return false;
+                    }
+                    $('.errMsg-modal-addr').html('');
+
+                    if(selectUnitID == undefined || !selectUnitID) {
+                        COMMON.errMsg($('.errMsg-modal-addr'), '请选择单元！');
+                        return false;
+                    }
+                    $('.errMsg-modal-addr').html('');
+
+                    if(selectRoomID == undefined || !selectRoomID) {
+                        COMMON.errMsg($('.errMsg-modal-addr'), '请选择房间！');
+                        return false;
+                    }
+                    $('.errMsg-modal-addr').html('');
+
+                    if(!COMMON.checkNull(inputModalCashVal)) {
+                        COMMON.errMsg($('.errMsg-modal-cash'), '请输入金额！');
+                        return false;
+                    }
+                    if(!COMMON.checkPositive(inputModalCashVal)) {
+                        COMMON.errMsg($('.errMsg-modal-cash'), '金额必须是大于0的数字！');
+                        return false;
+                    }
+                    $('.errMsg-modal-room').html('');
+
+                    if(!COMMON.checkNull(inputModalIntroVal)) {
+                        COMMON.errMsg($('.errMsg-modal-intro'), '请输入说明！');
+                        return false;
+                    }
+                    $('.errMsg-modal-intro').html('');
+
+                    var str = '';
+                    str += '<tr>';
+                    str += '<td data-area-id="'+ selectAreaID +'">'+ selectAreaText +'</td>';
+                    str += '<td data-building-id="'+ selectBuildingID +'">'+ selectBuildingText +'</td>';
+                    str += '<td data-unit-id="'+ selectUnitID +'">'+ selectUnitText +'</td>';
+                    str += '<td data-room-id="'+ selectRoomID +'">'+ selectRoomText +'</td>';
+                    str += '<td data-cash="'+ inputModalCashVal +'">¥ '+ inputModalCashVal +'</td>';
+                    str += '<td>'+ inputModalIntroVal +'</td>';
+                    str += '<td>';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    str += '</td>';
+                    str += '</tr>';
+                    
+                    if(index == '') {
+                        tableBalance.find('tbody').append(str);
+                    } else {
+                        tableBalance.find('tbody tr').eq(index).replaceWith(str);
+                    }
+                    CHARGE.btnAddEditBind();
+
+                    modalMask.fadeOut(200);
+                    peopleAddModal.fadeOut(200);
+                });
+            },
+            btnSubmitBind: function() {
+                btnSubmit.on('click', function() {
+                    var inputNameVal = inputName.val(),
+                        radioChargeTypeVal = radioChargeType.find('input[name="chargeType"]:checked').val(),
+                        dataInput = radioChargeType.find('input[name="chargeType"]:checked').attr('data-input'),
+                        assignmentStr = '',
+                        balanceStr = '';
+
+                    if(btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+                    $('.errMsg-chargeType').html('');
+                    $('.errMsg-checkbox-assignment').html('');
+                    $('.errMsg-balance').html('');
+                    $('.errMsg-submit').html('');
+
+                    if(!COMMON.checkNull(inputNameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入收费单名称!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if(!radioChargeTypeVal) {
+                        COMMON.errMsg($('.errMsg-chargeType'), '请选择类型!');
+                        return false;
+                    }
+                    $('.errMsg-chargeType').html('');
+
+                    if(dataInput == 1) {
+                        var assignmentArr = [],
+                            assignmentItem = checkboxAssignment.find('input[name="chargeAssignment"]:checked');
+
+                        assignmentItem.each(function() {
+                            var _val = $(this).val();
+
+                            assignmentArr.push(_val);
+                        });
+                        
+                        assignmentStr = assignmentArr.join(',');
+
+                        if(!assignmentStr) {
+                            COMMON.errMsg($('.errMsg-checkbox-assignment'), '请选择数据录入任务!');
+                            return false;
+                        }
+                        $('.errMsg-checkbox-assignment').html('');
+                    } else if(dataInput == 0) {
+                        var balanceArr = [],
+                            balanceTR = tableBalance.find('tbody tr');
+
+                        for(var i = 0; i < balanceTR.length; i++) {
+                            var currTR = balanceTR.eq(i),
+                                currAreaID = currTR.find('td').eq(0).attr('data-area-id'),
+                                currAreaText = currTR.find('td').eq(0).html(),
+                                currBuildingID = currTR.find('td').eq(1).attr('data-building-id'),
+                                currBuildingText = currTR.find('td').eq(1).html(),
+                                currUnitID = currTR.find('td').eq(2).attr('data-unit-id'),
+                                currUnitText = currTR.find('td').eq(2).html(),
+                                currRoomID = currTR.find('td').eq(3).attr('data-room-id'),
+                                currRoomText = currTR.find('td').eq(3).html(),
+                                currCash = currTR.find('td').eq(4).attr('data-cash'),
+                                currIntro = currTR.find('td').eq(5).html();
+
+                            balanceArr.push({
+                                areaid: currAreaID,
+                                areatext: currAreaText,
+                                buildingid: currBuildingID,
+                                buildingtext: currBuildingText,
+                                unitid: currUnitID,
+                                unittext: currUnitText,
+                                roomid: currRoomID,
+                                roomtext: currRoomText,
+                                cash: currCash,
+                                intro: currIntro
+                            });
+                        }
+
+                        balanceStr = JSON.stringify(balanceArr);
+
+                        if(!balanceStr) {
+                            COMMON.errMsg($('.errMsg-balance'), '请添加用户!');
+                            return false;
+                        }
+                        $('.errMsg-balance').html('');
+                    }
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+
+                    $.ajax({
+                        url: "/charge/form/create.html",
+                        dataType:"json",
+                        type:"post",
+                        data: {
+                            name: inputNameVal,
+                            type: radioChargeTypeVal,
+                            assignmentStr: assignmentStr,
+                            balanceStr: balanceStr
+                        },
+                        success:function(data) {
+                            if(data.code != 200) {
+                                COMMON.errMsg($('.errMsg-submit'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/charge.html';
+                            }
+                        },
+                        error: function() {
+                            COMMON.errMsg($('.errMsg-submit'), '创建失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            },
+            getUploadData: function(list) {
+                var str = '';
+                for(var i = 0; i < list.length; i ++) {
+                    str += '<tr>';
+                    str += '<td data-area-id="'+ list[i].buildingId +'">'+ list[i].buildingName +'</td>';
+                    str += '<td data-building-id="'+ list[i].buildingCellId +'">'+ list[i].buildingCellName +'</td>';
+                    str += '<td data-unit-id="'+ list[i].buildingUnitId +'">'+ list[i].unit +'</td>';
+                    str += '<td data-room="'+ list[i].roomNum +'">'+ list[i].roomNum +'</td>';
+                    str += '<td data-cash="'+ list[i].fees +'">¥ '+ list[i].fees +'</td>';
+                    str += '<td>'+ list[i].description +'</td>';
+                    str += '<td>';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    str += '</td>';
+                    str += '</tr>';
+                }
+                
+                $('.errMsg-balance').html('');
+                tableBalance.find('tbody').append(str);
+                CHARGE.btnAddEditBind();
+            }
+        };
+
+        CHARGE.init();
+    });
+</script>
+#end

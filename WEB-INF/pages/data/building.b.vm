@@ -1,0 +1,504 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>楼宇管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/attachment/template/download.html?fileName=building.xlsx" class="button-link button-download"
+               style="margin: 0 26px 0 0; color: #218adb;">模板下载</a>
+            <a href="/building/exportFile.html" class="button-link button-download"
+               style="margin: 0 26px 0 0; color: #218adb;">数据下载</a>
+            <a href="javascript:void(0);" class="button-link button-upload" style="margin: 0 26px 0 0; color: #218adb;"  id="btn-file-upload">数据导入</a>
+            <a href="javascript:void(0);" class="button-link button-add" id="btn-create-subarea"
+               style="margin: 0 26px 0 0; color: #218adb;">新建分区</a>
+        </div>
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">楼宇管理</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-building">
+                    <thead>
+                    <tr>
+                        <th>分区名称</th>
+                        <th>楼宇数量</th>
+                        <th>单元数量</th>
+                        <th>房间数量</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+						#foreach($building in $list)
+                        <tr data-id="$!building.id">
+                            <td>$!building.name</td>
+                            <td>$!building.numberCount</td>
+                            <td>$!building.unitCount</td>
+                            <td>xxxxx</td>
+							#if($!building.used)
+                                <td> &nbsp;</td>
+							#else
+                                <td>
+                                    <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-link-small btn-del" onclick="javascript: COMMON.createConfirmation('/building/deleteBuilding.html?id=$!building.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                                </td>
+							#end
+                        </tr>
+						#end
+					#*<tr data-id="">
+						<td>某某苑</td>
+						<td>6</td>
+						<td>15</td>
+						<td>
+							<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+						</td>
+					</tr>*#
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无楼宇信息</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="subarea-modal">
+    <div class="modal-header">
+        <h1>新建分区</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">分区名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-subarea-name"
+                               placeholder="请输入分区名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-subarea-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">楼宇</div>
+                <div class="group-item">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                               id="table-modal-building">
+                            <thead>
+                            <tr>
+                                <th>楼宇</th>
+                                <th>单元</th>
+                                <th>楼层</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+							##	<tr>
+							##		<td data-cell="1">1幢</td>
+							##		<td data-unit="2">2个单元</td>
+							##		<td data-floor="15">15层</td>
+							##		<td>
+							##			<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+							##			&nbsp;&nbsp;&nbsp;&nbsp;
+							##			<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+							##		</td>
+							##	</tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <a href="javascript:void(0);" class="button-link button-add">新增楼宇</a>
+                    </div>
+                    <p class="errMsg errMsg-modal-table-building"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="building-modal">
+    <div class="modal-header">
+        <h1>新建楼宇</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">楼宇</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-building-number"
+                               placeholder="请输入楼宇名称:xx幢">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-building-number"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">单元</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-unit-number"
+                               placeholder="请输入单元数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-unit-number"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">楼层</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-level-number"
+                               placeholder="请输入楼层数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-level-number"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var tableBuilding = $('#table-building'),
+                btnCreateSubarea = $('#btn-create-subarea'),
+                btnEditSubarea = tableBuilding.find('.btn-edit');
+
+        var modalMask = $('.modal-mask'),
+                subareaModal = $('#subarea-modal'),
+                subareaModalTitle = subareaModal.find('.modal-header h1'),
+                inputModalSubareaName = $('#input-modal-subarea-name'),
+                tableModalBuilding = $('#table-modal-building'),
+                btnModalSubareaSubmit = subareaModal.find('.btn-modal-submit');
+
+        var buildingModal = $('#building-modal'),
+                buildingModalTitle = buildingModal.find('.modal-header h1'),
+                inputModalBuildingNumber = $('#input-modal-building-number'),
+                inputModalUnitNumber = $('#input-modal-unit-number'),
+                inputModalLevelNumber = $('#input-modal-level-number'),
+                btnModalBuildingSubmit = buildingModal.find('.btn-modal-submit');
+
+        var DATA = {
+            init: function () {
+                DATA.btnBind();
+                COMMON.fileUploadBind('/building/importExcel.html');
+            },
+            btnBind: function () {
+                btnCreateSubarea.on('click', function () {
+                    DATA.showSubareaModal(0, undefined, undefined, '');
+                });
+
+                btnEditSubarea.on('click', function () {
+                    DATA.showSubareaModal(1, $(this), $(this).parent().parent().attr('data-id'), $(this).parent().parent().find('td').eq(0).html());
+                });
+
+                DATA.btnModalSubareaSubmitBind();
+
+                DATA.btnModalBuildingSubmitBind();
+            },
+            showSubareaModal: function (operate, obj, id, title) {
+                $('.errMsg-modal-subarea-name').html('');
+                $('.errMsg-modal-table-building').html('');
+
+                if (operate == 1) {
+                    // edit
+                    subareaModalTitle.html('编辑分区').attr('data-id', id);
+
+                    inputModalSubareaName.val(title);
+
+                    DATA.getSubareaBuildingList(id);
+                } else if (operate == 0) {
+                    // add
+                    subareaModalTitle.html('新建分区').attr('data-id', '');
+
+                    inputModalSubareaName.val(title);
+                    tableModalBuilding.find('tbody').html('');
+                    DATA.btnBuildingAddEditBind();
+                }
+
+                modalMask.fadeIn(200);
+                subareaModal.fadeIn(200);
+            },
+            getSubareaBuildingList: function (id) {
+                $.ajax({
+                    url: "/building/buildItemList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingId: id
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-modal-table-building'), data.msg);
+                        } else {
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr>';
+                                str += '<td data-cell="' + data.list[i].number + '">' + data.list[i].number + '</td>';
+                                str += '<td data-unit="' + data.list[i].unit + '">' + data.list[i].unit + '个单元</td>';
+                                str += '<td data-floor="' + data.list[i].floor + '">' + data.list[i].floor + '层</td>';
+                                str += '<td>';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                                str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                                str += '</td>';
+                                str += '</tr>';
+                            }
+                            tableModalBuilding.find('tbody').html(str);
+                            DATA.btnBuildingAddEditBind();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-modal-table-building'), '获取楼宇列表，请重试！');
+                    }
+                });
+            },
+            btnModalSubareaSubmitBind: function () {
+                btnModalSubareaSubmit.on('click', function () {
+                    var _this = $(this);
+
+                    if (_this.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+
+                    var nameVal = inputModalSubareaName.val(),
+                            cellStr = DATA.getBuildingArray();
+
+                    $('.errMsg-modal-subarea-name').html('');
+                    $('.errMsg-modal-table-building').html('');
+
+                    if (!COMMON.checkNull(nameVal)) {
+                        COMMON.errMsg($('.errMsg-modal-subarea-name'), '请输入分区名称');
+                        return false;
+                    }
+                    $('.errMsg-modal-subarea-name').html('');
+
+                    if (!cellStr) {
+                        COMMON.errMsg($('.errMsg-modal-table-building'), '请添加楼宇');
+                        return false;
+                    }
+                    $('.errMsg-modal-table-building').html('');
+
+                    _this.addClass('button-primary-disable').html('保存中...');
+
+                    var buildingId = subareaModalTitle.attr('data-id');
+                    if (buildingId == null || buildingId == undefined || buildingId == '') {
+                        buildingId = 0;
+                    }
+
+                    $.ajax({
+                        url: "/building/saveBuilding.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: buildingId,
+                            name: nameVal,
+                            fieldStr: cellStr
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-table-building'), data.msg);
+                                _this.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = '/admin/data/building.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-table-building'), '保存失败，请重试！');
+                            _this.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            getBuildingArray: function () {
+                var arr = [],
+                        tableBuildingItem = tableModalBuilding.find('tbody tr');
+
+                if (!tableBuildingItem || tableBuildingItem.length == 0) {
+                    return false;
+                }
+
+                for (var i = 0; i < tableBuildingItem.length; i++) {
+                    var itemTD = tableBuildingItem.eq(i).find('td'),
+                            strCell = itemTD.eq(0).attr('data-cell'),
+                            strUnit = itemTD.eq(1).attr('data-unit'),
+                            strFloor = itemTD.eq(2).attr('data-floor');
+                    arr.push({cell: strCell, unit: strUnit, floor: strFloor});
+                }
+
+                return JSON.stringify(arr);
+            },
+            btnBuildingAddEditBind: function () {
+                var btnBuildingAdd = subareaModal.find('.button-add'),
+                        btnBuildingEdit = subareaModal.find('.btn-edit'),
+                        btnBuildingDel = subareaModal.find('.btn-del');
+
+                btnBuildingDel.unbind('click');
+                btnBuildingDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+
+                btnBuildingAdd.unbind('click');
+                btnBuildingAdd.on('click', function () {
+                    DATA.buildingAddEdit(0, undefined, undefined);
+                });
+
+                btnBuildingEdit.unbind('click');
+                btnBuildingEdit.on('click', function () {
+                    DATA.buildingAddEdit(1, $(this), $(this).parent().parent().index());
+                });
+            },
+            buildingAddEdit: function (operate, obj, index) {
+                $('.errMsg-modal-building-number').html('');
+                $('.errMsg-modal-unit-number').html('');
+                $('.errMsg-modal-level-number').html('');
+
+                if (operate == 1) {
+                    // edit
+                    buildingModalTitle.html('编辑字段').attr('data-index', index);
+
+                    var currTR = obj.parent().parent(),
+                            currBuilding = currTR.find('td').eq(0).attr('data-cell'),
+                            currUnit = currTR.find('td').eq(1).attr('data-unit'),
+                            currLevel = currTR.find('td').eq(2).attr('data-floor');
+
+                    inputModalBuildingNumber.val(currBuilding);
+                    inputModalUnitNumber.val(currUnit);
+                    inputModalLevelNumber.val(currLevel);
+                } else if (operate == 0) {
+                    // add
+                    buildingModalTitle.html('添加新字段').attr('data-index', '');
+
+                    inputModalBuildingNumber.val('');
+                    inputModalUnitNumber.val('');
+                    inputModalLevelNumber.val('');
+                }
+
+                subareaModal.fadeOut(100);
+                buildingModal.fadeIn(200);
+            },
+            btnModalBuildingSubmitBind: function () {
+                btnModalBuildingSubmit.on('click', function () {
+                    var newBuilding = inputModalBuildingNumber.val(),
+                            newUnit = inputModalUnitNumber.val(),
+                            newLevel = inputModalLevelNumber.val();
+
+                    $('.errMsg-modal-building-number').html('');
+                    $('.errMsg-modal-unit-number').html('');
+                    $('.errMsg-modal-level-number').html('');
+
+                    if (!COMMON.checkNull(newBuilding)) {
+                        COMMON.errMsg($('.errMsg-modal-building-number'), '请输入楼宇名称');
+                        return false;
+                    }
+                    $('.errMsg-modal-building-number').html('');
+
+                    if (!COMMON.checkNull(newUnit)) {
+                        COMMON.errMsg($('.errMsg-modal-unit-number'), '请输入单元数量');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(newUnit)) {
+                        COMMON.errMsg($('.errMsg-modal-unit-number'), '单元数量必须是正整数');
+                        return false;
+                    }
+                    $('.errMsg-modal-unit-number').html('');
+
+                    if (!COMMON.checkNull(newLevel)) {
+                        COMMON.errMsg($('.errMsg-modal-level-number'), '请输入楼层数量');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(newLevel)) {
+                        COMMON.errMsg($('.errMsg-modal-level-number'), '楼层数量必须是正整数');
+                        return false;
+                    }
+                    $('.errMsg-modal-level-number').html('');
+
+                    var tableStr = '';
+                    tableStr += '<tr>';
+                    tableStr += '<td data-cell="' + newBuilding + '">' + newBuilding + '</td>';
+                    tableStr += '<td data-unit="' + newUnit + '">' + newUnit + '个单元</td>';
+                    tableStr += '<td data-floor="' + newLevel + '">' + newLevel + '层</td>';
+                    tableStr += '<td>';
+                    tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    tableStr += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    tableStr += '</td>';
+                    tableStr += '</tr>';
+
+
+                    var index = buildingModalTitle.attr('data-index');
+                    if (index == '') {
+                        // add
+                        tableModalBuilding.find('tbody').append(tableStr);
+                    } else {
+                        // edit
+                        tableModalBuilding.find('tbody tr').eq(index).replaceWith(tableStr);
+                    }
+
+                    DATA.btnBuildingAddEditBind();
+                    buildingModal.fadeOut(100);
+                    subareaModal.fadeIn(200);
+                });
+            }
+
+        };
+
+        DATA.init();
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/building.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

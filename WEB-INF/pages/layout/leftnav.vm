@@ -1,0 +1,80 @@
+<nav class="leftnav">
+    <div class="logo">i家帮物业项目管理平台</div>
+    <ul class="deep-overscroll">
+        <li>
+            <a href="/admin/index.html" class="navitem navitem-home #if($adminMenu && $!adminMenu eq 100) current active#end">首页</a>
+        </li>
+        <li>
+            <a href="/admin/assignment.html" class="navitem subnav navitem-assignment #if($adminMenu && $!adminMenu lt 10) current active#end">任务管理</a>
+            <div class="subnav-list">
+                <a href="/admin/assignment/generally.html" class="subnavitem #if($adminMenu && $!adminMenu eq 1) current active#end">常规任务</a>
+                <a href="/admin/assignment/temporary.html" class="subnavitem #if($adminMenu && $!adminMenu eq 2) current active#end">临时任务</a>
+                <a href="/admin/assignment/warning.html" class="subnavitem #if($adminMenu && $!adminMenu eq 3) current active#end">告警记录</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/charge.html" class="navitem subnav navitem-charge #if($adminMenu && $!adminMenu lt 20 && $!adminMenu gt 9) current active#end">收费管理</a>
+            <div class="subnav-list">
+                <a href="/admin/charge/type.html" class="subnavitem #if($adminMenu && $!adminMenu eq 11) current active#end">收费类型</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/form.html" class="navitem subnav navitem-form #if($adminMenu && $!adminMenu lt 30 && $!adminMenu gt 19) current active#end">作业表单</a>
+            <div class="subnav-list">
+                <a href="/admin/form/type.html" class="subnavitem #if($adminMenu && $!adminMenu eq 21) current active#end">表单类型</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/complaints.html" class="navitem subnav navitem-complaint #if($adminMenu && $!adminMenu lt 40 && $!adminMenu gt 29) current active#end">投诉报事</a>
+            <div class="subnav-list">
+                <a href="/admin/complaints/internalreport.html" class="subnavitem #if($adminMenu && $!adminMenu eq 31) current active#end">内部报事</a>
+                <a href="/admin/complaints/type.html" class="subnavitem #if($adminMenu && $!adminMenu eq 32) current active#end">投诉类型</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/repairs.html" class="navitem subnav navitem-pairs #if($adminMenu && $!adminMenu lt 50 && $!adminMenu gt 39) current active#end">客户报修</a>
+            <div class="subnav-list">
+                <a href="/admin/repairs/type.html" class="subnavitem #if($adminMenu && $!adminMenu eq 41) current active#end">报修类型</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/material.html" class="navitem navitem-material #if($adminMenu && $!adminMenu eq 50) current active#end">材料管理</a>
+        </li>
+        <li>
+            <a href="/admin/staff.html" class="navitem subnav navitem-staff #if($adminMenu && $!adminMenu lt 70 && $!adminMenu gt 59) current active#end">员工管理</a>
+            <div class="subnav-list">
+                <a href="/admin/staff/structure.html" class="subnavitem #if($adminMenu && $!adminMenu eq 61) current active#end">组织架构管理</a>
+                <a href="/admin/staff/permission.html" class="subnavitem #if($adminMenu && $!adminMenu eq 62) current active#end">权限管理</a>
+                <a href="/admin/staff/attendance.html" class="subnavitem #if($adminMenu && $!adminMenu eq 63) current active#end">考勤管理</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/data.html" class="navitem subnav navitem-data #if($adminMenu && $!adminMenu lt 80 && $!adminMenu gt 69) current active#end">基础数据</a>
+            <div class="subnav-list">
+                <a href="/admin/data/building.html" class="subnavitem #if($adminMenu && $!adminMenu eq 71) current active#end">楼宇管理</a>
+                <a href="/admin/data/machine.html" class="subnavitem #if($adminMenu && $!adminMenu eq 72) current active#end">设备管理</a>
+                <a href="/admin/data/control.html" class="subnavitem #if($adminMenu && $!adminMenu eq 73) current active#end">控制点管理</a>
+                <a href="/admin/data/proprietor.html" class="subnavitem #if($adminMenu && $!adminMenu eq 74) current active#end">业主管理</a>
+                <a href="/admin/data/car.html" class="subnavitem #if($adminMenu && $!adminMenu eq 75) current active#end">车辆管理</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/notification.html" class="navitem navitem-notification #if($adminMenu && $!adminMenu eq 80) current active#end">通知</a>
+        </li>
+        <li>
+            <a href="/admin/satisfaction.html" class="navitem navitem-satisfaction #if($adminMenu && $!adminMenu eq 81) current active#end">满意度调查</a>
+        </li>
+        <li>
+            <a href="/admin/statistics.html" class="navitem subnav navitem-statistics #if($adminMenu && $!adminMenu lt 100 && $!adminMenu gt 89) current active#end">数据统计</a>
+            <div class="subnav-list">
+                <a href="/admin/statistics/income.html" class="subnavitem #if($adminMenu && $!adminMenu eq 91) current active#end">收入</a>
+                <a href="/admin/statistics/user.html" class="subnavitem #if($adminMenu && $!adminMenu eq 92) current active#end">用户</a>
+                <a href="/admin/statistics/assignment.html" class="subnavitem #if($adminMenu && $!adminMenu eq 93) current active#end">任务</a>
+                <a href="/admin/statistics/repair.html" class="subnavitem #if($adminMenu && $!adminMenu eq 94) current active#end">报修</a>
+                <a href="/admin/statistics/complain.html" class="subnavitem #if($adminMenu && $!adminMenu eq 95) current active#end">投诉</a>
+                <a href="/admin/statistics/attendance.html" class="subnavitem #if($adminMenu && $!adminMenu eq 96) current active#end">考勤</a>
+                <a href="/admin/statistics/visitor.html" class="subnavitem #if($adminMenu && $!adminMenu eq 97) current active#end">访客</a>
+            </div>
+        </li>
+    </ul>
+</nav>

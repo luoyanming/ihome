@@ -1,0 +1,521 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>任务--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">任务</a>
+    </article>
+
+    <div class="assignment-container">
+        <!-- <div class="common-title fs14">数据统计&nbsp;&nbsp;|&nbsp;&nbsp;<span class="col-333">任务</span></div> -->
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日任务情况</div>
+                <div class="fs14 col-999">更新时间：$!currentDate</div>
+                <div id="bar"></div>
+            </div>
+            <div class="right-content pull-right">
+                <div class="fs14 common-text">应完成任务分布</div>
+                <div class="fs14 col-999">任务总数：$!todayCount</div>
+                <div id="pie"></div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">任务明细</div>
+            <form action="" method="post">
+                <article class="form-condition">
+                    <div class="condition-group clearfix">
+                        <div class="title">任务类型</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="taskKindId" style="min-width: 120px;">
+                                <input type="hidden" name="taskKindId" value="$!taskKindId" class="input-hidden">
+								#if($taskKindId && $!taskKindId gt 0 )
+									#foreach($!item in $!taskKind)
+										#if($!taskKindId eq $!item.kindId)
+											<span class="select-placeholder">$!item.kind</span>
+										#end
+									#end
+								#else
+									<span class="select-placeholder">全部</span>	
+								#end
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!taskKindId eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!taskKind)
+                                    <li data-value="$!item.kindId" #if($!taskKindId eq $!item.kindId)
+                                        class="selected"#end>$!item.kind</li>
+								#end
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    <option value="0" #if($!taskKindId eq 0) selected #end>全部</option>
+							#foreach($!item in $!taskKind)
+                                <option value="$!item.kindId" #if($!taskKindId eq $!item.kindId)
+                                        selected #end>$!item.kind</option>
+							#end
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+					<div class="condition-group clearfix">
+                        <div class="title">员工</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="paramNameId" style="min-width: 120px;">
+                                <input type="hidden" name="paramNameId" value="$!paramNameId" class="input-hidden">
+								#if($paramNameId && $!paramNameId gt 0 )
+									#foreach($!item in $!employeeVoList)
+										#if($!paramNameId eq $!item.id)
+											<span class="select-placeholder">$!item.name</span>
+										#end
+									#end
+								#else
+									<span class="select-placeholder">全部</span>	
+								#end
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!paramNameId eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!employeeVoList)
+                                    <li data-value="$!item.id" #if($!paramNameId eq $!item.id)
+                                        class="selected"#end>$!item.name</li>
+								#end
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    <option value="0" #if($!paramNameId eq 0) selected #end>全部</option>
+							#foreach($!item in $!employeeVoList)
+                                <option value="$!item.id" #if($!paramNameId eq $!item.id)
+                                        selected #end>$!item.name</option>
+							#end
+                                </select>
+                            </div>
+                        </div>
+                    </div>					
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">日期&nbsp;&nbsp;</div>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramStartDate" value="$!{paramStartDate}" placeholder="xxxx年xx月xx日">
+                           <!--  <input type="text" id="d111" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'d222\')||$dp.$DV(\'%y-%M-%d\',{d:-29})}',minDate:'#F{$dp.$D(\'d222\',{d:-29})}'})" name="paramStartDate" value="$!{paramStartDate}" placeholder="xxxx年xx月xx日"> -->
+                        </div>
+                        <span class="text"> - </span>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramEndDate" value="$!{paramEndDate}" placeholder="xxxx年xx月xx日">
+                          <!--  <input type="text" id="d222" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'d111\',{d:29})||\'%y-%M-%d\'}',minDate:'#F{$dp.$D(\'d111\')}'})" name="paramEndDate" value="$!{paramEndDate}" placeholder="xxxx年xx月xx日"> -->
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="bottom-detail clearfix">
+                <div class="lines" id="lines"></div>
+                <article class="">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                            <thead>
+								#if($dataList && $dataList.size()>0)
+                            <tr>
+                                <th>日期</th>
+                                <th>任务类型</th>
+                                <th>员工</th>
+                                <th>应完成</th>
+                                <th>告警</th>
+                                <th>告警率</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+								 #foreach($item in $dataList)
+									<tr>
+									<td>$!DateUtils.formatTimeInSecond($item.date)</td>
+                                    #if($taskKindId && $!taskKindId gt 0 )
+										#foreach($!item in $!taskKind)
+											#if($!taskKindId eq $!item.kindId)
+												<td>$!item.kind</td>
+											#end
+										#end
+									#else
+										<td>全部</td>
+									#end
+									#if($paramNameId && $!paramNameId gt 0 )
+									#foreach($!item in $!employeeVoList)
+										#if($!paramNameId eq $!item.id)
+												<td>$!item.name</td>
+											#end
+										#end
+									#else
+										<td>全部</td>
+									#end
+									
+                                    <td>$item.needToBeDone</td>
+                                    <td>$item.warnTask</td>
+                                    <td>$item.warnTaskPercent</td>
+									</tr>
+								
+                                #end
+                                </tbody>
+								#end
+                        </table>
+                    </div>
+					#parse("/layout/pagination.vm")
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+
+			STATISTICS.getAssignmentBarData();
+			STATISTICS.getAssignmentPieData();
+			STATISTICS.getAssignmentLineData();
+		},
+		getAssignmentBarData: function() {
+			 $.ajax({
+	             url: "/task/todayStatisticsNumber.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.assignmentChartBarBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		getAssignmentPieData: function() {
+			 $.ajax({
+	             url: "/task/todayStatisticsDistribution.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.assignmentChartPieBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		getAssignmentLineData: function() {
+			 $.ajax({
+	             url: "/task/statistics.html",
+	             dataType:"json",
+	             type:"post",
+	             data: {
+	              	taskKindId: '$!taskKindId',
+                    paramNameId: '$!paramNameId',
+                    paramStartDate: '$!paramStartDate',
+                    paramEndDate: '$!paramEndDate'					
+	             },
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var assignmentChartLineArr1 = data.data.needToBeDone,
+	            			assignmentChartLineArr2 = data.data.warnTask,
+	            			assignmentChartLineArr3 = data.data.alreadyDonePercent,
+							assignmentChartLineArr4 = data.data.date;
+
+	            		STATISTICS.assignmentChartLineBind(assignmentChartLineArr1, assignmentChartLineArr2, assignmentChartLineArr3,assignmentChartLineArr4);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		assignmentChartBarBind: function(bArr) {
+			var myChart1 = echarts.init(document.getElementById('bar'));
+	        var barOption = {
+	            grid:{
+	                x:'100',
+	                y:'20',
+	                y2:'40',
+	                x2:'60'
+	            },
+	            xAxis : [
+	                {
+	                    type : 'category',
+	                    data : ["应完成", "已完成", "进行中", "告警数"],
+	                    axisLabel: {
+	                        show: true,
+	                        textStyle: {
+	                            color: '#888'  //X轴字体颜色
+	                        }
+	                    },
+	                    axisLine: {
+	                        show: true,
+	                        lineStyle:{
+	                            color:'#8C8C8C'  //X轴颜色
+	                        }
+	                    },
+	                    splitLine : {
+	                        show:false  //无横向分割线
+	                    }
+	                }
+	            ],
+	            color:['rgba(80,172,252,0.80)','rgba(255,168,68,0.80)','rgba(60,205,138,0.80)','rgba(249,91,80,0.80)'],
+	            yAxis: {       //直角坐标系 grid 中的 y 轴
+	                type: 'value',
+	                axisLine: {
+	                    show: false
+	                },
+	                splitLine : {
+	                    show:true,
+	                    lineStyle: {
+	                        color: '#DEDEDE',
+	                        type: 'dashed',
+	                        width: 1
+	                    }
+	                },
+	                axisLabel: {
+	                    show : true,
+	                    textStyle: {
+	                        color: '#888'  //Y轴字体颜色
+	                    }
+	                }
+	            },
+	            tooltip: {
+	                show : true
+	            },
+	            series : [
+	                {
+	                    type:'bar',
+	                    data: bArr,
+	                    barWidth:'40',
+	                    itemStyle: {
+	                        normal: {
+	                            color: function(params) {
+	                                // build a color map as your need.
+	                                var colorList = [
+	                                    'rgba(80,172,252,0.80)','rgba(255,168,68,0.80)','rgba(60,205,138,0.80)','rgba(249,91,80,0.80)'
+	                                ];
+	                                return colorList[params.dataIndex]
+	                            },
+	                            label: {
+	                                show: true,
+	                                position: 'top',
+	                                formatter: '{c}',
+	                                textStyle:{
+	                                    color:'#666'
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            ]
+	        };
+	        myChart1.setOption(barOption);
+		},
+		assignmentChartPieBind: function(pArr) {
+			var myChart2 = echarts.init(document.getElementById('pie'));
+	        var pieOption = {
+	            tooltip : {
+	                trigger: 'item',
+	                formatter: "{b}<br />{c}<br />{d}%",
+	            },
+	            series : [
+	                {
+	                    type:'pie',
+	                    center: ['55%', '50%'],
+	                    radius: '90%',
+	                    data: pArr,
+	                    itemStyle : {
+	                        normal : {
+	                            label : {
+	                                show:false
+	                            },
+	                            labelLine : {
+	                                show : false
+	                            }
+	                        }
+	                    }
+	                }
+	            ],
+	            color:['#56aefa','#87c5fb','#218ADB','#fff','#56aefa','#87c5fb','#218ADB','#56aefa','#87c5fb','#218ADB','#56aefa','#87c5fb']
+	        };
+	        myChart2.setOption(pieOption);
+		},
+		assignmentChartLineBind: function(lArr1, lArr2, lArr3,lArr4) {
+			var myChart3 = echarts.init(document.getElementById('lines'));
+	        var dateNum = [];
+	        for(var i = 0; i<lArr4.length; i++){
+	            dateNum.push(lArr4[i]);
+	        }
+
+	        option = {
+	            tooltip : {
+	                trigger: 'item',  //item只显示一个信息 axis显示所有
+	                axisPointer :{
+	                    type: "none"   //没有指示线
+	                }
+	            },
+	            legend: {
+	                data:['应完成任务数','告警任务数','完成率'] ,
+	                x : "right"
+	            },
+	            xAxis : [
+	                {
+	                    type : 'category',
+	                    boundaryGap: true,
+	                    axisLine : {    // 轴线
+	                        show: true,
+	                        lineStyle: {
+	                            color: '#8c8c8c',
+	                            type: 'solid',
+	                            width: 2
+	                        }
+	                    },
+	                    axisLabel : {
+	                        show:true,
+	                        interval: 'auto',    // {number}
+	                        rotate: 30,
+	                        textStyle: {
+	                            color: '#888888',
+	                            fontFamily: 'sans-serif',
+	                            fontSize: 12
+	                        }
+	                    },
+	                    splitLine : {
+	                        show:false
+	                    },
+	                    splitArea : {
+	                        show: false
+	                    },
+	                    data : dateNum
+	                }
+	            ],
+	            yAxis : [
+	                {
+	                    type : 'value',
+	                    axisLine : {    // 轴线
+	                        show: false
+	                    },
+	                    axisLabel : {
+	                        show:true,
+	                        formatter: '{value}%',  //显示百分比
+	                        textStyle: {  //Y轴左侧指示
+	                            color: '#888888',
+	                            fontSize: 12
+	                        }
+	                    },
+	                    splitLine : {
+	                        show:true,
+	                        lineStyle: {
+	                            color: '#DEDEDE',
+	                            type: 'dotted',
+	                            width: 2
+	                        }
+	                    }
+	                },
+	                {
+	                    //Y轴右侧指示
+	                    type : 'value',
+	                    axisLabel : {
+	                        show:true,
+	                        textStyle: {  //Y轴左侧指示
+	                            color: '#FFA944',
+	                            fontSize: 12
+	                        }
+	                    },
+	                    axisLine : {    // 轴线
+	                        show: false
+	                    },
+	                    splitLine : {
+	                        show:false
+	                    }
+	                }
+	            ],
+	            series : [
+	                {
+	                    name: '应完成任务数',
+	                    type: 'line',
+	                    yAxisIndex: 1,
+	                    itemStyle:{
+	                        normal:{
+	                            color:"#51ADFD",
+	                            lineStyle:{
+	                                color:'rgba(80,171,253,0.40)'
+	                            }
+	                        }
+	                    },
+	                    data: lArr1
+	                },
+	                {
+	                    name: '告警任务数',
+	                    type: 'line',
+	                    yAxisIndex: 1,
+	                    itemStyle:{
+	                        normal:{
+	                            color:"#F95B50",  //点的颜色
+	                            lineStyle:{
+	                                color:'rgba(249,90,80,0.40)'  //折线颜色
+	                            }
+	                        }
+	                    },
+	                    data: lArr2
+	                },
+	                {
+	                    name: '完成率',
+	                    type: 'bar',
+	                    barWidth:'16',
+	                    itemStyle:{
+	                        normal:{
+	                            color:"rgba(255,168,67,0.50)"
+	                        }
+	                    },
+	                    data: lArr3
+	                }
+	            ]
+	        };
+
+	        myChart3.setOption(option);
+		}
+	};
+
+	STATISTICS.init();
+});
+//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/statistics/assignment.html',
+                {
+                    taskKindId: '$!taskKindId',
+                    paramNameId: '$!paramNameId',
+                    paramStartDate: '$!paramStartDate',
+                    paramEndDate: '$!paramEndDate',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

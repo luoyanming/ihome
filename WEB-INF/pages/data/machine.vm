@@ -1,0 +1,213 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>设备管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/admin/data/machine/type.html" class="button-link button-manage"
+               style="margin: 0 26px 0 0; color: #218adb;">管理设备系统类型</a>
+            <a href="/admin/data/machine/create.html" class="button-link button-add"
+               style="margin: 0 26px 0 0; color: #218adb;">新增设备</a>
+        </div>
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">设备管理</a>
+    </article>
+
+
+    <article class="form-condition">
+        <div class="operate-group">
+            <a href="/equipment/export/equipment/qrcode.html" class="button-link button-download">二维码批量下载</a>
+            <a href="/attachment/template/download.html?fileName=equipment.xlsx" class="button-link button-download">模板下载</a>
+            <a href="/equipment/exportDepartment.html" class="button-link button-download">数据下载</a>
+            <a href="javascript:void(0);" class="button-link button-upload" id="btn-file-upload">数据导入</a>
+        </div>
+        <form action="/admin/data/machine.html" method="post">
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="">
+                        <input type="hidden" name="type" class="input-hidden" value="$!paramType">
+                        <span class="select-placeholder">#if($paramTypeName) $paramTypeName #else 全部 #end </span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($typeList && $typeList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($type in $typeList)
+                                        <li data-value="$!type.id" #if($!paramType==$!type.id)
+                                            class="selected" #end>$!type.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            #*<li data-value="" class="selected">全部</li>
+                            <li data-value="1">电梯</li>
+                            <li data-value="2">消防栓</li>
+                            <li data-value="3">灭火器</li>*#
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($typeList && $typeList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($type in $typeList)
+                                    <option value="$!type.id" #if($!paramType==$!type.id)
+                                            selected #end>$!type.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        #*<option value="" selected>全部</option>
+                        <option value="1">电梯</option>
+                        <option value="2">消防栓</option>
+                        <option value="3">灭火器</option>*#
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">状态</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="">
+                        <input type="hidden" name="status" class="input-hidden" value="$!paramStatus">
+                        <span class="select-placeholder">#if($!paramStatus==0) 正常 #elseif($!paramStatus==1) 异常 #else
+                            全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="" #if(!$!paramStatus) class="selected" #end>全部</li>
+                                <li data-value="0" #if($!paramStatus==0) class="selected" #end>正常</li>
+                                <li data-value="1" #if($!paramStatus==1) class="selected" #end>异常</li>
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="" #if(!$!paramStatus) selected #end>全部</option>
+                            <option value="0" #if($!paramStatus==0) selected #end>正常</option>
+                            <option value="1" #if($!paramStatus==1) selected #end>异常</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">编码</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" placeholder="请输入设备编码" name="code" class="input-primary input-x-small"
+                               value="$!paramCode">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 120px;">
+                        <input type="search" placeholder="请输入名称" name="name"
+                               class="input-primary input-x-small input-search" value="$!paramName">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+    </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size() gt 0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>编码</th>
+                        <th>名称</th>
+                        <th>地点</th>
+                        <th>系统类型</th>
+                        <th>品牌</th>
+                        <th>型号</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($equipment in $list)
+                        <tr data-id="$!type.id">
+                            <td>$!equipment.code</td>
+                            <td>$!equipment.name</td>
+                            <td>$!equipment.place</td>
+                            <td>$!equipment.equipmentTypeName</td>
+                            <td>$!equipment.brand</td>
+                            <td>$!equipment.model</td>
+                            #if($!equipment.status > 0)
+                                <td class="state state-already">异常</td>
+                            #else
+                                <td>正常</td>
+                            #end
+
+                            #if($!equipment.used)
+                                <td><a href="/attachment/viewImg.html?attachmentId=$!equipment.qrcode"
+                                       class="button-link button-link-small" target="_blank">二维码</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="/admin/data/machine/detail.html?id=$!equipment.id"
+                                       class="button-link button-link-small">查看</a></td>
+                            #else
+                                <td>
+                                    <a href="/attachment/viewImg.html?attachmentId=$!equipment.qrcode"
+                                       class="button-link button-link-small" target="_blank">二维码</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="/admin/data/machine/detail.html?id=$!equipment.id"
+                                       class="button-link button-link-small">查看</a>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:void(0);"
+                                       class="button-link button-link-small btn-del"
+                                       onclick="javascript: COMMON.createConfirmation('/equipment/deleteEquipment.html?id=$!equipment.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                                </td>
+                            #end
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无设备</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+                COMMON.fileUploadBind('/equipment/importExcel.html');
+            }
+        };
+
+        DATA.init();
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/machine.html',
+                {
+                    name: '$!paramName',
+                    type: '$!paramType',
+                    status: '$!paramStatus',
+                    code: '$!paramCode',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

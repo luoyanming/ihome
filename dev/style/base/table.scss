@@ -1,0 +1,182 @@
+@import "mixin-font";
+@import "mixin-background";
+@import "mixin-position";
+@import "mixin-transform";
+
+// ==============================================
+// table primary
+// ==============================================
+.table-wrapper{
+	position: relative;
+	background: $colorFFF;
+	box-shadow: 0 1px 4px 0 rgba(63,84,101,0.13);
+
+	&.table-wrapper-nobg{
+		background: transparent;
+		box-shadow: none;
+
+		.table-primary{
+			tr{
+				td{
+					color: #333;
+				}
+			}
+		}
+	}
+}
+.table-primary{
+
+	tr{
+		th{
+			padding: 12px 40px 12px 0;
+			font-size: 12px;
+			color: $color333;
+			line-height: 18px;
+			font-weight: 500;
+			letter-spacing: -0.21px;
+			background: $colorF7;
+			box-shadow: 0 1px 0 0 #DEDEDE;
+			white-space: nowrap;
+			text-align: left;
+
+			&:first-child{
+				padding-left: 40px;
+			}
+		}
+
+		td{
+			padding: 22px 40px 23px 0;
+			font-size: 12px;
+			line-height: 19px;
+			color: $color666;
+			letter-spacing: -0.21px;
+			border-bottom: 1px solid #DEDEDE;
+			text-align: left;
+
+			&:first-child{
+				padding-left: 40px;
+			}
+
+			&.state{
+				color: $color666;
+
+				&.state-ING{
+					color: $colorING;
+				}
+				&.state-already{
+					color: $colorAlready;
+				}
+				&.state-warning{
+					color: $colorWarning;
+				}
+			}
+		}
+
+		&.row-state-closed{
+			td{
+				color: rgba(102,102,102,0.30) !important;
+			}
+		}
+
+		&.state{
+			&.state-disable{
+				td{
+					color: rgba(102,102,102,0.30) !important;
+				}
+			}
+			&.state-ING{
+				td{
+					color: $colorING !important;
+				}
+			}
+			&.state-already{
+				td{
+					color: $colorAlready !important;
+				}
+			}
+			&.state-warning{
+				td{
+					color: $colorWarning !important;
+				}
+			}
+		}
+	}
+
+	&.table-primary-small{
+		tr{
+			th{
+				padding: 10px 16px 10px 0;
+				line-height: 18px;
+
+				&:first-child{
+					padding-left: 16px;
+				}
+			}
+
+			td{
+				padding: 10px 16px 10px 0;
+				font-size: 12px;
+				line-height: 19px;
+
+				&:first-child{
+					padding-left: 16px;
+				}
+			}
+		}
+	}
+
+	&.table-noborder{
+		tr{
+			th{
+				background: transparent;
+				box-shadow: none;
+			}
+
+			td{
+				border-bottom: none;
+			}
+		}
+	}
+}
+
+.table-nodata {
+	@include position(absolute, 1, 0, 0, 0, 0);
+
+	&:before{
+		content: "";
+		@include position(absolute, 2, 0, 0, none, 0);
+		height: 42px;
+		background: $colorF7;
+		box-shadow: 0 1px 0 0 #DEDEDE;
+	}
+
+	&:after{
+		content: "";
+		@include position(absolute, 2, 50%, none, none, 50%);
+		@include translate(-50%, -55px, 0);
+		width: 48px;
+		height: 48px;
+		@include backgroundImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClLOS0AAAAJFBMVEUAAACMjIyOjo6Li4uSkpKNjY2NjY2UlJSNjY2NjY2/v7+Ojo7UcYrxAAAADHRSTlMAzK2LHMJZD7CjBFWM4hAWAAAAkElEQVQ4y2OgBCybGpmFTZx9oqCgZAEWiZWCQDALi8RGwfQyQWkUIRZTQRAQY2BIBDOCHaASroJgIM7AUAhhhUAlDIONjU1hEiC2MFQiUIGBgQNmVAMDA5MoVEIQIgGyHCIhiCIBAqRIsLhAgQOaBAKMSoxKDB2JQHQJUURWQwGmwvDMiQZCENkZBmDZmRwAAAYnJXWcFGfGAAAAAElFTkSuQmCC', no-repeat, center, center, 100%, 100%);
+	}
+
+	p{
+		@include position(absolute, 2, 50%, none, none, 50%);
+		@include translate(-50%, 5px, 0);
+		font-size: 14px;
+		color: $color888;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,131 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>提现记录--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/boss/layout/header.vm")
+#parse("/boss/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/boss/cash.html" class="button-link">提现申请</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">提现记录</a>
+    </article>
+
+    <form action="/boss/cash/history.html" method="post">
+        <article class="form-condition">
+            <div class="condition-group clearfix">
+                <div class="title">项目名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 200px;">
+                        <input type="text" placeholder="请输入项目名称" name="projectName"
+                               class="input-primary input-primary-boss input-x-small" value="$!projectName">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">联系人</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" placeholder="请输入联系人" name="name" class="input-primary input-primary-boss input-x-small"
+                               value="$!name">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">手机号</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" placeholder="请输入手机号" name="mobile"
+                               class="input-primary input-primary-boss input-x-small" value="$!mobile">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search button-search-boss btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>项目名称</th>
+                        <th>联系人</th>
+                        <th>手机号</th>
+                        <th>账户余额</th>
+                        <th>提现金额</th>
+                        <th>申请日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($withdraw in $list)
+                        <tr>
+                            <td>$!withdraw.projectName</td>
+                            <td>$!withdraw.name</td>
+                            <td>$!withdraw.mobile</td>
+                            <td>¥ $!withdraw.balance</td>
+                            <td>¥ $!withdraw.amount</td>
+                            <td>#if($withdraw.createdDate) $!DateUtils.formatTimeYMDHM($!withdraw.createdDate) #end</td>
+							#if($!withdraw.status eq 0 )
+                                <td>未处理</td>
+							#elseif($!withdraw.status eq 1)
+                                <td class="state state-already">审批通过</td>
+							#else
+                                <td class="state state-already">审批不通过</td>
+							#end
+                            <td>
+                                <a href="/boss/cash/detail.html?id=$!{withdraw.id}"
+                                   class="button-link button-boss-link button-link-small">查看</a>
+                            </td>
+
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无提现记录</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/boss/layout/pagination.vm")
+    </article>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/boss/cash/history.html',
+                {
+                    name: '$!name',
+                    mobile: '$!mobile',
+                    projectName: '$!projectName',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

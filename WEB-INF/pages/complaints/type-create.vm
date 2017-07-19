@@ -1,0 +1,563 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>投诉类型--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css" />
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb clearfix">
+		<a href="/admin/complaints.html" class="button-link">投诉报事</a>
+		<span class="separate">|</span>
+		<a href="/admin/complaints/type.html" class="button-link">投诉类型</a>
+		<span class="separate">|</span>
+		<a href="javascript:void(0);" class="button-link button-link-disable">新建投诉类型</a>
+	</article>
+
+	<form action="" method="get" class="form-main">
+		<input type="hidden" id="complaintsTypeId" name="complaintsTypeId" value="$!{complaintsType.id}"/>
+		<div class="form-part">
+			<div class="form-group clearfix">
+				<div class="group-title">名称</div>
+				<div class="group-item">
+					<div class="input-item" style="width: 360px;">
+						<input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入投诉类型名称" value="$!complaintsType.name">
+						<i class="icon-delete"></i>
+					</div>
+					<p class="errMsg errMsg-name"></p>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">说明</div>
+				<div class="group-item">
+					<div class="input-item" style="width: 360px;">
+						<input type="text" class="input-primary input-small input-null"  id="input-explain" placeholder="请输入投诉类型说明" value="$!complaintsType.description">
+						<i class="icon-delete"></i>
+					</div>
+					<p class="errMsg errMsg-explain"></p>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">投诉字段</div>
+				<div class="group-item">
+					<div class="table-wrapper">
+						<table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small" id="table-field">
+							<thead>
+								<tr>
+									<th>名称</th>
+									<th>类型</th>
+									<th>必填</th>
+									<th>限制</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+							#if($list && $list.size()>0)
+								#foreach($field in $list)
+                                <tr>
+									<td data-name="$!field.name">$!field.name</td>
+									#if($!field.type eq 1)
+                                        <td data-type="1">输入框</td>
+									#elseif($!field.type eq 2)
+                                        <td data-type="2">单选框</td>
+									#else
+                                        <td data-type="3">图片</td>
+									#end
+
+									#if($!field.mustInput)
+                                        <td data-must="0">是</td>
+									#else
+                                        <td data-must="1">否</td>
+									#end
+									#if($!field.type eq 1)
+                                        <td data-limit="$!field.sizeLimit">$!field.sizeLimit 字</td>
+									#elseif($!field.type eq 2)
+										#set($radioValues = '')
+										#foreach($radioValue in $!field.fieldExtras)
+											#if($radioValues eq '')
+												#set($radioValues = $!radioValue.value)
+											#else
+												#set($radioValues = $radioValues + "," + $!radioValue.value)
+											#end
+										#end
+                                        <td data-limit="$!radioValues">$!radioValues</td>
+									#else
+                                        <td data-limit="">无</td>
+									#end
+									<td>
+										<a href="javascript:void(0);" class="button-link button-link-small btn-type-edit">编辑</a>
+										&nbsp;&nbsp;&nbsp;&nbsp;
+										<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+									</td>
+								</tr>
+								#end
+							#end
+							</tbody>
+						</table>
+					</div>
+					<div class="btn-box">
+						<a href="javascript:void(0);" class="button-link button-add" id="btn-type-add">添加新字段</a>
+					</div>
+					<p class="errMsg errMsg-fieldStr"></p>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">&nbsp;</div>
+				<div class="group-item">
+					<a href="javascript:void(0);" class="button-primary-able btn-submit" style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+					<a href="/admin/complaints/type.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+				</div>
+			</div>
+		</div>
+	</form>
+</section>
+
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="type-add">
+	<div class="modal-header">
+		<h1>添加新字段</h1>
+		<a href="javascript:void(0);" class="btn-close"></a>
+	</div>
+	<div class="modal-content">
+		<div class="form-part">
+			<div class="form-group clearfix">
+				<div class="group-title">名称</div>
+				<div class="group-item">
+					<div class="input-item" style="width: 270px;">
+						<input type="text" class="input-primary input-small input-null" id="input-modal-name" placeholder="请输入字段名称">
+						<i class="icon-delete"></i>
+					</div>
+					<p class="errMsg errMsg-modal-name"></p>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">必填</div>
+				<div class="group-item">
+					<div class="select-box clearfix">
+						<div class="select-primary" id="select-modal-must">
+							<input type="hidden" name="" class="input-hidden" value="0">
+							<span class="select-placeholder">是</span>
+							<div class="select-options light-overscroll">
+							    <ul>
+							    	<li data-value="0" class="selected">是</li>
+							    	<li data-value="1">否</li>
+							    </ul>
+							</div>
+							<select class="select-select">
+						    	<option value="0" selected>是</option>
+						    	<option value="1">否</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">类型</div>
+				<div class="group-item">
+					<div class="radio-hidden-item" id="radio-modal-tabnav">
+						<label>
+							<input name="type" type="radio" value="1" />
+							<p class="radio-text">输入框</p>
+						</label>
+						<label>
+							<input name="type" type="radio" value="2" />
+							<p class="radio-text">单选项</p>
+						</label>
+						<label>
+							<input name="type" type="radio" value="3" />
+							<p class="radio-text">图片</p>
+						</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix type-input" id="type-input">
+				<div class="group-title">最长字数</div>
+				<div class="group-item">
+					<div class="input-item" style="width: 72px;">
+						<input type="text" class="input-primary input-small input-null" name="" placeholder="0">
+						<i class="icon-delete"></i>
+					</div>
+					<div class="input-item-text">字</div>
+					<p class="errMsg errMsg-modal-input-limit"></p>
+				</div>
+			</div>
+
+			<div class="form-group clearfix type-radio" id="type-radio">
+				<div class="group-title">可选项</div>
+				<div class="group-item">
+					<div class="input-item" style="width: 270px;">
+						<input type="text" class="input-primary input-small input-null" name="" placeholder="请输入选项">
+						<i class="btn-delete"></i>
+					</div>
+					<div>
+						<a href="javascript:void(0);" class="button-link button-add">添加可选项</a>
+					</div>
+					<p class="errMsg errMsg-modal-radio-list"></p>
+				</div>
+			</div>
+			
+			<div class="form-group clearfix">
+				<div class="group-title">&nbsp;</div>
+				<div class="group-item">
+					<a href="javascript:void(0);" class="button-primary-able btn-modal-submit" style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+	$(function() {
+		window.FORM = {
+			init: function() {
+				COMMON.selectBind($('.select-primary'), undefined);
+
+				FORM.modalTabnavBind();
+
+				FORM.typeAddEditBind();
+
+				FORM.btnModalSubmitBind();
+
+				FORM.btnSubmitBind();
+
+				FORM.btnTypeRadioAddBind();
+			},
+			modalTabnavBind: function() {
+				$('#radio-modal-tabnav').find('label').eq(0).on('click', function() {
+					$('#type-input').show();
+					$('#type-radio').hide();
+				});
+				$('#radio-modal-tabnav').find('label').eq(1).on('click', function() {
+					$('#type-input').hide();
+					$('#type-radio').show();
+				});
+				$('#radio-modal-tabnav').find('label').eq(2).on('click', function() {
+					$('#type-input').hide();
+					$('#type-radio').hide();
+				});
+			},
+			btnTypeRadioAddBind: function() {
+				$('#type-radio .button-add').on('click', function() {
+					$(this).parent().before(FORM.createRadioItem());
+					FORM.btnTypeRadioDelBind();
+				});
+			},
+			btnTypeRadioDelBind: function() {
+				$('#type-radio .btn-delete').unbind('click');
+				$('#type-radio .btn-delete').on('click', function() {
+					$(this).parent().remove();
+				});
+			},
+			typeAddEditBind: function() {
+				$('#table-field .btn-type-edit').unbind('click');
+				$('#table-field .btn-type-edit').on('click', function() {
+					FORM.typeAdd(1, $(this), $(this).parent().parent().index());
+				});
+
+				$('#table-field .btn-del').unbind('click');
+				$('#table-field .btn-del').on('click', function() {
+					$(this).parent().parent().remove();
+				});
+
+				$('#btn-type-add').on('click', function() {
+					FORM.typeAdd(0, undefined, undefined);
+				});
+			},
+			typeAdd: function(operate, obj, index) {
+				var modalTitle = $('#type-add .modal-header h1');
+				var inputModalName = $('#input-modal-name'),
+					selectModalMust = $('#select-modal-must'),
+					radioModalTabnav = $('#radio-modal-tabnav'),
+					typeInput = $('#type-input'),
+					typeRadio = $('#type-radio');
+
+				$('.errMsg-name').html('');
+				$('.errMsg-explain').html('');
+				$('.errMsg-fieldStr').html('');
+
+				if(operate == 1) {
+					// edit
+					modalTitle.html('编辑字段').attr('data-index', index);
+
+					var currTR = obj.parent().parent(),
+						currName = currTR.find('td').eq(0).attr('data-name'),
+						currMust = currTR.find('td').eq(2).attr('data-must'),
+						currType = currTR.find('td').eq(1).attr('data-type'),
+						currLimit = currTR.find('td').eq(3).attr('data-limit');
+
+					inputModalName.val(currName);
+
+					if(currMust == 0) {
+						selectModalMust.find('.input-hidden').val('0');
+						selectModalMust.find('.select-placeholder').html('是');
+						selectModalMust.find('.select-options ul li.selected').removeClass('selected');
+						selectModalMust.find('.select-options ul li').eq(0).addClass('selected');
+						selectModalMust.find('.select-select option').eq(0).attr('selected', true);
+					} else if(currMust == 1) {
+						selectModalMust.find('.input-hidden').val('1');
+						selectModalMust.find('.select-placeholder').html('否');
+						selectModalMust.find('.select-options ul li.selected').removeClass('selected');
+						selectModalMust.find('.select-options ul li').eq(1).addClass('selected');
+						selectModalMust.find('.select-select option').eq(1).attr('selected', true);
+					}
+
+					if(currType == 1) {
+						radioModalTabnav.find('label').eq(0).click();
+						typeInput.find('input').val(currLimit);
+					} else if(currType == 2) {
+						radioModalTabnav.find('label').eq(1).click();
+						var arr = currLimit.split(',');
+						typeRadio.find('.input-item').remove();
+						for(var i = 0; i < arr.length; i++) {
+							typeRadio.find('.button-add').parent().before(FORM.createRadioItem(arr[i]));
+							FORM.btnTypeRadioDelBind();
+						}
+					} else if(currType == 3) {
+						radioModalTabnav.find('label').eq(2).click();
+					}
+				} else if(operate == 0) {
+					// add
+					modalTitle.html('添加新字段').attr('data-index', '');
+
+					inputModalName.val('');
+
+					selectModalMust.find('.input-hidden').val('0');
+					selectModalMust.find('.select-placeholder').html('是');
+					selectModalMust.find('.select-options ul li.selected').removeClass('selected');
+					selectModalMust.find('.select-options ul li').eq(0).addClass('selected');
+					selectModalMust.find('.select-select option').eq(0).attr('selected', true);
+
+					radioModalTabnav.find('label').eq(0).click();
+
+					typeInput.find('input').val('');
+
+					typeRadio.find('.input-item').remove();
+					typeRadio.find('.button-add').parent().before(FORM.createRadioItem());
+					FORM.btnTypeRadioDelBind();
+				}
+				
+				$('.modal-mask').fadeIn(200);
+				$('#type-add').fadeIn(200);
+			},
+			createRadioItem: function(text) {
+				var str = '';
+				str += '<div class="input-item" style="width: 270px;">';
+				if(text){
+					str += '<input type="text" class="input-primary input-small input-null" value="'+ text +'" placeholder="请输入选项">';
+				} else {
+					str += '<input type="text" class="input-primary input-small input-null" placeholder="请输入选项">';
+				}
+				str += '<i class="btn-delete"></i>';
+				str += '</div>';
+
+				return str;
+			},
+			btnModalSubmitBind: function() {
+				var btnModalSubmit = $('.btn-modal-submit');
+
+				btnModalSubmit.on('click', function() {
+					var inputModalName = $('#input-modal-name'),
+						selectModalMust = $('#select-modal-must'),
+						radioModalTabnav = $('#radio-modal-tabnav'),
+						typeInput = $('#type-input'),
+						typeRadio = $('#type-radio');
+
+					var newName = inputModalName.val(),
+						newMust = selectModalMust.find('.input-hidden').val(),
+						newType = radioModalTabnav.find('label input[type="radio"]:checked').val(),
+						newLimit = '',
+						newLimitText = '';
+
+					$('.errMsg-modal-name').html('');
+					$('.errMsg-modal-input-limit').html('');
+					$('.errMsg-modal-radio-list').html('');
+
+					if(!COMMON.checkNull(newName)) {
+						COMMON.errMsg($('.errMsg-modal-name'), '请输入字段名称');
+						return false;
+					}
+					$('.errMsg-modal-name').html('');
+
+					if(newType == 1) {
+						newLimit = typeInput.find('input').val();
+
+						if(!COMMON.checkNull(newLimit)) {
+							COMMON.errMsg($('.errMsg-modal-input-limit'), '请输入最长字数');
+							return false;
+						}
+						if(!COMMON.checkInit(newLimit)) {
+							COMMON.errMsg($('.errMsg-modal-input-limit'), '最长字数必须是正整数');
+							return false;
+						}
+						$('.errMsg-modal-input-limit').html('');
+					} else if(newType == 2) {
+						var radioItem = $('#type-radio .input-item'),
+							radioStr = '',
+							radioArr = [];
+
+						for(var i = 0; i < radioItem.length; i++) {
+							var radioItemValue = radioItem.eq(i).find('input').val();
+							if(radioItemValue != '') {
+								radioArr.push(radioItemValue);
+							}
+						}
+						newLimit = radioArr.join(',');
+						newLimitText = radioArr.join('、');
+
+						if(!COMMON.checkNull(newLimit)) {
+							COMMON.errMsg($('.errMsg-modal-radio-list'), '请输入可选项');
+							return false;
+						}
+						$('.errMsg-modal-radio-list').html('');
+					} else if(newType == 3) {
+						newLimit = '无';
+					}
+
+					var tableStr = '';
+					tableStr += '<tr>';
+					tableStr += '<td data-name="'+ newName +'">'+ newName +'</td>';
+					if(newType == 1) {
+						tableStr += '<td data-type="1">输入框</td>';
+					} else if(newType == 2) {
+						tableStr += '<td data-type="2">单选框</td>';
+					} else if(newType == 3) {
+						tableStr += '<td data-type="3">图片</td>';
+					}
+					if(newMust == 0) {
+						tableStr += '<td data-must="0">是</td>';
+					} else if(newMust == 1) {
+						tableStr += '<td data-must="1">否</td>';
+					}
+					if(newType == 1) {
+						tableStr += '<td data-limit="'+ newLimit +'">'+ newLimit +'字</td>';
+					} else if(newType == 2) {
+						tableStr += '<td data-limit="'+ newLimit +'">'+ newLimitText +'</td>';
+					} else if(newType == 3) {
+						tableStr += '<td data-limit="'+ newLimit +'">'+ newLimit +'</td>';
+					}
+					tableStr += '<td>';
+					tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-type-edit">编辑</a>';
+					tableStr += '&nbsp;&nbsp;&nbsp;&nbsp;';
+					tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+					tableStr += '</td>';
+					tableStr += '</tr>';
+
+
+					var index = $('#type-add .modal-header h1').attr('data-index');
+					if(index == '') {
+						// add
+						$('#table-field tbody').append(tableStr);
+					} else {
+						// edit
+						$('#table-field tbody tr').eq(index).replaceWith(tableStr);
+					}
+
+					FORM.typeAddEditBind();
+					$('.modal-mask').fadeOut(200);
+					$('#type-add').fadeOut(200);
+				});
+			},
+			btnSubmitBind: function() {
+				var btnSubmit = $('.btn-submit');
+
+				btnSubmit.on('click', function() {
+					var _this = $(this);
+
+					if(_this.hasClass('button-primary-disable')) {
+						return false;
+					}
+
+					var nameVal = $('#input-name').val(),
+						explainVal = $('#input-explain').val(),
+						fieldStr = FORM.getTypeArray();
+
+					$('.errMsg-name').html('');
+					$('.errMsg-explain').html('');
+					$('.errMsg-fieldStr').html('');
+
+					if(!COMMON.checkNull(nameVal)) {
+						COMMON.errMsg($('.errMsg-name'), '请输入投诉类型名称');
+						return false;
+					}
+					$('.errMsg-name').html('');
+
+					if(!COMMON.checkNull(explainVal)) {
+						COMMON.errMsg($('.errMsg-explain'), '请输入投诉类型说明');
+						return false;
+					}
+					$('.errMsg-explain').html('');
+
+					if(!fieldStr) {
+						COMMON.errMsg($('.errMsg-fieldStr'), '请输入投诉字段');
+						return false;
+					}
+					$('.errMsg-fieldStr').html('');
+
+					_this.addClass('button-primary-disable').html('创建中...');
+
+					$.ajax({
+			            url: "/complaints/type/create.html",
+			            dataType:"json",
+			            type:"post",
+			            data: {
+                            id:$('#complaintsTypeId').val(),
+			                name: nameVal,
+                            explains: explainVal,
+                            fieldStr: fieldStr
+			            },
+			            success:function(data) {
+			            	if(data.code != 200) {
+			            		COMMON.errMsg($('.errMsg-fieldStr'), data.msg);
+			            		_this.removeClass('button-primary-disable').html('创建');
+			            	} else {
+			            		location.href = '/admin/complaints/type.html';
+			            	}
+			            },
+			            error: function() {
+			                COMMON.errMsg($('.errMsg-fieldStr'), '创建失败，请重试！');
+							_this.removeClass('button-primary-disable').html('创建');
+			            }
+			        });
+
+				});
+			},
+			getTypeArray: function() {
+				var arr = [],
+					tableField = $('#table-field'),
+					tableFieldItem = $('#table-field').find('tbody tr');
+
+				if(!tableFieldItem || tableFieldItem.length == 0) {
+					return false;
+				}
+
+				for(var i = 0; i < tableFieldItem.length; i++) {
+					var itemTD = tableFieldItem.eq(i).find('td'),
+						strName = itemTD.eq(0).attr('data-name'),
+						strType = itemTD.eq(1).attr('data-type'),
+						strMustInput = itemTD.eq(2).attr('data-must'),
+						strLimit = itemTD.eq(3).attr('data-limit');
+					arr.push({name: strName, type: strType, mustInput: strMustInput, limit: strLimit});
+				}
+
+				return JSON.stringify(arr);
+			}
+		};
+
+		FORM.init();
+	});
+</script>
+#end

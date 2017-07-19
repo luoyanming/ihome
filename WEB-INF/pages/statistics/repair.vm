@@ -1,0 +1,470 @@
+#set($layout = '/layout/common.vm')
+#define($title)
+<title>报修--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">报修</a>
+    </article>
+
+    <div class="checking-container">
+        <!-- <div class="common-title fs14">数据统计&nbsp;&nbsp;|&nbsp;&nbsp;<span class="col-333">报修</span></div> -->
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日报修情况</div>
+                <div class="fs14 col-999">更新时间：$!currentDate</div>
+                <div id="checking_count" style="width: 100%; height:250px;"></div>
+            </div>
+            <div class="right-content pull-right">
+                <div class="fs14 common-text">未完成报修分布</div>
+                <div class="fs14 col-999">未完成报修总数：<span>$!imconpletedCount</span></div>
+                <div id="pie" style="width: 100%;height: 231px;"></div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">报修明细</div>
+            <form action="" method="get">
+                <article class="form-condition">
+                    <div class="condition-group clearfix">
+                        <div class="title">报修类型</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="repairsTypeId" style="min-width: 120px;">
+                                <input type="hidden" name="repairsTypeId" value="$!repairsTypeId" class="input-hidden">
+								#if($repairsTypeId && $!repairsTypeId gt 0 )
+                            #foreach($!repairsType in $!repairsTypeList)
+                                #if($!repairsTypeId eq $!repairsType.id)
+                                    <span class="select-placeholder">$!repairsType.name</span>
+                                #end
+                            #end
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+								
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                <li data-value="0" #if($!repairsTypeId eq 0) class="selected" #end>全部</li>
+								#foreach($!repairsType in $!repairsTypeList)
+                                    <li data-value="$!repairsType.id" #if($!repairsTypeId eq $!repairsType.id)
+                                        class="selected"#end>$!repairsType.name</li>
+								#end
+                            </ul>
+                                </div>
+                                <select class="select-select">
+                                    <option value="0" #if($!repairsTypeId eq 0) selected #end>全部</option>
+							#foreach($!repairsType in $!repairsTypeVoList)
+                                <option value="$!repairsType.id" #if($!repairsTypeId eq $!repairsType.id)
+                                        selected #end>$!repairsType.name</option>
+							#end
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">日期&nbsp;&nbsp;</div>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramStartDate" value="$!{paramStartDate}" placeholder="xxxx年xx月xx日">
+                        </div>
+                        <span class="text"> - </span>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramEndDate" value="$!{paramEndDate}" placeholder="xxxx年xx月xx日">
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="update_repair_count" id="update_repair_count" style="width: 100%;height: 300px; margin-bottom: 40px;"></div>
+            <div class="bottom-detail clearfix">
+                <div class="table" style="width: 100%;">
+                    <article class="">
+                        <div class="table-wrapper">
+                            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                                <thead>
+									#if($list && $list.size()>0)
+                                <tr>
+                                    <th>日期</th>
+                                    <th>报修类型</th>
+                                    <th>提交</th>
+                                    <th>完成</th>
+                                    <th>金额</th>
+                                </tr>
+                                </thead>
+								<tbody>
+								 #foreach($item in $list)
+									<tr>
+									<td>$!DateUtils.formatTimeInSecond($item.date)</td>
+                                    #if($repairsTypeId && $!repairsTypeId gt 0 )
+                            #foreach($!repairsType in $!repairsTypeList)
+                                #if($!repairsTypeId eq $!repairsType.id)
+                                    <td>$!repairsType.name</td>
+                                #end
+                            #end
+                        #else
+                            <td>全部</td>
+                        #end
+                                    <td>$item.committed</td>
+                                    <td>$item.completed</td>
+                                    <td>$item.money</td>
+									</tr>
+								
+                                #end
+                                </tbody>
+								#end
+                            </table>
+                        </div>
+						#parse("/layout/pagination.vm")
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script src="/assets/script/common.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+
+			STATISTICS.getRepairBarData();
+			STATISTICS.getRepairPieData();
+			STATISTICS.getRepairLineData();
+		},
+		getRepairBarData: function() {
+			 $.ajax({
+	             url: "/repairs/repairsTodayStatistics.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.repairChartBarBind(chartArr);
+	             	}
+	             },
+	            error: function() {
+	                
+	             }
+	         });
+		},
+		getRepairPieData: function() {
+			 $.ajax({
+	             url: "/repairs/imcompletedRepairs.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.repairChartPieBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	            }
+	        });
+		},
+		getRepairLineData: function() {
+			 $.ajax({
+	             url: "/repairs/getRepairLineData.html",
+	             dataType:"json",
+	             type:"post",
+	             data: {
+	                repairsTypeId:'$!repairsTypeId',
+					paramStartDate: '$!paramStartDate',
+                    paramEndDate: '$!paramEndDate'
+	             },
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var repairChartLineArr1 = data.data.countCommitted,
+	            			repairChartLineArr2 = data.data.countCompleted,
+	            			repairChartLineArr3 = data.data.countMoney,
+							repairChartLineArr4 = data.data.countDate;
+
+	            		STATISTICS.repairChartLineBind(repairChartLineArr1, repairChartLineArr2, repairChartLineArr3,repairChartLineArr4);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		repairChartBarBind: function(bArr) {
+			var myChart1 = echarts.init(document.getElementById('checking_count'));
+		    var barOption = {
+		        grid:{
+		            x:'100',
+		            y:'20',
+		            y2:'40',
+		            x2:'60'
+		        },
+		        xAxis : [
+		            {
+		                type : 'category',
+		                data : ["提交", "接单", "服务完成", "付款"],
+		                axisLabel: {
+		                    show: true,
+		                    textStyle: {
+		                        color: '#888'  //X轴字体颜色
+		                    }
+		                },
+		                axisLine: {
+		                    show: true,
+		                    lineStyle:{
+		                        color:'#8C8C8C'  //X轴颜色
+		                    }
+		                },
+		                splitLine : {
+		                    show:false  //无横向分割线
+		                }
+		            }
+		        ],
+		        color:['rgba(80,172,252,0.80)','rgba(80,172,252,0.80)','rgba(255,168,67,0.80)','rgba(199,199,199,0.80)'],
+		        yAxis: {       //直角坐标系 grid 中的 y 轴
+		            type: 'value',
+		            axisLine: {
+		                show: false
+		            },
+		            splitLine : {
+		                show:true,
+		                lineStyle: {
+		                    color: '#DEDEDE',
+		                    type: 'dashed',
+		                    width: 1
+		                }
+		            },
+		            axisLabel: {
+		                show : true,
+		                textStyle: {
+		                    color: '#888'  //Y轴字体颜色
+		                }
+		            }
+		        },
+		        tooltip: {
+		            show : true
+		        },
+		        series : [
+		            {
+		                type:'bar',
+		                data: bArr,
+		                barWidth:'40',
+		                itemStyle: {
+		                    normal: {
+		                        color: function(params) {
+		                            // 柱状图不同的颜色
+		                            var colorList = [
+		                                'rgba(80,172,252,0.80)','rgba(80,172,252,0.80)','rgba(255,168,67,0.80)','rgba(199,199,199,0.80)'
+		                            ];
+		                            return colorList[params.dataIndex]
+		                        },
+		                        label: {
+		                            show: true,
+		                            position: 'top',
+		                            formatter: '{c}',
+		                            textStyle:{
+		                                color:'#666'
+		                            }
+		                        }
+		                    }
+		                }
+		            }
+		        ]
+		    };
+		    myChart1.setOption(barOption);
+		},
+		repairChartPieBind: function(pArr) {
+			var myChart2 = echarts.init(document.getElementById('pie'));
+		    var pieOption = {
+		        tooltip : {
+		            trigger: 'item',
+		            formatter: "{b}<br />{c}<br />{d}%",
+		        },
+		        series : [
+		            {
+		                type:'pie',
+		                center: ['55%', '50%'],
+		                radius: '90%',
+		                data: pArr,
+		                itemStyle : {
+		                    normal : {
+		                        label : {
+		                            show:false
+		                        },
+		                        labelLine : {
+		                            show : false
+		                        }
+		                    }
+		                }
+		            }
+		        ],
+		        color:['#56aefa','#87c5fb','#218ADB','#fff','#56aefa','#87c5fb','#218ADB','#56aefa','#87c5fb','#218ADB','#56aefa','#87c5fb']
+		    };
+		    myChart2.setOption(pieOption);
+		},
+		repairChartLineBind: function(lArr1, lArr2, lArr3 , lArr4) {
+			var myChart = echarts.init(document.getElementById('update_repair_count'));
+		    var dateNum = [];
+		    for(var i = 0; i<lArr4.length; i++){
+			dateNum.push(lArr4[i]);
+		    }
+
+		    option = {
+		        tooltip : {
+		            trigger: 'item',  //item只显示一个信息 axis显示所有
+		            axisPointer :{
+		                type: "none"   //没有指示线
+		            }
+		        },
+		        legend: {
+		            data:['提交报修数','完成报修数','金额'] ,
+		            x : "right"
+		        },
+		        xAxis : [
+		            {
+		                type : 'category',
+		                boundaryGap: true,
+		                axisLine : {    // 轴线
+		                    show: true,
+		                    lineStyle: {
+		                            color: '#8c8c8c',
+		                            type: 'solid',
+		                            width: 2
+		                    }
+		                },
+		                axisLabel : {
+		                    show:true,
+		                    interval: 'auto',    // {number}
+		                    rotate: 30,
+		                    textStyle: {
+		                        color: '#888888',
+		                        fontFamily: 'sans-serif',
+		                        fontSize: 12
+		                    }
+		                },
+		                splitLine : {
+		                    show:false
+		                },
+		                splitArea : {
+		                    show: false
+		                },
+		                data : dateNum
+		            }
+		        ],
+		        yAxis : [
+		            {
+		                type : 'value',
+		                axisLine : {    // 轴线
+		                    show: false
+		                },
+		                axisLabel : {
+		                    show:true,
+		                    textStyle: {  //Y轴左侧指示
+		                        color: '#888888',
+		                        fontSize: 12
+		                    }
+		                },
+		                splitLine : {
+		                    show:true,
+		                    lineStyle: {
+		                        color: '#DEDEDE',
+		                        type: 'dotted',
+		                        width: 2
+		                    }
+		                }
+		            },
+		            {
+		                //Y轴右侧指示
+		                type : 'value',
+		                axisLabel : {
+		                    show:true,
+		                    textStyle: {  //Y轴左侧指示
+		                        color: '#51ADFD',
+		                        fontSize: 12
+		                    }
+		                },
+		                axisLine : {    // 轴线
+		                    show: false
+		                },
+		                splitLine : {
+		                    show:false
+		                }
+		            }
+		        ],
+		        series : [
+		            {
+		                name: '提交报修数',
+		                type: 'line',
+		                yAxisIndex: 1,
+		                itemStyle:{
+		                    normal:{
+		                        color:"#51ADFD"
+		                    }
+		                },
+		                data: lArr1
+		            },
+		            {
+		                name: '完成报修数',
+		                type: 'line',
+		                yAxisIndex: 1,
+		                itemStyle:{
+		                    normal:{
+		                        color:"#FFA944"
+		                    }
+		                },
+		                data: lArr2
+		            },
+		            {
+		                name: '金额',
+		                type: 'bar',
+		                barWidth:'24',
+		                itemStyle:{
+		                    normal:{
+		                        color:"rgba(60,205,138,0.5)"
+		                    }
+		                },
+		                data: lArr3
+		            }
+		        ]
+		    };
+
+		    myChart.setOption(option);
+		}
+	};
+	
+
+	STATISTICS.init();
+});
+//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/statistics/repair.html',
+                {
+                    repairsTypeId: '$!repairsTypeId',
+                    repairsStatus: '$!repairsStatus',
+                    paramStartDate: '$!paramStartDate',
+                    paramEndDate: '$!paramEndDate',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

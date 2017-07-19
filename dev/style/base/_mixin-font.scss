@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+// font相关
+// --------------------------------------------------------------------------
+$fontFamily: 				Source Han sans, Helvetica Neue, Helvetica, Arial, sans-serif, 微软雅黑 !default;
+$baseFontSize:				12px !default;
+$fs20:						20px !default;
+$fs18:						18px !default;
+$fs16:						16px !default;
+$fs14:						14px !default;
+$fs13:						13px !default;
+$fs12:						12px !default;
+
+
+
+// color 相关
+// ------------------------------------------------------------------------------
+$color000:					#000000 !default;
+$colorFFF:					#FFFFFF !default;
+$colorCCC:					#CCCCCC !default;
+$colorC1:					#C1C1C1 !default;
+$colorC5:					#C5C5C5 !default;
+$colorE0:					#E0E0E0 !default;
+$colorE5:					#E5E5E5 !default;
+
+$colorF7:					#F7F7F7 !default;
+$colorDE:					#DEDEDE !default;
+
+$color333:					#333333 !default;
+$color666:					#666666 !default;
+$color888:					#888888 !default;
+
+$colorING:					#3DCD8A !default;
+$colorAlready:				#FFA944 !default;
+$colorWarning:				#D34842 !default;
+
+$colorBgLeftnav:			#2B4052 !default;
+$colorBgLeftnavCurrent:		#253847 !default;
+$colorBg:					#F5F8FA !default;
+$colorBgBoss:				#F5FAFA !default;
+
+$colorBlue:					#51ADFD !default;
+$colorBlueHover:			#4797df !default;
+$colorBlueDisable:			#84c4fd !default;
+$colorDeepBlue:				#218ADB !default;
+$colorDeepBlueHover:		#1c79c2 !default;
+
+$colorBlueBoss:				#0dbfd4 !default;
+$colorBlueBossHover:		#0ba8bb !default;
+$colorBlueBossDisable:		#56d2e0 !default;
+$colorDeepBlueBoss:			#149da9 !default;
+$colorDeepBlueBossHover:	#118994 !default;
+
+$colorBorder: 				#e5e5e5 !default;
+$colorBorderHover: 			#c9c9c9 !default;
+$colorBorderFocus: 			#51acfd !default;
+$colorBorderBossFocus:	 	#0dbfd4 !default;
+

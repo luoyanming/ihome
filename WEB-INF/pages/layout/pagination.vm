@@ -1,0 +1,67 @@
+<div class="pagination">
+    #if($count>0)
+        #if($totalPage==0)
+            <a href="javascript:void(0);" class="pagi-item" onclick="goPage(1);">首页</a>
+            <a href="javascript:void(0);" class="pagi-item current">1</a>
+            <a href="javascript:void(0);" class="pagi-item" onclick="goPage(1);">末页</a>
+        #elseif($totalPage>0)
+            <a href="javascript:void(0);" class="pagi-item" onclick="goPage(1);">首页</a>
+            #if(${pageNo}!=1)
+                <a href="javascript:void(0);" class="pagi-item" onclick="goPage(${pageNo}-1);">上一页</a>
+            #end
+            #if($pageNo<=3)
+                #foreach($foo in [1..${pageNo}])
+                    <a href="javascript:void(0);" class="pagi-item #if($pageNo ==$foo ) current #end"
+                       onclick="goPage($foo);">$foo</a>
+                #end
+                #if($totalPage<5)
+                    #set($endPage = ${totalPage})
+                #else
+                    #set($endPage = 5)
+                #end
+                #if($pageNo+1<=$endPage)
+                    #set($start = ${pageNo}+1)
+                    #foreach($foo in [${start}..${endPage}])
+                        <a href="javascript:void(0);" class="pagi-item #if($pageNo ==$foo ) current #end"
+                           onclick="goPage($foo);">$foo</a>
+                    #end
+                #end
+            #else
+                #set($start = ${pageNo} - 2)
+                #foreach($foo in [${start}..${pageNo}])
+                    <a href="javascript:void(0);" class="pagi-item #if($pageNo ==$foo ) current #end"
+                       onclick="goPage($foo);">$foo</a>
+                #end
+                #if($totalPage<${pageNo}+2)
+                    #set($endPage = ${totalPage})
+                #else
+                    #set($endPage = ${pageNo}+2)
+                #end
+                #if($pageNo+1<=$endPage)
+                    #set($start = ${pageNo}+1)
+                    #foreach($foo in [${start}..${endPage}])
+                        <a href="javascript:void(0);" class="pagi-item #if($pageNo ==$foo ) current #end"
+                           onclick="goPage($foo);">$foo</a>
+                    #end
+                #end
+            #end
+            #if($pageNo!=$totalPage)
+                <a href="javascript:void(0);" class="pagi-item" onclick="goPage(${pageNo}+1);">下一页</a>
+            #end
+            <a href="javascript:void(0);" class="pagi-item" onclick="goPage($totalPage);">末页</a>
+        #end
+    #end
+
+#*
+    <a href="javascript:void(0);" class="pagi-item">首页</a>
+    <a href="javascript:void(0);" class="pagi-item">上一页</a>
+    <a href="javascript:void(0);" class="pagi-item">1</a>
+    <a href="javascript:void(0);" class="pagi-item">2</a>
+    <a href="javascript:void(0);" class="pagi-item current">3</a>
+    <a href="javascript:void(0);" class="pagi-item">4</a>
+    <a href="javascript:void(0);" class="pagi-item">5</a>
+    <a href="javascript:void(0);" class="pagi-item">6</a>
+    <a href="javascript:void(0);" class="pagi-item">7</a>
+    <a href="javascript:void(0);" class="pagi-item">下一页</a>
+    <a href="javascript:void(0);" class="pagi-item">末页</a>*#
+</div>

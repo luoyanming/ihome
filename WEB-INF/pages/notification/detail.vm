@@ -1,0 +1,60 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看通知--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/notification.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/notification.html" class="button-link">通知</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看通知</a>
+    </article>
+
+    <form action="" method="get" class="form-main" style="margin-top: 20px;">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!notice.title</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">#if($!notice.type eq 1) 通知公告 #else 管理通知 #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">内容</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0; line-height: 28px; padding: 6px 0;">$!notice.content</div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var NOTIFICATION = {
+            init: function () {
+                
+            }
+        };
+
+        NOTIFICATION.init();
+    });
+</script>
+#end

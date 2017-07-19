@@ -1,0 +1,181 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看员工--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看员工</a>
+    </article>
+
+    <div class="tabnav tabnav-staff clearfix">
+        <a href="/admin/staff/detail/baseinfo.html?employeeId=$!employeeId" class="tabnav-item">基本信息</a>
+        <a href="/admin/staff/detail/assignment.html?employeeId=$!employeeId" class="tabnav-item">任务记录</a>
+        <a href="/admin/staff/detail/warning.html?employeeId=$!employeeId" class="tabnav-item">告警记录</a>
+        <a href="/admin/staff/detail/attendance.html?employeeId=$!employeeId" class="tabnav-item">考勤记录</a>
+        <a href="/admin/staff/detail/grabform.html?employeeId=$!employeeId" class="tabnav-item">抢单记录</a>
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">内部报事</a>
+    </div>
+
+    <div style="padding: 0 50px;">
+        <form action="/admin/staff/detail/internalreport.html?employeeId=$!employeeId" method="post">
+            <article class="form-condition">
+                <div class="condition-group clearfix">
+                    <div class="title">状态</div>
+                    <div class="select-box clearfix">
+                        <div class="select-primary select-small" id="">
+                            <input type="hidden" name="reportStatus" value="$!reportStatus" class="input-hidden">
+                            #if($reportStatus && $!reportStatus ne '' )
+                                #foreach($!reportStatusItem in $!reportStatusList)
+                                    #if($!reportStatus eq $!reportStatusItem.code)
+                                        <span class="select-placeholder">$!reportStatusItem.desc</span>
+                                    #end
+                                #end
+                            #else
+                                <span class="select-placeholder">全部</span>
+                            #end
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" #if($!reportStatus eq '') class="selected" #end>全部</li>
+                                    #foreach($!reportStatusItem in $!reportStatusList)
+                                        <li data-value="$!reportStatusItem.code" #if($!reportStatus eq $!reportStatusItem.code)
+                                            class="selected"#end>$!reportStatusItem.desc</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" #if($!reportStatus eq '') selected #end>全部</option>
+                                #foreach($!reportStatusItem in $!reportStatusList)
+                                    <option value="$!reportStatusItem.code" #if($!reportStatus eq $!reportStatusItem.code)
+                                            selected #end>$!reportStatusItem.desc</option>
+                                #end
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">提交日期&nbsp;&nbsp;</div>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar"
+                               value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                    </div>
+                    <span class="text"> - </span>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                               placeholder="xxxx年xx月xx日">
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="search-box clearfix">
+                        <input type="submit" value="搜索" class="button-search btn-search"/>
+                    </div>
+                </div>
+            </article>
+        </form>
+
+        <article class="" style="margin-top: 20px;">
+            <div class="table-wrapper">
+                #if($list && $list.size()>0)
+                    <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                        <thead>
+                        <tr>
+                            <th>描述</th>
+                            <th>提交日期</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            #foreach($internalReport in $list)
+                            <tr>
+                                <td>$!internalReport.content</td>
+                                <td>$!DateUtils.formatTimeYMDHM($!internalReport.createdDate)</td>
+                                #if($!internalReport.status eq 2)
+                                    <td class="state state-already">$!internalReport.statusMsg</td>
+                                #elseif($!internalReport.status eq 1)
+                                    <td class="state state-ING">$!internalReport.statusMsg</td>
+                                #else
+                                    <td>$!internalReport.statusMsg</td>
+                                #end
+                                <td>
+                                    <a href="/admin/complaints/internalreport/detail.html?id=$!internalReport.id"
+                                       class="button-link button-link-small">查看</a>
+                                </td>
+                            </tr>
+                            #end
+                       #* <tr>
+                            <td>发现某某地方某某东西出现问题，请马上安排检修！！！</td>
+                            <td>2016/12/22</td>
+                            <td>未处理</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>发现某某地方某某东西出现问题，请马上安排检修！！！</td>
+                            <td>2016/12/22</td>
+                            <td class="state state-ING">处理中</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>发现某某地方某某东西出现问题，请马上安排检修！！！</td>
+                            <td>2016/12/22</td>
+                            <td class="state state-already">已完成</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>*#
+                        </tbody>
+                    </table>
+                #else
+                    <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                        <div class="table-nodata"><p>暂无内部报事</p></div>
+                    </div>
+                #end
+            </div>
+            #parse("/layout/pagination.vm")
+        </article>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var STAFF = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        STAFF.init();
+    });
+
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/staff/detail/internalreport.html',
+                {
+                    employeeId: '$!employeeId',
+                    reportStatus: '$!reportStatus',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

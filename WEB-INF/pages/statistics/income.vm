@@ -1,0 +1,652 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>收入--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">收入</a>
+    </article>
+
+    <div class="income-container">
+        <!-- <div class="common-title fs14">数据统计&nbsp;&nbsp;|&nbsp;&nbsp;<span class="col-333">收入</span></div> -->
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日进账</div>
+                <div class="clearfix">
+                    <div class="pull-left left-container" style=" padding-left: 20px; margin-bottom: 10px;">
+                        <div class="fs24" style="margin-top: 10px; margin-right:20px;display: inline-block;">¥ $!todayCount</div>
+                        <div class="fs14" style="display: inline-block;">更新时间：$!currentTime</div>
+                    </div>
+                    <div class="pull-left" id="line"></div>
+                </div>
+            </div>
+            <div class="right-content pull-right">
+                <div class="fs14 common-text">昨日进账</div>
+                <div class="fs36">¥ $!yesterdayCount</div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">明细记录</div>
+            <form action="" method="post">
+                <article class="form-condition">
+                    <div class="condition-group clearfix">
+                        <div class="title">类型</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="chargeTypeId" style="min-width: 120px;">
+                                <input type="hidden" name="chargeTypeId" value="$!chargeTypeId" class="input-hidden">
+                                #if($chargeTypeId && $!chargeTypeId gt 0 )
+									#foreach($!item in $!chargeTypeList)
+										#if($!chargeTypeId eq $!item.id)
+												<span class="select-placeholder">$!item.name</span>
+										#end
+									#end
+								#else
+									<span class="select-placeholder">全部</span>	
+								#end
+								
+								
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!chargeTypeId eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!chargeTypeList)
+                                    <li data-value="$!item.id" #if($!chargeTypeId eq $!item.id)
+                                        class="selected"#end>$!item.name</li>
+								#end
+                                    </ul>
+                                </div>
+								
+								
+                                <select class="select-select">
+                                    <option value="0" #if($!chargeTypeId eq 0) selected #end>全部</option>
+							#foreach($!item in $!chargeTypeList)
+                                <option value="$!item.id" #if($!chargeTypeId eq $!item.id)
+                                        selected #end>$!item.name</option>
+							#end
+                                </select>
+								
+                            </div>
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="title">房间</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="buildingId">
+                                <input type="hidden" name="buildingId" value="$!buildingId" class="input-hidden">
+									#if($buildingId&&$buildingId &&$!buildingId gt 0 )
+										#foreach($!item in $!buildingList)
+											#if($!buildingId eq $!item.id)
+												<span class="select-placeholder">$!item.name</span>
+											#end
+										#end
+									#else
+									<span class="select-placeholder">全部</span>	
+									#end
+								
+								
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!buildingId eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!buildingList)
+                                    <li data-value="$!item.id" #if($!buildingId eq $!item.id)
+                                        class="selected"#end>$!item.name</li>
+									   #end
+                                    </ul>
+                                </div>
+								
+								
+                                <select class="select-select">
+                                    <option value="0" #if($!buildingId eq 0) selected #end>全部</option>
+										#foreach($!item in $!buildingList)
+									<option value="$!item.id" #if($!buildingId eq $!item.id)
+												selected #end>$!item.name</option>
+										#end
+                                </select>
+                            </div>
+							
+							
+							#if($buildingCellId && $!buildingCellId gt 0)
+							<div class="select-primary select-small" id="select-building">
+                                <input type="hidden" name="buildingCellId" value="$!buildingCellId" class="input-hidden">
+										#foreach($!item in $!buildingCellList)
+											#if($!buildingCellId eq $!item.value)
+												<span class="select-placeholder">$!item.name</span>
+											#end
+										#end
+								
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!buildingCellId eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!buildingCellList)
+                                    <li data-value="$!item.value" #if($!buildingCellId eq $!item.value)
+                                        class="selected"#end>$!item.name</li>
+									   #end
+                                    </ul>
+                                </div>
+								
+								
+                                <select class="select-select">
+                                    <option value="0" #if($!buildingCellId eq 0) selected #end>全部</option>
+										#foreach($!item in $!buildingCellList)
+									<option value="$!item.value" #if($!buildingCellId eq $!item.value)
+												selected #end>$!item.name</option>
+										#end
+                                </select>
+							</div>
+							
+							#else
+								<div class="select-primary select-small" id="select-building" style="display: none;">
+                                </div>
+							#end
+
+							#if($buildingUnitId && $!buildingUnitId gt 0)
+								<div class="select-primary select-small" id="select-unit">
+                                <input type="hidden" name="buildingUnitId" value="$!buildingUnitId" class="input-hidden">
+										#foreach($!item in $!buildingUnitList)
+											#if($!buildingUnitId eq $!item.value)
+												<span class="select-placeholder">$!item.name</span>
+											#end
+										#end
+								
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!buildingUnitId eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!buildingUnitList)
+                                    <li data-value="$!item.value" #if($!buildingUnitId eq $!item.value)
+                                        class="selected"#end>$!item.name</li>
+									   #end
+                                    </ul>
+                                </div>
+								
+								
+                                <select class="select-select">
+                                    <option value="0" #if($!buildingUnitId eq 0) selected #end>全部</option>
+										#foreach($!item in $!buildingUnitList)
+									<option value="$!item.value" #if($!buildingUnitId eq $!item.value)
+												selected #end>$!item.name</option>
+										#end
+                                </select>
+							</div>
+							
+							#else
+							<div class="select-primary select-small" id="select-unit" style="display: none;">
+                                </div>	
+							#end
+								
+							#if($roomNumber && $!roomNumber gt 0)
+								<div class="select-primary select-small" id="select-room">
+                                <input type="hidden" name="roomNumber" value="$!roomNumber" class="input-hidden">
+										#foreach($!item in $!roomNumberList)
+											#if($!roomNumber eq $!item.value)
+												<span class="select-placeholder">$!item.name</span>
+											#end
+										#end
+								
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" #if($!roomNumber eq 0) class="selected" #end>全部</li>
+                                       #foreach($!item in $!roomNumberList)
+                                    <li data-value="$!item.value" #if($!roomNumber eq $!item.value)
+                                        class="selected"#end>$!item.name</li>
+									   #end
+                                    </ul>
+                                </div>
+								
+								
+                                <select class="select-select">
+                                    <option value="0" #if($!roomNumber eq 0) selected #end>全部</option>
+										#foreach($!item in $!roomNumberList)
+									<option value="$!item.value" #if($!roomNumber eq $!item.value)
+												selected #end>$!item.name</option>
+										#end
+                                </select>
+							</div>
+							#else
+								<div class="select-primary select-small" id="select-room" style="display: none;">
+                                </div>
+							#end
+								
+								
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="title">用户</div>
+                        <div class="input-item" style="width: 84px; margin-left: 7px;">
+                            <input type="text" placeholder="全部" name="userName" value="$!userName" class="input-primary input-x-small">
+                            <i class="icon-delete"></i>
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">收费时间&nbsp;&nbsp;</div>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStartInt" value="$!createdDateStartInt" placeholder="xxxx年xx月xx日">
+                        </div>
+                        <span class="text"> - </span>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEndInt" value="$!createdDateEndInt" placeholder="xxxx年xx月xx日">
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="bottom-detail clearfix">
+                <div class="pie pull-left" id="pie"></div>
+                <div class="table pull-left">
+                    <article class="">
+                        <div class="table-wrapper">
+									#if($chargeBillItemList && $chargeBillItemList.size()>0)
+                            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                                <thead>
+                                <tr>
+                                    <th>收费时间</th>
+                                    <th>类型</th>
+                                    <th>房间</th>
+                                    <th>用户</th>
+                                    <th>金额</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+								#foreach($chargeItem in $chargeBillItemList)
+										<tr>
+									<td>$!DateUtils.formatTimeYMDHM($chargeItem.chargeBillItem.createdDate)</td>
+										#foreach($!item in $!chargeTypeList)
+											#if($!chargeItem.typeId eq $!item.id)
+												<td>$!item.name</td>
+											#end
+										#end
+										<td>
+										#foreach($!item1 in $!buildingList)
+											#if($!item1.id eq $!chargeItem.chargeBillItem.buildingId)
+												$!item1.name
+											#end
+										#end
+										#foreach($!item2 in $!buildingCellList)
+											#if($!item2.value eq $!chargeItem.chargeBillItem.buildingCellId)
+												$!item2.name
+											#end
+										#end
+										#foreach($!item3 in $!buildingUnitList)
+											#if($!item3.value eq $!chargeItem.chargeBillItem.buildingUnitId)
+												$!item3.name
+											#end
+										#end
+										#foreach($!item4 in $!roomNumberList)
+											#if($!item4.value eq $!chargeItem.chargeBillItem.roomId)
+												$!item4.name
+											#end
+										#end
+											
+										</td>
+
+										<td>$!chargeItem.ownersName</td>
+									<td>#if($!chargeItem.chargeBillItem.payStatus eq 2) $!chargeItem.chargeBillItem.cashFees #else $!chargeItem.chargeBillItem.fees #end</td>
+									</tr>
+								#end
+                                </tbody>
+								
+                            </table>
+								#else
+							<div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+								<div class="table-nodata"><p>暂无数据</p></div>
+								#end
+                        </div>
+						#parse("/layout/pagination.vm")
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script src="/assets/script/common.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+			COMMON.selectBind($('#buildingId'), STATISTICS.getSelectBuildingData);
+			COMMON.selectBind($('#select-building'), STATISTICS.getSelectUnitData);
+			COMMON.selectBind($('#select-unit'), STATISTICS.getSelectRoomData);
+
+			STATISTICS.getIncomeData();
+			STATISTICS.getBalanceData();
+		},
+		getSelectBuildingData: function(AID) {
+			$.ajax({
+                url: "/charge/buildingCellList.html",
+                dataType: "json",
+                type: "post",
+                data: {
+                    buildingId: AID
+                },
+                success: function (data) {
+                    if (data.code != 200) {
+
+                    } else {
+                        var str = '';
+                        str += '<input type="hidden" name="buildingCellId" class="input-hidden">';
+                        str += '<span class="select-placeholder">全部</span>';
+                        str += '<div class="select-options light-overscroll">';
+                        str += '<ul>';
+                        str += '<li data-value="0" class="selected">全部</li>';
+                        for (var i = 0; i < data.data.length; i++) {
+                            str += '<li data-value="' + data.data[i].value + '">' + data.data[i].name + '</li>';
+                        }
+                        str += '</ul>';
+                        str += '</div>';
+                        str += '<select class="select-select">';
+                        str += '<option value="0" selected>全部</option>';
+                        for (var j = 0; j < data.data.length; j++) {
+                            str += '<option value="' + data.data[j].value + '">' + data.data[j].name + '</option>';
+                        }
+                        str += '</select>';
+                        $('#select-building').html(str).show();
+                        $('#select-unit').html('').hide();
+                        $('#select-room').html('').hide();
+                        COMMON.selectBind($('#select-building'), STATISTICS.getSelectUnitData);
+                    }
+                },
+                error: function () {
+
+                }
+            });
+		},
+		getSelectUnitData: function(BID) {
+			$.ajax({
+                url: "/charge/buildingUnitList.html",
+                dataType: "json",
+                type: "post",
+                data: {
+                    buildingCellId: BID
+                },
+                success: function (data) {
+                    if (data.code != 200) {
+
+                    } else {
+                        var str = '';
+                        str += '<input type="hidden" name="buildingUnitId" class="input-hidden">';
+                        str += '<span class="select-placeholder">全部</span>';
+                        str += '<div class="select-options light-overscroll">';
+                        str += '<ul>';
+                        str += '<li data-value="0" class="selected">全部</li>';
+                        for (var i = 0; i < data.data.length; i++) {
+                            str += '<li data-value="' + data.data[i].value + '">' + data.data[i].name + '</li>';
+                        }
+                        str += '</ul>';
+                        str += '</div>';
+                        str += '<select class="select-select">';
+                        str += '<option value="0" selected>全部</option>';
+                        for (var j = 0; j < data.data.length; j++) {
+                            str += '<option value="' + data.data[j].value + '">' + data.data[j].name + '</option>';
+                        }
+                        str += '</select>';
+
+                        $('#select-unit').html(str).show();
+                        $('#select-room').html('').hide();
+                        COMMON.selectBind($('#select-unit'), STATISTICS.getSelectRoomData);
+                    }
+                },
+                error: function () {
+
+                }
+            });
+		},
+		getSelectRoomData: function(UID) {
+			$.ajax({
+                url: "/charge/buildingRoomNumberList.html",
+                dataType: "json",
+                type: "post",
+                data: {
+                    buildingUnitId: UID
+                },
+                success: function (data) {
+                    if (data.code != 200) {
+
+                    } else {
+                        var str = '';
+                        str += '<input type="hidden" name="roomNumber" class="input-hidden">';
+                        str += '<span class="select-placeholder">全部</span>';
+                        str += '<div class="select-options light-overscroll">';
+                        str += '<ul>';
+                        str += '<li data-value="0" class="selected">全部</li>';
+                        for (var i = 0; i < data.data.length; i++) {
+                            str += '<li data-value="' + data.data[i].value + '">' + data.data[i].name + '</li>';
+                        }
+                        str += '</ul>';
+                        str += '</div>';
+                        str += '<select class="select-select">';
+                        str += '<option value="0" selected>全部</option>';
+                        for (var j = 0; j < data.data.length; j++) {
+                            str += '<option value="' + data.data[j].value + '">' + data.data[j].name + '</option>';
+                        }
+                        str += '</select>';
+
+                        $('#select-room').html(str).show();
+                        COMMON.selectBind($('#select-room'), undefined);
+                    }
+                },
+                error: function () {
+
+                }
+            });
+		},
+		getIncomeData: function() {
+			 $.ajax({
+	             url: "/charge/todayStatistics.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.incomeChartBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		getBalanceData: function() {
+			$.ajax({
+	             url: "/charge/typeStatistics.html",
+	             dataType:"json",
+	             type:"post",
+	             data: {
+				 	chargeTypeId: '$!chargeTypeId',
+                    buildingId: '$!buildingId',
+                    buildingCellId: '$!buildingCellId',
+                    buildingUnitId: '$!buildingUnitId',
+                    roomNumber: '$!roomNumber',
+                    userName: '$!userName',
+                    createdDateStartInt: '$!createdDateStartInt',
+                    createdDateEndInt: '$!createdDateEndInt'
+				 },
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.balanceChartBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		incomeChartBind: function(iArr) {
+			var myChart = echarts.init(document.getElementById('line'));
+
+	        var timeDate = [];
+	        var j;
+	        for(var i = 1; i<25; i++){
+	            if(i<10){
+	                j = "0"+i+":00";
+	            } else {
+	                j = i+":00";
+	            }
+	            timeDate.push(j);
+
+	        }
+
+	        //参数设置
+
+	        option = {
+	            tooltip: {    //提示框组件
+	                trigger: 'axis', //鼠标跟随可以显示不同时刻的状态
+	                axisPointer :{
+	                    type: "none"   //没有指示线
+	                }
+	            },
+	            grid:{
+	                x:'80',
+	                y:'20',
+	                y2:'80',
+	                x2:'40'
+	            },
+	            xAxis: {       //直角坐标系 grid 中的 x 轴
+	                axisLabel: {
+	                    show: true,
+	                    rotate : 40,  //文字倾斜
+	                    textStyle: {
+	                        color: '#888'  //X轴字体颜色
+	                    }
+	                },
+	                axisLine: {
+	                    show: true,
+	                    lineStyle:{
+	                        color:'#8C8C8C'  //X轴颜色
+	                    }
+	                },
+	                splitLine : {
+	                    show:false  //无横向分割线
+	                },
+	                data: timeDate
+	            },
+	            yAxis: {       //直角坐标系 grid 中的 y 轴
+	                type: 'value',
+	                axisLine: {
+	                    show: false
+	                },
+	                splitLine : {
+	                    show:true,
+	                    lineStyle: {
+	                        color: '#DEDEDE',
+	                        type: 'dashed',
+	                        width: 1
+	                    }
+	                },
+	                axisLabel: {
+	                    show : true,
+	                    textStyle: {
+	                        color: '#888'  //Y轴字体颜色
+	                    }
+	                }
+	            },
+	            series: [      //系列列表
+	                {
+	                    type: 'line',
+	                    name: '进账',
+	                    itemStyle : {
+	                        normal : {
+	                            color:'#51ADFD',  //交汇远点颜色
+	                            lineStyle:{
+	                                color:'rgba(80,171,253,0.40)',  //折线颜色
+	                                width:3
+	                            }
+	                        }
+	                    },
+	                    data: iArr
+	                }
+	            ]
+	        };
+	        myChart.setOption(option);   //参数设置方法
+		},
+		balanceChartBind: function(bArr) {
+			var myChartBalance = echarts.init(document.getElementById('pie'));
+	        var pieOption = {
+	            series : [
+	                {
+	                    type:'pie',
+	                    center: ['45%', '50%'],
+	                    radius: '80%',
+	                    data: bArr,
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    show:false
+                                },
+                                labelLine : {
+                                    show : false
+                                }
+                            }
+                        }
+	                    // itemStyle : {
+	                    //     normal : {
+	                    //         label : {
+	                    //             show:true,
+	                    //             position : 'inner',
+	                    //             formatter:'{d} %\n{b}',
+	                    //             textStyle : {
+	                    //                 fontSize : '16'
+	                    //             }
+	                    //         },
+	                    //         labelLine : {
+	                    //             show : false
+	                    //         }
+	                    //     }
+	                    // }
+	                }
+	            ],
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{d}%<br />{b}",
+                    textStyle: {
+                        fontSize: '14'
+                    }
+                },
+	            color:['#56aefa','#87c5fb','#218ADB']
+	        };
+	        myChartBalance.setOption(pieOption);   //参数设置方法
+		}
+	};
+
+	STATISTICS.init();
+});
+//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/statistics/income.html',
+                {
+                    chargeTypeId: '$!chargeTypeId',
+                    buildingId: '$!buildingId',
+                    buildingCellId: '$!buildingCellId',
+                    buildingUnitId: '$!buildingUnitId',
+                    roomNumber: '$!roomNumber',
+                    userName: '$!userName',
+					
+                    createdDateStartInt: '$!createdDateStartInt',
+                    createdDateEndInt: '$!createdDateEndInt',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

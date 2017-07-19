@@ -1,0 +1,151 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>访客记录--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/proprietor.html" class="button-link">业主管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看房间</a>
+    </article>
+
+    <div class="tabnav clearfix">
+        <a href="/admin/data/proprietor/detail/baseinfo.html?id=$!roomId" class="tabnav-item">基本信息</a>
+        <a href="/admin/data/proprietor/detail/repair.html?id=$!roomId" class="tabnav-item">报修记录</a>
+        <a href="/admin/data/proprietor/detail/payment.html?id=$!roomId" class="tabnav-item">缴费记录</a>
+        <a href="/admin/data/proprietor/detail/dataentry.html?id=$!roomId" class="tabnav-item">数据录入记录</a>
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">访客记录</a>
+    </div>
+
+    <div style="padding: 0 50px;">
+        <form action="" method="post">
+            <article class="form-condition">
+                <input type="hidden" name="id" value="$!roomId" class="input-hidden">
+                <div class="condition-group clearfix">
+                    <div class="title">访客姓名</div>
+                    <div class="search-box clearfix">
+                        <div class="input-item" style="width: 120px;">
+                            <input type="search" name="name" value="$!name" placeholder="请输入访客姓名"
+                                   class="input-primary input-x-small input-search">
+                            <i class="icon-delete"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">手机号</div>
+                    <div class="search-box clearfix">
+                        <div class="input-item" style="width: 120px;">
+                            <input type="search" name="mobile" value="$!mobile" placeholder="请输入手机号"
+                                   class="input-primary input-x-small input-search">
+                            <i class="icon-delete"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">车牌号</div>
+                    <div class="search-box clearfix">
+                        <div class="input-item" style="width: 120px;">
+                            <input type="search" name="plate" value="$!plate" placeholder="请输入车牌号"
+                                   class="input-primary input-x-small input-search">
+                            <i class="icon-delete"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="title">提交日期&nbsp;&nbsp;</div>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar"
+                               value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                    </div>
+                    <span class="text"> - </span>
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-x-small input-datepicker"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}"
+                               placeholder="xxxx年xx月xx日">
+                    </div>
+                </div>
+                <div class="condition-group clearfix">
+                    <div class="search-box clearfix">
+                        <input type="submit" value="搜索" class="button-search btn-search"/>
+                    </div>
+                </div>
+            </article>
+        </form>
+
+        <article class="" style="margin-top: 20px;">
+            <div class="table-wrapper">
+				#if($list && $list.size()>0)
+                    <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                        <thead>
+                        <tr>
+                            <th>访客姓名</th>
+                            <th>手机号</th>
+                            <th>车牌号</th>
+                            <th>人数</th>
+                            <th>预约用户</th>
+                            <th>到访日期</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+							#foreach($vistorItem in $list)
+                            <tr>
+                                <td>$!vistorItem.name</td>
+                                <td>$!vistorItem.mobile</td>
+                                <td>$!vistorItem.plateNumber</td>
+                                <td>$!vistorItem.num</td>
+                                <td>$!vistorItem.OwnersRoomVo.ownersName</td>
+                                <td>$!DateUtils.formatTimeInSecond($!vistorItem.visitDate)</td>
+                            </tr>
+							#end
+                        </tbody>
+                    </table>
+				#else
+                    <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                        <div class="table-nodata"><p>暂无访客</p></div>
+                    </div>
+				#end
+            </div>
+			#parse("/layout/pagination.vm")
+        </article>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+
+            }
+        };
+
+        DATA.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/data/proprietor/detail/visitor.html?id=$!roomId',
+                {
+                    name: '$!name',
+                    mobile: '$!mobile',
+                    plate: '$!plate',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

@@ -1,0 +1,249 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>内部报事--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb clearfix">
+        <a href="/admin/complaints.html" class="button-link">投诉报事</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">内部报事</a>
+    </article>
+    <form action="" method="POST">
+        <article class="form-condition">
+            <div class="operate-group">
+                <a href="/admin/complaints/type/create.html" class="button-link button-add">新建投诉类型</a>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交人</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="select-primary-0">
+                        <input type="hidden" name="departmentId" class="input-hidden" value="$!paramDepartmentId">
+                        <span class="select-placeholder">#if($paramDepartmentName) $paramDepartmentName #else 全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($departmentList && $departmentList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($departmentItem in $departmentList)
+                                        <li data-value="$!departmentItem.id" #if($!paramDepartmentId eq $!departmentItem.id)
+                                            class="selected" #end>$!departmentItem.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($departmentList && $departmentList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($departmentItem in $departmentList)
+                                    <option value="$!{departmentItem.id}" #if($!paramDepartmentId eq $!departmentItem.id)
+                                            selected #end>$!departmentItem.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        </select>
+                    </div>
+
+                    <div class="select-primary select-small" id="select-primary-1">
+                        <input type="hidden" name="employeeId" class="input-hidden" value="$!paramEmployeeName">
+                        <span class="select-placeholder">#if($paramEmployeeName) $paramEmployeeName #else 全部 #end</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($employeeList && $employeeList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($employeeItem in $employeeList)
+                                        <li data-value="$!employeeItem.employeeId" #if($!{paramEmployeeId} eq $!{employeeItem.employeeId}) class="selected" #end>$!{employeeItem.employeeName}</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($employeeList && $employeeList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($employeeItem in $employeeList)
+                                    <option value="$!employeeItem.id" #if($!paramEmployeeId eq $!employeeItem.employeeId)
+                                            selected #end>$!employeeItem.employeeName</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">状态</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="reportStatus">
+                        <input type="hidden" name="reportStatus" value="$!reportStatus" class="input-hidden">
+                        #if($reportStatus && $!reportStatus ne '' )
+                            #foreach($!reportStatusItem in $!reportStatusList)
+                                #if($!reportStatus eq $!reportStatusItem.code)
+                                    <span class="select-placeholder">$!reportStatusItem.desc</span>
+                                #end
+                            #end
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="" #if($!reportStatus eq '') class="selected" #end>全部</li>
+                                #foreach($!reportStatusItem in $!reportStatusList)
+                                    <li data-value="$!reportStatusItem.code" #if($!reportStatus eq $!reportStatusItem.code)
+                                        class="selected"#end>$!reportStatusItem.desc</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="" #if($!reportStatus eq '') selected #end>全部</option>
+                            #foreach($!reportStatusItem in $!reportStatusList)
+                                <option value="$!reportStatusItem.code" #if($!reportStatus eq $!reportStatusItem.code)
+                                        selected #end>$!reportStatusItem.desc</option>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStar" value="$!{paramCreatedDateStar}" placeholder="xxxx年xx月xx日">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text" class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEnd" value="$!{paramCreatedDateEnd}" placeholder="xxxx年xx月xx日">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>内容</th>
+                        <th>提交人</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($internalReport in $list)
+                        <tr>
+                            <td>$!internalReport.content</td>
+                            <td>$!{internalReport.propertyEmployeeRoleVo.departmentName} / $!{internalReport.propertyEmployeeRoleVo.employeeName}</td>
+                            <td>$!DateUtils.formatTimeYMDHM($!internalReport.createdDate)</td>
+                            #if($!internalReport.status eq 2)
+                                <td class="state state-already">$!internalReport.statusMsg</td>
+                            #elseif($!internalReport.status eq 1)
+                                <td class="state state-ING">$!internalReport.statusMsg</td>
+                            #else
+                                <td>$!internalReport.statusMsg</td>
+                            #end
+                            <td>
+                                <a href="/admin/complaints/internalreport/detail.html?id=$!internalReport.id"
+                                   class="button-link button-link-small">查看</a>
+                            </td>
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无内部报事</p></div>
+                </div>
+			#end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var ASSIGNMENT = {
+            init: function () {
+                COMMON.selectBind($('#select-primary-0'), undefined);
+                COMMON.selectBind($('#select-primary-1'), undefined);
+                COMMON.selectBind($('#reportStatus'), undefined);
+                COMMON.selectBind($('#select-primary-0'), ASSIGNMENT.getEmployeeName);
+            },
+            getEmployeeName: function (PID) {
+                $.ajax({
+                    url: "/department/propertyEmployeeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        departmentId: PID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="employeeId" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">全部</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>全部</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            $('#select-primary-1').html(str).show();
+                            COMMON.selectBind($('#select-primary-1'), undefined);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        };
+
+        ASSIGNMENT.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/complaints/internalreport.html',
+                {
+                    departmentId: '$!paramDepartmentId',
+                    employeeId: '$!paramEmployeeId',
+                    reportStatus: '$!reportStatus',
+                    createdDateStar: '$!paramCreatedDateStar',
+                    createdDateEnd: '$!paramCreatedDateEnd',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

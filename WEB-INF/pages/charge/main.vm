@@ -1,0 +1,131 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>收费--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/charge.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="account clearfix">
+        <div class="operate-box">
+            <a href="/admin/charge/cash.html" class="button-primary-able button-blue"
+               style="width: 88px; margin-right: 16px;">提现</a>
+            <a href="/admin/charge/balance.html" class="button-primary-able button-grey" style="width: 118px;">收支明细</a>
+        </div>
+
+        <p>账户余额<span>$!balance</span></p>
+    </article>
+
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/admin/charge/form.html" class="button-link button-record"
+               style="margin: 0 26px 0 0; color: #218adb;">收费单记录</a>
+            <a href="/admin/charge/form/create.html" class="button-link button-add" style="margin: 0 26px 0 0; color: #218adb;">新建收费单</a>
+        </div>
+        <a href="javascript:void(0);" class="button-link button-link-disable">未完成收费单</a>
+    </article>
+
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                    <thead>
+                    <tr>
+                        <th>收费单名称</th>
+                        <th>类型</th>
+                        <th>户数</th>
+                        <th>已收户数</th>
+                        <th>应收金额</th>
+                        <th>实收金额</th>
+                        <th>下发日期</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($item in $list)
+                        <tr>
+                            <td>$!item.name</td>
+                            <td>$!item.chargeTypeName</td>
+                            <td>$!item.totalCount</td>
+                            <td>$!item.paidCount</td>
+                            <td>$!item.totalFees</td>
+                            <td>
+								#if($item.paidFees)
+									$!{item.paidFees}
+								#else
+                                    0.00
+								#end
+                            </td>
+                            <td>$!DateUtils.formatTimeInSecond($!item.createdDate)</td>
+                            <td><a href="/admin/charge/form/detail.html?id=$!{item.id}"
+                                   class="button-link button-link-small">查看</a></td>
+                        </tr>
+						#end
+					##					<tr>
+					##						<td>10月份电费</td>
+					##						<td>电费</td>
+					##						<td>1102</td>
+					##						<td>1032</td>
+					##						<td>¥ 108,932.3</td>
+					##						<td>¥ 90,942.4</td>
+					##						<td>2016/12/21</td>
+					##						<td><a href="/admin/charge/form/detail.html" class="button-link button-link-small">查看</a></td>
+					##					</tr>
+					##					<tr>
+					##						<td>10月份电费</td>
+					##						<td>电费</td>
+					##						<td>1102</td>
+					##						<td>1032</td>
+					##						<td>¥ 108,932.3</td>
+					##						<td>¥ 90,942.4</td>
+					##						<td>2016/12/21</td>
+					##						<td><a href="/admin/charge/form/detail.html" class="button-link button-link-small">查看</a></td>
+					##					</tr>
+					##					<tr>
+					##						<td>10月份电费</td>
+					##						<td>电费</td>
+					##						<td>1102</td>
+					##						<td>1032</td>
+					##						<td>¥ 108,932.3</td>
+					##						<td>¥ 90,942.4</td>
+					##						<td>2016/12/21</td>
+					##						<td><a href="/admin/charge/form/detail.html" class="button-link button-link-small">查看</a></td>
+					##					</tr>
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无收费单记录</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var CHARGE = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        CHARGE.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/charge.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

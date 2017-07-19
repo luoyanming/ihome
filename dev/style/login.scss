@@ -1,0 +1,71 @@
+@import "base/common";
+
+// ==============================================
+// login
+// ==============================================
+.modules-center{
+	@include position(absolute, 2, 50%, none, none, 50%);
+	@include translate(-50%, -50%, 0);
+	width: 750px;
+	padding: 34px 170px 54px;
+	background-color: $colorFFF;
+	@include boxShadow(0, 1px, 4px, rgba(63,84,101,0.13), outset);
+
+	.link-admin{
+		@include position(absolute, 2, -35px, 40px, none, none);
+	}
+
+	h1{
+		text-align: center;
+		line-height: 34px;
+	}
+
+	.tabnav{
+		width: 400px;
+		padding: 0;
+		margin: 16px auto 0;
+
+		.tabnav-item{
+			width: 49.99%;
+		}
+	}
+
+
+	.forget-box{
+		margin-top: 10px;
+		text-align: right;
+	}
+
+
+	&.register-box{
+		@include position(relative, 1, 0, none, none, 0);
+		@include translate(0, 0, 0);
+		margin: 58px auto 90px;
+		padding: 34px 0 55px;
+
+		.examine-result{
+			width: 602px;
+			height: 42px;
+			margin: 35px auto 0;
+			font-size: 14px;
+			line-height: 42px;
+			text-align: center;
+			font-weight: 500;
+			letter-spacing: -0.24px;
+			@include backgroundImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAloAAAAqBAMAAACZyOgxAAAAMFBMVEXg4ODe3t7e3t7e3t7e3t7f398AAADf39/f39/d3d3g4ODg4ODg4ODh4eHe3t7e3t7cO/O0AAAAD3RSTlNT0k27TrIA5j7kkXteYcYEGHRmAAAA3ElEQVRo3u3brQ3CUBiF4cMCVBA0LEAweBIWQDUBBqipxhASFKIDkHQFFqgmbIBiBCx/CRJGoFU9X/Je8eqjHnU/Zfvdl1fnfRaZ8s2pN+tMhuRf+sdKxbnjMCVCRqVW7a8Ik1RbgxVRctXdYEWUjPUwWBEliV4GK6JkoLfBiiiZ6mmwIkrmKI/yKG8QlEd5lHcIyqM8yjsE5VEe5R2C8iiP8g5BeZRHeYegPMqjvENQHuVR3iEoj/Io75BEa4MVUXLjJ2WDpCou7a+IklL5gU/N9dJdVlwXNLku+AFwMLdHigBq4AAAAABJRU5ErkJggg==', no-repeat, center, center, 100%, 100%);
+
+			&.result-wating{
+				color: $color666;
+			}
+
+			&.result-refused{
+				color: $colorWarning;
+			}
+		}
+		
+		.form-part{
+			margin-top: 35px;
+		}
+	}
+}
+

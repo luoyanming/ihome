@@ -1,0 +1,377 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新增车辆--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css" />
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb">
+		<a href="/admin/data.html" class="button-link">基础数据</a>
+		<span class="separate">|</span>
+		<a href="/admin/data/car.html" class="button-link">车辆管理</a>
+		<span class="separate">|</span>
+		<a href="javascript:void(0);" class="button-link button-link-disable">新增车辆</a>
+	</article>
+
+	<form action="" method="get" class="form-main">
+		<input type="hidden" id="carID" value="$!car.id">
+		<div class="form-part">
+			<div class="form-group clearfix">
+				<div class="group-title">车牌号</div>
+				<div class="group-item">
+					<div class="input-item" style="width: 360px;">
+						<input type="text" class="input-primary input-small input-null" id="plate-number" placeholder="请输入车牌号" value="$!car.num">
+						<i class="icon-delete"></i>
+					</div>
+					<div class="errMsg errMsg-plate-number"></div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">分区</div>
+				<div class="group-item">
+					<div class="radio-hidden-item" id="radio-subarea">
+						#if($buildingList && $buildingList.size()>0)
+							#foreach($building in $buildingList)
+                                <label style="margin-bottom: 10px;">
+                                    <input name="subarea" type="radio" value="$!building.id" #if($!car.buildingId == $!building.id) checked #end/>
+                                    <p class="radio-text">$!building.name</p>
+                                </label>
+							#end
+						#end
+						#*<label>
+							<input name="subarea" type="radio" value="1" />
+							<p class="radio-text">某某苑</p>
+						</label>
+						<label>
+							<input name="subarea" type="radio" value="2" />
+							<p class="radio-text">某某苑</p>
+						</label>*#
+					</div>
+					<div class="errMsg errMsg-subarea"></div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix" #if(!$buildingCellList || $buildingCellList.size()<=0)style="display: none;" #end>
+				<div class="group-title">楼宇</div>
+				<div class="group-item">
+					<div class="radio-hidden-item" id="radio-building">
+						#if($buildingCellList && $buildingCellList.size()>0)
+							#foreach($cell in $buildingCellList)
+                                <label>
+                                    <input name="building" type="radio" value="$!cell.id" #if($!car.buildingCellId == $!cell.id) checked #end/>
+                                    <p class="radio-text">$!cell.name</p>
+                                </label>
+							#end
+						#end
+					##	<label>
+					##		<input name="building" type="radio" value="1" />
+					##		<p class="radio-text">1幢</p>
+					##	</label>
+					</div>
+					<div class="errMsg errMsg-building"></div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix" #if(!$buildingUnitList|| $buildingUnitList.size()<=0)style="display: none;"#end>
+				<div class="group-title">单元</div>
+				<div class="group-item">
+					<div class="radio-hidden-item" id="radio-unit">
+						#if($buildingUnitList && $buildingUnitList.size()>0)
+							#foreach($unit in $buildingUnitList)
+                                <label>
+                                    <input name="unit" type="radio" value="$!unit.id" #if($!car.buildingUnitId == $!unit.id) checked #end/>
+                                    <p class="radio-text">$!unit.name</p>
+                                </label>
+							#end
+						#end
+					##	<label>
+					##		<input name="unit" type="radio" value="1" />
+					##		<p class="radio-text">1单元</p>
+					##	</label>
+					</div>
+					<div class="errMsg errMsg-unit"></div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix" #if(!$roomList|| $roomList.size()<=0)style="display: none;"#end>
+				<div class="group-title">房间号</div>
+				<div class="group-item">
+					<div class="radio-hidden-item" id="radio-room-number">
+					##	<label>
+					##		<input name="roomNumber" type="radio" value="1" />
+					##		<p class="radio-text">1101室</p>
+					##	</label>
+						#if($roomList && $roomList.size()>0)
+							#foreach($room in $roomList)
+                                <label>
+                                    <input name="roomNumber" type="radio" value="$!room.num" #if($!car.roomNum == $!room.num) checked #end/>
+                                    <p class="radio-text">$!room.num</p>
+                                </label>
+							#end
+						#end
+					</div>
+					<div class="errMsg errMsg-room-number"></div>
+				</div>
+			</div>
+
+			<div class="form-group clearfix">
+				<div class="group-title">&nbsp;</div>
+				<div class="group-item">
+					<a href="javascript:void(0);" class="button-primary-able btn-submit" style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+					<a href="/admin/data/car.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+				</div>
+			</div>
+		</div>
+	</form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+	$(function() {
+		var radioSubarea = $('#radio-subarea'),
+			radioBuilding = $('#radio-building'),
+			radioUnit = $('#radio-unit'),
+			radioRoomNumber = $('#radio-room-number'),
+			btnSubmit = $('.btn-submit');
+
+		var DATA = {
+			init: function() {
+				DATA.radioSubareaBind();
+
+				DATA.radioBuildingBind();
+
+				DATA.btnSubmitBind();
+			},
+			radioSubareaBind: function() {
+				var labelSubarea = radioSubarea.find('label');
+
+				labelSubarea.on('click', function() {
+					var labelSubareaInput = $(this).find('input');
+
+//					if(labelSubareaInput.attr('checked')) {
+//						return false;
+//					}
+
+					var subareaVal = labelSubareaInput.val();
+					DATA.getRadioBuildingList(subareaVal);
+				});
+			},
+			getRadioBuildingList: function(subareaID) {
+				$('.errMsg-building').html('');
+
+				 $.ajax({
+		             url: "/building/buildingCellList.html",
+		             dataType:"json",
+		             type:"post",
+		             data: {
+		                 buildingId: subareaID
+		             },
+		             success:function(data) {
+		             	if(data.code != 200) {
+		             		COMMON.errMsg($('.errMsg-building'), data.msg);
+		             	} else {
+		            		var buildingStr = '';
+		            		for(var i = 0; i < data.list.length; i++) {
+		            			buildingStr += '<label>';
+								buildingStr += '<input name="building" type="radio" value="'+ data.list[i].id +'" />';
+								buildingStr += '<p class="radio-text">'+ data.list[i].name +'</p>';
+								buildingStr += '</label>';
+		            		}
+		            		radioBuilding.html(buildingStr);
+		            		radioBuilding.parent().parent().show();
+		            		radioUnit.html('');
+		            		radioUnit.parent().parent().hide();
+		            		radioRoomNumber.html('');
+		            		radioRoomNumber.parent().parent().hide();
+		            		DATA.radioBuildingBind();
+                        }
+                     },
+                     error: function () {
+                         COMMON.errMsg($('.errMsg-building'), '获取楼宇失败，请刷新页面重试！');
+                     }
+                 });
+			},
+			radioBuildingBind: function() {
+				var labelBuilding = radioBuilding.find('label');
+
+				labelBuilding.on('click', function() {
+					var labelBuildingInput = $(this).find('input');
+
+//					if(labelBuildingInput.attr('checked')) {
+//						return false;
+//					}
+
+					var buildingVal = labelBuildingInput.val();
+					DATA.getRadioUnitList(buildingVal);
+				});
+			},
+			getRadioUnitList: function(buildingID) {
+				$('.errMsg-unit').html('');
+
+				 $.ajax({
+		             url: "/building/buildingUnitList.html",
+		             dataType:"json",
+		             type:"post",
+		             data: {
+                         buildingCellId: buildingID
+		             },
+		             success:function(data) {
+		             	if(data.code != 200) {
+		             		COMMON.errMsg($('.errMsg-unit'), data.msg);
+		             	} else {
+		            		var unitStr = '';
+		            		for(var i = 0; i < data.list.length; i++) {
+		            			unitStr += '<label>';
+								unitStr += '<input name="unit" type="radio" value="'+ data.list[i].id +'" />';
+								unitStr += '<p class="radio-text">'+ data.list[i].name +'</p>';
+								unitStr += '</label>';
+		            		}
+		            		radioUnit.html(unitStr);
+		            		radioUnit.parent().parent().show();
+		            		radioRoomNumber.html('');
+		            		radioRoomNumber.parent().parent().hide();
+		            		DATA.radioUnitBind();
+                        }
+                     },
+                     error: function () {
+                         COMMON.errMsg($('.errMsg-unit'), '获取单元失败，请刷新页面重试！');
+                     }
+                 });
+			},
+			radioUnitBind: function() {
+				var labelUnit = radioUnit.find('label');
+
+				labelUnit.on('click', function() {
+					var labelUnitInput = $(this).find('input');
+
+					var unitVal = labelUnitInput.val();
+					DATA.getRadioRoomNumberList(unitVal);
+				});
+			},
+			getRadioRoomNumberList: function(unitID) {
+				$('.errMsg-room-number').html('');
+
+				 $.ajax({
+		             url: "/room/list.html",
+		             dataType:"json",
+		             type:"post",
+		             data: {
+                         buildingId: radioSubarea.find('input[name="subarea"]:checked').val(),
+                         buildingCellId: radioBuilding.find('input[name="building"]:checked').val(),
+                         buildingUnitId: unitID
+		             },
+		             success:function(data) {
+		             	if(data.code != 200) {
+		             		COMMON.errMsg($('.errMsg-room-number'), data.msg);
+		             	} else {
+		            		var unitStr = '';
+		            		for(var i = 0; i < data.list.length; i++) {
+		            			unitStr += '<label>';
+								unitStr += '<input name="roomNumber" type="radio" value="'+ data.list[i].num +'" />';
+								unitStr += '<p class="radio-text">'+ data.list[i].num +'</p>';
+								unitStr += '</label>';
+		            		}
+		            		radioRoomNumber.html(unitStr);
+		            		radioRoomNumber.parent().parent().show();
+                        }
+                     },
+                     error: function () {
+                         COMMON.errMsg($('.errMsg-room-number'), '获取房间号失败，请刷新页面重试！');
+                     }
+                 });
+			},
+			btnSubmitBind: function() {
+				btnSubmit.on('click', function() {
+					var plateNumber = $('#plate-number').val(),
+						subareaValue = $('#radio-subarea input[name="subarea"]:checked').val(),
+						buildingValue = $('#radio-building input[name="building"]:checked').val(),
+						unitValue = $('#radio-unit input[name="unit"]:checked').val(),
+						roomNumber = $('#radio-room-number input[name="roomNumber"]:checked').val();
+
+					if(btnSubmit.hasClass('button-primary-disable')) {
+						return false;
+					}
+					$('.errMsg-plate-number').html('');
+					$('.errMsg-subarea').html('');
+					$('.errMsg-building').html('');
+					$('.errMsg-unit').html('');
+					$('.errMsg-room-number').html('');
+
+					if(!COMMON.checkNull(plateNumber)) {
+						COMMON.errMsg($('.errMsg-plate-number'), '请输入车牌号码!');
+						return false;
+					}
+					$('.errMsg-plate-number').html('');
+
+					if(!subareaValue) {
+						COMMON.errMsg($('.errMsg-subarea'), '请选择分区!');
+						return false;
+					}
+					$('.errMsg-subarea').html('');
+
+					if(!buildingValue) {
+						COMMON.errMsg($('.errMsg-building'), '请选择楼宇!');
+						return false;
+					}
+					$('.errMsg-building').html('');
+
+					if(!unitValue) {
+						COMMON.errMsg($('.errMsg-unit'), '请选择单元!');
+						return false;
+					}
+					$('.errMsg-unit').html('');
+
+					if(!roomNumber) {
+						COMMON.errMsg($('.errMsg-room-number'), '请输入房间号!');
+						return false;
+					}
+					$('.errMsg-room-number').html('');
+
+					btnSubmit.addClass('button-primary-disable').html('正在创建...');
+					var carId = $('#carID').val();
+                    if (carId == null || carId == undefined || carId == '') {
+                        carId = 0;
+                    }
+
+					$.ajax({
+			            url: "/car/saveCar.html",
+			            dataType:"json",
+			            type:"post",
+			            data: {
+			            	id:carId ,
+			                plateNumber: plateNumber,
+			                buildingId: subareaValue,
+			                buildingCellId: buildingValue,
+			                buildingUnitId: unitValue,
+			                roomNumber: roomNumber
+			            },
+			            success:function(data) {
+			            	if(data.code != 200) {
+			            		COMMON.errMsg($('.errMsg-room-number'), data.msg);
+			            		btnSubmit.removeClass('button-primary-disable').html('创建');
+			            	} else {
+			            		location.href = '/admin/data/car.html';
+			            	}
+			            },
+			            error: function() {
+			                COMMON.errMsg($('.errMsg-room-number'), '创建失败，请重试！');
+							btnSubmit.removeClass('button-primary-disable').html('创建');
+			            }
+			        });
+				});
+			}
+		};
+
+		DATA.init();
+	});
+</script>
+#end

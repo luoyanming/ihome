@@ -1,0 +1,921 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>申请入驻--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/login.css"/>
+#end
+
+
+## #define($header)
+## #parse("/share/header-new-mb.vm")
+## #end
+
+<div class="wrapper">
+    <section class="modules-center register-box">
+
+        <h1>i家帮管理后台</h1>
+        <div class="tabnav clearfix">
+            <a href="/admin/index.html" class="tabnav-item">登录</a>
+            <a href="javascript:void(0);" class="tabnav-item link-disable current">申请入驻</a>
+        </div>
+        #if($applyDetail.status eq 0)
+            <div class="examine-result result-wating">您的申请正在审核中，请耐心等待，谢谢！</div>
+
+        #elseif($applyDetail.status eq 2)
+            <div class="examine-result result-refused">您提交的申请，因$!applyDetail.reason，请重新提交，谢谢！</div>
+        #elseif($applyDetail.status eq 1)
+            <div class="examine-result result-refused">您提交的申请已经审核通过，谢谢！</div>
+        #else
+            &nbsp;
+        #end
+
+        <div class="form-part">
+            <input type="hidden" id="companyId" value="$!applyDetail.id"/>
+            <div class="form-group clearfix">
+                <div class="group-title">项目名称</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null input-project-name"
+                               name="projectName" placeholder="请输入项目名称" value="$!applyDetail.projectName">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-project-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">项目地址</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        #if($applyDetail.id)
+                            <div class="select-primary" id="province">
+                                <input type="hidden" class="input-hidden" value="$!applyDetail.regionsProv">
+                                <span class="select-placeholder">$!applyDetail.regionsProvName</span>
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        #if($provList && $provList.size()>0)
+                                            #foreach($prov in $provList)
+                                                <li data-value="$!prov.regionCode" #if($!applyDetail.regionsProv == $!prov.regionCode)
+                                                    class="selected" #end>$!prov.regionName</li>
+                                            #end
+                                        #end
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    #if($provList && $provList.size()>0)
+                                        #foreach($prov in $provList)
+                                            <option value="$!prov.regionCode" #if($!applyDetail.regionsProv == $!prov.regionCode)
+                                                    selected #end>$!prov.regionName</option>
+                                        #end
+                                    #end
+                                </select>
+                            </div>
+                        #*城市*#
+                            <div class="select-primary" id="city">
+                                <input type="hidden" class="input-hidden" value="$!applyDetail.regionsCity">
+                                <span class="select-placeholder">$!applyDetail.regionsCityName</span>
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        #if($applyDetail.cityList && $applyDetail.cityList.size()>0)
+                                            #foreach($city in $applyDetail.cityList)
+                                                <li data-value="$!city.regionCode" #if($!applyDetail.regionsCity == $!city.regionCode)
+                                                    class="selected" #end>$!city.regionName</li>
+                                            #end
+                                        #end
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    #if($applyDetail.cityList && $applyDetail.cityList.size()>0)
+                                        #foreach($city in $applyDetail.cityList)
+                                            <option value="$!city.regionCode" #if($!applyDetail.regionsCity == $!city.regionCode)
+                                                    selected #end>$!city.regionName</option>
+                                        #end
+                                    #end
+                                </select>
+                            </div>
+                        #*地区*#
+                            <div class="select-primary" id="area">
+                                <input type="hidden" class="input-hidden" value="$!applyDetail.regionsTown">
+                                <span class="select-placeholder">$!applyDetail.regionsTownName</span>
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        #if($applyDetail.townList && $applyDetail.townList.size()>0)
+                                            #foreach($town in $applyDetail.townList)
+                                                <li data-value="$!town.regionCode" #if($!applyDetail.regionsTown == $!town.regionCode)
+                                                    class="selected" #end>$!town.regionName</li>
+                                            #end
+                                        #end
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    #if($applyDetail.townList && $applyDetail.townList.size()>0)
+                                        #foreach($town in $applyDetail.townList)
+                                            <option value="$!town.regionCode" #if($!applyDetail.regionsTown == $!town.regionCode)
+                                                    selected #end>$!town.regionName</option>
+                                        #end
+                                    #end
+                                </select>
+                            </div>
+                        #else
+                            <div class="select-primary" id="province">
+                                <input type="hidden" class="input-hidden">
+                                <span class="select-placeholder">请选择省</span>
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        #if($provList && $provList.size()>0)
+                                            #foreach($prov in $provList)
+                                                <li data-value="$!prov.regionCode">$!prov.regionName</li>
+                                            #end
+                                        #end
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    #if($provList && $provList.size()>0)
+                                        #foreach($prov in $provList)
+                                            <option value="$!prov.regionCode">$!prov.regionName</option>
+                                        #end
+                                    #end
+                                </select>
+                            </div>
+                        #end
+                    </div>
+                    <div class="input-item" style="margin-top: 10px;">
+                        <input type="text" class="input-primary input-small input-null input-project-address"
+                               name="projectAddress" placeholder="请输入项目地址" value="$!applyDetail.projectAddress">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-project-address"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">物业公司名称</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null input-company"
+                               name="companyName" placeholder="请输入公司名称" value="$!applyDetail.companyName">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-company"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">营业执照</div>
+                <div class="group-item">
+                    #if($applyDetail.status eq 0 || $applyDetail.status eq 1)
+                        <div class="upload-box file-yyzz" data-imgid="$!applyDetail.businessLicense">
+                            <div class="upload-image"><img
+                                    src="/attachment/viewImg.html?attachmentId=$!applyDetail.businessLicense"
+                                    class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                        </div>
+                    #elseif($applyDetail.status eq 2)
+                        <div class="upload-box file-yyzz" data-imgid="$!applyDetail.businessLicense">
+                            <div class="upload-image"><img
+                                    src="/attachment/viewImg.html?attachmentId=$!applyDetail.businessLicense"
+                                    class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                            <a href="javascript:void(0);" class="button-link button-refresh">
+                                重新上传<input type="file" class="input-file file-image"></a>
+                        </div>
+                    #else
+                        <div class="upload-box file-yyzz input-null">
+                            <div class="btn-upload">
+                                +
+                                <input type="file" class="input-file file-image">
+                            </div>
+                        </div>
+                    #end
+                    <div class="errMsg errMsg-yyzz"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">委托合同</div>
+                <div class="group-item">
+                    <form class="form-agreement">
+                        <div class="upload-box file-agreement">
+                            #if($applyDetail.status eq 0 || $applyDetail.status eq 1)
+                                <a href="javascript:void(0);"
+                                   class="button-link link-normal"
+                                   onclick="downloadContract($!applyDetail.entrustContract);">$!applyDetail.entrustContractName</a>
+                            #elseif($applyDetail.status==2)
+                                <a href="javascript:void(0);"
+                                   class="button-link link-normal"
+                                   onclick="downloadContract($!applyDetail.entrustContract);">$!applyDetail.entrustContractName</a>
+                                <a href="javascript:void(0);" class="button-link button-add">
+                                    重新上传<input type="file" class="input-file file-word" name="file">
+                                </a>
+                            #else
+                                <a href="javascript:void(0);" class="button-link button-add">
+                                    添加合同
+                                    <input type="file" class="input-file file-word" name="file">
+                                </a>
+                            #end
+                        </div>
+                    </form>
+                    <div class="tips tips-grey">业主自管除外</div>
+                    <div class="errMsg errMsg-agreement"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">申请人</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null input-name" name="name"
+                               placeholder="请输入申请人姓名" value="$!applyDetail.name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">身份证号码</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        <input type="text" class="input-primary input-small input-null input-idCards"
+                               name="idCardNo" placeholder="请输入身份证号码" value="$!applyDetail.idCardNo">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-idCards"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">身份证照片正面</div>
+                <div class="group-item">
+                    #if($applyDetail.status eq 0 || $applyDetail.status eq 1)
+                        <div class="upload-box file-photo-a" data-imgid="$!applyDetail.idCardPhotoA">
+                            <div class="upload-image">
+                                <img src="/attachment/viewImg.html?attachmentId=$!applyDetail.idCardPhotoA"
+                                     class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                        </div>
+                    #elseif($applyDetail.status eq 2)
+                        <div class="upload-box file-photo-a" data-imgid="$!applyDetail.idCardPhotoA">
+                            <div class="upload-image">
+                                <img src="/attachment/viewImg.html?attachmentId=$!applyDetail.idCardPhotoA"
+                                     class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                            <a href="javascript:void(0);" class="button-link button-refresh">
+                                重新上传<input type="file" class="input-file file-image"></a>
+                        </div>
+                    #else
+                        <div class="upload-box file-photo-a input-null">
+                            <div class="btn-upload">
+                                +
+                                <input type="file" class="input-file file-image">
+                            </div>
+                        </div>
+                    #end
+                    <div class="errMsg errMsg-photo-a"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">身份证照片反面</div>
+                <div class="group-item">
+                    #if($applyDetail.status eq 0 || $applyDetail.status eq 1)
+                        <div class="upload-box file-photo-b" data-imgid="$!applyDetail.idCardPhotoB">
+                            <div class="upload-image">
+                                <img src="/attachment/viewImg.html?attachmentId=$!applyDetail.idCardPhotoB"
+                                     class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                        </div>
+                    #elseif($applyDetail.status eq 2)
+                        <div class="upload-box file-photo-b" data-imgid="$!applyDetail.idCardPhotoB">
+                            <div class="upload-image">
+                                <img src="/attachment/viewImg.html?attachmentId=$!applyDetail.idCardPhotoB"
+                                     class="file-img">
+                                <div class="img-mask"></div>
+                            </div>
+                            <a href="javascript:void(0);" class="button-link button-refresh">
+                                重新上传<input type="file" class="input-file file-image"></a>
+                        </div>
+                    #else
+                        <div class="upload-box file-photo-b input-null">
+                            <div class="btn-upload">
+                                +
+                                <input type="file" class="input-file file-image">
+                            </div>
+                        </div>
+                    #end
+                    <div class="errMsg errMsg-photo-b"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">手机号</div>
+                <div class="group-item">
+                    <div class="input-item">
+                        #if($applyDetail.id)
+                            <input type="text" class="input-primary input-small input-null input-mobile" name="mobile"
+                                   placeholder="请输入手机号码" disabled value="$!applyDetail.mobile">
+                        #else
+                            <input type="text" class="input-primary input-small input-null input-mobile" name="mobile"
+                                   placeholder="请输入手机号码">
+                            <i class="icon-delete"></i>
+                        #end
+                    </div>
+                    <div class="errMsg errMsg-mobile"></div>
+                </div>
+            </div>
+            #if(!$applyDetail.id)
+                <div class="form-group clearfix">
+                    <div class="group-title">登陆密码</div>
+                    <div class="group-item">
+                        <div class="input-item">
+                            <input type="password" class="input-primary input-small input-null input-pwd1"
+                                   name="password" placeholder="请输入登陆密码">
+                            <i class="icon-delete"></i>
+                        </div>
+                        <div class="errMsg errMsg-pwd1"></div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">确认登陆密码</div>
+                    <div class="group-item">
+                        <div class="input-item">
+                            <input type="password" class="input-primary input-small input-null input-pwd2"
+                                   placeholder="请再次输入登陆密码">
+                            <i class="icon-delete"></i>
+                        </div>
+                        <div class="tips tips-warning">手机号将作为登录管理平台的账号</div>
+                        <div class="errMsg errMsg-pwd2"></div>
+                    </div>
+                </div>
+            #end
+            #if(!$applyDetail.id || $applyDetail.status eq 2)
+                <div class="form-group clearfix">
+                    <div class="group-title">验证码</div>
+                    <div class="group-item">
+                        <div class="input-item clearfix" style="width: 206px;">
+                            <input type="text" class="input-primary input-small input-null input-code" name="code"
+                                   maxlength="4" placeholder="请输入4位验证码" style="width: 140px;">
+                            <i class="icon-delete" style="right: 81px;"></i>
+                            <a href="javascript:void(0);" class="button-primary-able button-code button-small btn-code"
+                               style="width: 56px;">发送</a>
+                        </div>
+                        <div class="errMsg errMsg-code"></div>
+                    </div>
+                </div>
+            #end
+
+            <div class="form-group clearfix" style="margin-top: 0;">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <div class="errMsg errMsg-submit"></div>
+                </div>
+            </div>
+            #if($applyDetail.status eq 0)
+                <a href="javascript:void(0);" class="button-primary-able btn-submit" style="margin-top: 0;">申请中</a>
+            #elseif($applyDetail.status eq 1)
+                &nbsp;
+            #elseif($applyDetail.status eq 2)
+                <a href="javascript:void(0);" class="button-primary-able btn-submit" style="margin-top: 0;">重新申请</a>
+            #else
+                <a href="javascript:void(0);" class="button-primary-able btn-submit" style="margin-top: 0;">申请入驻</a>
+            #end
+            
+            <div style="text-align: center; margin: 40px 0 30px 0;">
+                <a href="/assets/html/usingagree.htm" style="color: #51adfd; font-size: 12px; line-height: 1.5;">《“i家帮”物业项目管理平台使用协议》</a>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var addrJson = '';
+
+        window.REGISTER = {
+            init: function () {
+                REGISTER.getAddressJsonData();
+                REGISTER.imageUploadBind();
+                REGISTER.fileUploadBind();
+                REGISTER.btnCodeBind();
+                REGISTER.btnSubmitBind();
+            },
+            getAddressJsonData: function () {
+                $.getJSON("/assets/script/lib/regions.json", function (data) {
+                    addrJson = data;
+//                    REGISTER.createProvince();
+                    COMMON.selectBind($('#province'), REGISTER.getCityData);
+                });
+            },
+            createProvince: function () {
+                var pstr = '';
+
+                pstr += '<div class="select-primary" id="province">';
+                pstr += '<input type="hidden" name="regionsProv" class="input-hidden">';
+                pstr += '<span class="select-placeholder input-null">请选择省</span>';
+                pstr += '<div class="select-options light-overscroll">';
+                pstr += '<ul>';
+                pstr += '<li data-value="" class="selected">请选择省</li>';
+                for (var i = 0; i < addrJson.length; i++) {
+                    pstr += '<li data-value="' + addrJson[i].v + '">' + addrJson[i].n + '</li>';
+                }
+                pstr += '</ul>';
+                pstr += '</div>';
+                pstr += '<select class="select-select">';
+                pstr += '<option value="" selected>请选择省</option>';
+                for (var i = 0; i < addrJson.length; i++) {
+                    pstr += '<option value="' + addrJson[i].v + '">' + addrJson[i].n + '</option>';
+                }
+                pstr += '</select>';
+                pstr += '</div>';
+
+                $('.select-box').html(pstr);
+                COMMON.selectBind($('#province'), REGISTER.getCityData);
+            },
+            getCityData: function (cID) {
+                if (cID == '') {
+                    $('#city').remove();
+                    $('#area').remove();
+                }
+
+                for (var i = 0; i < addrJson.length; i++) {
+                    if (addrJson[i].v == cID) {
+                        REGISTER.createCity(addrJson[i].s);
+                        return false;
+                    }
+                }
+            },
+            createCity: function (cData) {
+                var cstr = '';
+
+                cstr += '<div class="select-primary" id="city">';
+                cstr += '<input type="hidden" name="regionsCity" class="input-hidden">';
+                cstr += '<span class="select-placeholder input-null">请选择市</span>';
+                cstr += '<div class="select-options light-overscroll">';
+                cstr += '<ul>';
+                cstr += '<li data-value="" class="selected">请选择市</li>';
+                for (var i = 0; i < cData.length; i++) {
+                    cstr += '<li data-value="' + cData[i].v + '">' + cData[i].n + '</li>';
+                }
+                cstr += '</ul>';
+                cstr += '</div>';
+                cstr += '<select class="select-select">';
+                cstr += '<option value="" selected>请选择市</option>';
+                for (var i = 0; i < cData.length; i++) {
+                    cstr += '<option value="' + cData[i].v + '">' + cData[i].n + '</option>';
+                }
+                cstr += '</select>';
+                cstr += '</div>';
+
+                $('#city').remove();
+                $('#area').remove();
+                $('.select-box').append(cstr);
+                COMMON.selectBind($('#city'), REGISTER.getAreaData);
+            },
+            getAreaData: function (aID) {
+                if (aID == '') {
+                    $('#area').remove();
+                }
+
+                for (var i = 0; i < addrJson.length; i++) {
+                    for (var j = 0; j < addrJson[i].s.length; j++) {
+                        if (addrJson[i].s[j].v == aID) {
+                            REGISTER.createArea(addrJson[i].s[j].s);
+                            return false;
+                        }
+                    }
+                }
+            },
+            createArea: function (aData) {
+                var astr = '';
+
+                astr += '<div class="select-primary" id="area">';
+                astr += '<input type="hidden" name="regionsTown" class="input-hidden">';
+                astr += '<span class="select-placeholder input-null">请选择区</span>';
+                astr += '<div class="select-options light-overscroll">';
+                astr += '<ul>';
+                astr += '<li data-value="" class="selected">请选择区</li>';
+                for (var i = 0; i < aData.length; i++) {
+                    astr += '<li data-value="' + aData[i].v + '">' + aData[i].n + '</li>';
+                }
+                astr += '</ul>';
+                astr += '</div>';
+                astr += '<select class="select-select">';
+                astr += '<option value="" selected>请选择区</option>';
+                for (var i = 0; i < aData.length; i++) {
+                    astr += '<option value="' + aData[i].v + '">' + aData[i].n + '</option>';
+                }
+                astr += '</select>';
+                astr += '</div>';
+
+                $('#area').remove();
+                $('.select-box').append(astr);
+                COMMON.selectBind($('#area'), undefined);
+            },
+            imageUploadBind: function () {
+                var fileImage = $('.file-image');
+
+                fileImage.unbind('change');
+                fileImage.change(function () {
+                    var _this = $(this),
+                            btnUpload = _this.parent(),
+                            uploadBox = _this.parent().parent(),
+                            files = this.files[0],
+                            reader = new FileReader();
+
+                    if (!/image\/\w+/.test(files.type)) {
+                        COMMON.errMsg(uploadBox.parent().find('.errMsg'), "请确保文件类型为图像类型");
+                        return false;
+                    }
+                    uploadBox.parent().find('.errMsg').html('');
+
+                    btnUpload.hide();
+
+                    reader.readAsDataURL(files);
+
+                    reader.onload = function (e) {
+                        var imgBase64Data = this.result,
+                                imgLen = imgBase64Data.length;
+                        if (imgLen > 512000) {
+                            var scale = 512000 / imgLen * 1.5,
+                                    img = new Image();
+
+                            img.src = imgBase64Data;
+                            img.onload = function () {
+                                var nW = img.width,
+                                        nH = img.height,
+                                        w = nW * scale,
+                                        h = nH * scale;
+
+                                var canvas = document.createElement('canvas'),
+                                        ctx = canvas.getContext('2d');
+                                canvas.width = w;
+                                canvas.height = h;
+                                ctx.drawImage(img, 0, 0, w, h);
+                                base64 = canvas.toDataURL('image/jpeg');
+                                REGISTER.submitImageData(base64, _this);
+                            }
+                        } else {
+                            REGISTER.submitImageData(imgBase64Data, _this);
+                        }
+                    }
+                });
+            },
+            submitImageData: function (imgData, obj) {
+                var btnUpload = obj.parent(),
+                        uploadBox = obj.parent().parent();
+
+                uploadBox.parent().find('.errMsg').html('');
+                $.ajax({
+                    url: "/attachment/ajax/uploadImg.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        imgData: imgData
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            obj.parent().parent().attr('data-imgid', data.attachmentId).removeClass('input-null');
+
+                            var imgurl = "/attachment/viewImg.html?attachmentId=" + data.attachmentId;
+                            uploadBox.html('<div class="upload-image"><img src="' + imgurl + '" class="file-img"><div class="img-mask"></div></div><a href="javascript:void(0);" class="button-link button-refresh">重新上传<input type="file" class="input-file file-image"></a>');
+                            REGISTER.imageUploadBind();
+                            COMMON.imgMaskBind();
+                        } else {
+                            COMMON.errMsg(uploadBox.parent().find('.errMsg'), data.msg);
+                            uploadBox.html('<div class="btn-upload">+<input type="file" class="input-file file-image"></div>');
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg(uploadBox.parent().find('.errMsg'), '图片加载失败，请重试');
+                        uploadBox.html('<div class="btn-upload">+<input type="file" class="input-file file-image"></div>');
+                        REGISTER.imageUploadBind();
+                    }
+                });
+            },
+            fileUploadBind: function () {
+                var fileWord = $('.file-word');
+
+                fileWord.unbind('change');
+                fileWord.change(function () {
+                    var _this = $(this),
+                            formData = new FormData($('.form-agreement')[0]),
+                            errMsgBox = _this.parent().parent().parent().parent().find('.errMsg');
+
+                    errMsgBox.html('');
+                    $.ajax({
+                        url: '/attachment/ajax/uploadFile.html',
+                        type: 'POST',
+                        data: formData,
+                        dataType: 'JSON',
+                        async: true,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            if (data.code == 200) {
+                                _this.parent().parent().attr('data-wordid', data.attachment.id);
+                                _this.parent().parent().html('<a href="javascript:void(0);" class="button-link link-normal">' + data.attachment.name + '</a><a href="javascript:void(0);" class="button-link button-refresh">重新上传<input type="file" class="input-file file-word"></a>');
+                            } else {
+                                COMMON.errMsg(errMsgBox, data.msg);
+                                _this.parent().parent().html('<a href="javascript:void(0);" class="button-link button-add">添加合同<input type="file" class="input-file file-word"></a>');
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg(errMsgBox, '文件加载失败，请重试');
+                            _this.parent().parent().html('<a href="javascript:void(0);" class="button-link button-add">添加合同<input type="file" class="input-file file-word"></a>');
+                        }
+                    });
+                });
+            },
+            btnCodeBind: function () {
+                var inputMobile = $('.input-mobile'),
+                        btnCode = $('.btn-code');
+                btnCode.on('click', function () {
+                    var mobile = inputMobile.val();
+
+                    if (btnCode.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-mobile').html('');
+                    $('.errMsg-code').html('');
+
+                    if (!COMMON.checkNull(mobile)) {
+                        COMMON.errMsg($('.errMsg-mobile'), '请输入手机号码!');
+                        return false;
+                    }
+                    if (!COMMON.checkMobile(mobile)) {
+                        COMMON.errMsg($('.errMsg-mobile'), '手机号码格式不正确!');
+                        return false;
+                    }
+                    $('.errMsg-mobile').html('');
+
+                    btnCode.addClass('button-primary-disable');
+
+                    $.ajax({
+                        url: "/property/company/apply/sendSms.html",
+                        dataType: "json",
+                        type: "get",
+                        data: {
+                            mobile: mobile
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-mobile'), data.msg);
+                                btnCode.removeClass('button-primary-disable').html('重发');
+                            } else {
+                                COMMON.errMsg($('.errMsg-mobile'), '验证码已发送，请注意查收！');
+
+                                FORGETPWD.codeTime();
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-mobile'), '获取验证码失败，请重试！');
+                            btnCode.removeClass('button-primary-disable').html('重发');
+                        }
+                    });
+                });
+            },
+            codeTime: function () {
+                var t = 60,
+                        btnCode = $('.btn-code');
+
+                btnCode.html(t + 's');
+                var xf = setInterval(function () {
+                    if (t == 1) {
+                        btnCode.removeClass('button-primary-disable').html('重发');
+                        clearInterval(xf);
+                    } else {
+                        t--;
+                        btnCode.html(t + 's');
+                    }
+                }, 1000);
+            },
+            btnSubmitBind: function () {
+                var btnSubmit = $('.btn-submit');
+                if ($('.confirmation-mask').length > 0) {
+                    $('.confirmation-mask').remove();
+                }
+                if ($('#confirmation-modal').length > 0) {
+                    $('#confirmation-modal').remove();
+                }
+
+                btnSubmit.on('click', function () {
+                    var projectName = $('.input-project-name').val(),
+                            regionsProv = $("#province ").find('.input-hidden').val(),
+                            regionsCity = $("#city ").find('.input-hidden').val(),
+                            regionsTown = $("#area ").find('.input-hidden').val(),
+                            projectAddress = $('.input-project-address').val(),
+                            companyName = $('.input-company').val(),
+                            businessLicense = $('.file-yyzz').attr('data-imgid'),
+                            entrustContract = $('.file-agreement').attr('data-wordid'),
+                            mobile = $('.input-mobile').val(),
+                            name = $('.input-name').val(),
+                            password1 = $('.input-pwd1').val(),
+                            password2 = $('.input-pwd2').val(),
+                            idCardNo = $('.input-idCards').val(),
+                            idCardPhotoA = $('.file-photo-a').attr('data-imgid'),
+                            idCardPhotoB = $('.file-photo-b').attr('data-imgid'),
+                            code = $('.input-code').val();
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-project-name').html('');
+                    $('.errMsg-project-address').html('');
+                    $('.errMsg-company').html('');
+                    $('.errMsg-yyzz').html('');
+                    $('.errMsg-name').html('');
+                    $('.errMsg-idCards').html('');
+                    $('.errMsg-photo-a').html('');
+                    $('.errMsg-photo-b').html('');
+                    $('.errMsg-mobile').html('');
+                    $('.errMsg-pwd1').html('');
+                    $('.errMsg-pwd2').html('');
+                    $('.errMsg-code').html('');
+                    $('.errMsg-submit').html('');
+
+                    if (!COMMON.checkNull(projectName)) {
+                        COMMON.errMsg($('.errMsg-project-name'), '请输入手机号码!');
+                        return false;
+                    }
+                    $('.errMsg-project-name').html('');
+
+                    if (!COMMON.checkNull(regionsProv)) {
+                        COMMON.errMsg($('.errMsg-project-address'), '请选择省!');
+                        return false;
+                    }
+                    if (!COMMON.checkNull(regionsCity)) {
+                        COMMON.errMsg($('.errMsg-project-address'), '请选择市!');
+                        return false;
+                    }
+                    if (!COMMON.checkNull(regionsTown)) {
+                        COMMON.errMsg($('.errMsg-project-address'), '请选择区!');
+                        return false;
+                    }
+                    if (!COMMON.checkNull(projectAddress)) {
+                        COMMON.errMsg($('.errMsg-project-address'), '请输入项目地址!');
+                        return false;
+                    }
+                    $('.errMsg-project-address').html('');
+
+                    if (!COMMON.checkNull(companyName)) {
+                        COMMON.errMsg($('.errMsg-company'), '请输入公司名称!');
+                        return false;
+                    }
+                    $('.errMsg-company').html('');
+
+                    if (!COMMON.checkNull(businessLicense)) {
+                        COMMON.errMsg($('.errMsg-yyzz'), '请上传营业执照!');
+                        return false;
+                    }
+                    $('.errMsg-yyzz').html('');
+
+                    if (!COMMON.checkNull(name)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入申请人姓名!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if (!COMMON.checkNull(idCardNo)) {
+                        COMMON.errMsg($('.errMsg-idCards'), '请输入身份证号码!');
+                        return false;
+                    }
+                    if (!COMMON.checkIDCards(idCardNo)) {
+                        COMMON.errMsg($('.errMsg-idCards'), '身份证号码格式不正确!');
+                        return false;
+                    }
+                    $('.errMsg-idCards').html('');
+
+                    if (!COMMON.checkNull(idCardPhotoA)) {
+                        COMMON.errMsg($('.errMsg-photo-a'), '请上传身份证正面照片!');
+                        return false;
+                    }
+                    $('.errMsg-photo-a').html('');
+
+                    if (!COMMON.checkNull(idCardPhotoB)) {
+                        COMMON.errMsg($('.errMsg-photo-b'), '请上传身份证反面照片!');
+                        return false;
+                    }
+                    $('.errMsg-photo-b').html('');
+
+                    if (!COMMON.checkNull(mobile)) {
+                        COMMON.errMsg($('.errMsg-mobile'), '请输入手机号码!');
+                        return false;
+                    }
+                    if (!COMMON.checkMobile(mobile)) {
+                        COMMON.errMsg($('.errMsg-mobile'), '手机号码格式不正确!');
+                        return false;
+                    }
+                    $('.errMsg-mobile').html('');
+
+                    if (!COMMON.checkNull(password1)) {
+                        COMMON.errMsg($('.errMsg-pwd1'), '请输入登录密码!');
+                        return false;
+                    }
+                    $('.errMsg-pwd1').html('');
+
+                    if (password1 != password2) {
+                        COMMON.errMsg($('.errMsg-pwd2'), '两次输入的密码不一致!');
+                        return false;
+                    }
+                    $('.errMsg-pwd2').html();
+
+                    if (!COMMON.checkNull(code)) {
+                        COMMON.errMsg($('.errMsg-code'), '请输入4位验证码!');
+                        return false;
+                    }
+                    if (!COMMON.checkInit(code, true)) {
+                        COMMON.errMsg($('.errMsg-code'), '请输入4位数字!');
+                        return false;
+                    }
+                    if (code.length != 4) {
+                        COMMON.errMsg($('.errMsg-code'), '请填写4位验证码!');
+                        return false;
+                    }
+                    $('.errMsg-code').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在申请...');
+
+                    var companyId = $("#companyId").val();
+                    if (companyId == null) {
+                        companyId = 0;
+                    }
+
+                    $.ajax({
+                        url: "/property/company/apply.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            companyId: companyId,
+                            projectName: projectName,
+                            regionsProv: regionsProv,
+                            regionsCity: regionsCity,
+                            regionsTown: regionsTown,
+                            projectAddress: projectAddress,
+                            companyName: companyName,
+                            businessLicense: businessLicense,
+                            entrustContract: entrustContract,
+                            mobile: mobile,
+                            name: name,
+                            password: password1,
+                            idCardNo: idCardNo,
+                            idCardPhotoA: idCardPhotoA,
+                            idCardPhotoB: idCardPhotoB,
+                            code: code
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-submit'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('申请入驻');
+                            } else {
+                                var str = '';
+                                str += '<section class="confirmation-mask"></section>';
+                                str += '<section class="modal-box" style="width: 400px;" id="confirmation-modal">';
+                                str += '<div class="modal-header">';
+                                str += '<h1>提示</h1>';
+                                str += '</div>';
+                                str += '<div class="modal-content">';
+                                str += '<div class="form-part" style="padding-bottom: 40px;">';
+                                str += '<div class="group-text state state-warning" style="font-size: 16px; text-align: center;">您的物业入驻申请已经提交成功，正在进行审核处理，请等待短信通知</div>';
+                                str += '<div class="group-btn clearfix" style="margin-top: 40px; text-align: center">';
+                                str += '<a href="javascript:location.href = location.href;" class="button-primary-able" style="display: inline-block; width: auto; padding: 0 30px;">确认</a>';
+                                str += '</div>';
+                                str += '</div>';
+                                str += '</div>';
+                                str += '</section>';
+                                $('body').append(str);
+                                $('.confirmation-mask').fadeIn(200);
+                                $('#confirmation-modal').fadeIn(200);
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-submit'), '申请入驻失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('申请入驻');
+                        }
+                    });
+                });
+            }
+        };
+
+        REGISTER.init();
+    });
+    //下载合同
+    function downloadContract(id) {
+        if (id == null || id == '' || id == undefined) {
+            return;
+        }
+        window.open("/admin/download/contract.html?attachmentId=" + id);
+    }
+</script>
+#end

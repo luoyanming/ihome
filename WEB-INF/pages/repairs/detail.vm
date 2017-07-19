@@ -1,0 +1,163 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看报修--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/repairs.html" class="button-link">报修</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看报修</a>
+    </article>
+	#set($ownersInfoVo = $!repairsAdminDetailVo.ownersInfoVo)
+	#set($repairsDataVos = $!repairsAdminDetailVo.repairsDataVos)
+	#set($repairsOrderLogVos = $!repairsAdminDetailVo.repairsOrderLogVos)
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">报修人</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!ownersInfoVo.ownersName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">房间</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">$!{ownersInfoVo.buildingName}$!{ownersInfoVo.buildingCellName}$!{ownersInfoVo.buildingUnitName}$!{ownersInfoVo.num}</div>
+                </div>
+            </div>
+
+			#foreach($repairsDataVo in $!repairsDataVos)
+				#if($!repairsDataVo.fieldType eq 1 || $!repairsDataVo.fieldType eq 2)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!repairsDataVo.fieldName</div>
+                        <div class="group-item">
+                            <div class="input-item-text" style="margin-left: 0;">$!repairsDataVo.fieldValue</div>
+                        </div>
+                    </div>
+				#elseif($!repairsDataVo.fieldType eq 3)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!repairsDataVo.fieldName</div>
+                        <div class="group-item clearfix">
+							#foreach($fieldValue in $!repairsDataVo.fieldValues)
+                                <div class="upload-box" style="float: left;">
+                                    <div class="upload-image">
+                                        <img src="$!fieldValue" class="file-img">
+                                        <div class="img-mask"></div>
+                                    </div>
+                                </div>
+							#end
+                        </div>
+                    </div>
+				#end
+			#end
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!{repairsAdminDetailVo.typeName}</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">当前状态</div>
+                <div class="group-item">
+					#if($!{repairsAdminDetailVo.status} eq 0)
+					## 待接单
+                        <div class="input-item-text state state-warning"
+                             style="margin-left: 0;">$!{repairsAdminDetailVo.statusMsg}</div>
+					#elseif($!{repairsAdminDetailVo.status} eq 1)
+					## 待服务
+                        <div class="input-item-text state state-warning"
+                             style="margin-left: 0;">$!{repairsAdminDetailVo.statusMsg}</div>
+					#elseif($!{repairsAdminDetailVo.status} eq 2)
+					## 待确认费用
+                        <div class="input-item-text state state-warning"
+                             style="margin-left: 0;">$!{repairsAdminDetailVo.statusMsg}</div>
+					#elseif($!{repairsAdminDetailVo.status} eq 3)
+					## 待付款
+                        <div class="input-item-text state state-warning"
+                             style="margin-left: 0;">$!{repairsAdminDetailVo.statusMsg}</div>
+					#elseif($!{repairsAdminDetailVo.status} eq 4)
+					## 待评价
+                        <div class="input-item-text"
+                             style="margin-left: 0;">$!{repairsAdminDetailVo.statusMsg}</div>
+					#elseif($!{repairsAdminDetailVo.status} eq 5)
+					## 已完成
+                        <div class="input-item-text state state-already"
+                             style="margin-left: 0;">$!{repairsAdminDetailVo.statusMsg}</div>
+					#end
+
+                </div>
+            </div>
+		    ## 接单后就显示接单人信息
+			#if($!repairsAdminDetailVo.status ge 1)
+                <div class="form-group clearfix">
+                    <div class="group-title">接单人</div>
+                    <div class="group-item" style="padding: 11px 0;">
+                        <a href="javascript: void(0);"
+                           class="button-link button-link-small">$!{repairsAdminDetailVo.employeeInfoVo.employeeName}</a>
+                    </div>
+                </div>
+			#end
+		    ## 提交费用后就显示
+			#if($!repairsAdminDetailVo.status gt 2)
+				#set($repairsFeeVos = $!repairsAdminDetailVo.repairsFeeVos)
+                <div class="form-group clearfix">
+                    <div class="group-title">费用清单</div>
+                    <div class="group-item" style="padding: 6px 0;">
+						#foreach($repairsFeeVo in $repairsFeeVos)
+                            <div class="clearfix">
+                                <div class="input-item-text"
+                                     style="margin-left: 0; line-height: 28px; width: 150px;">$!repairsFeeVo.title</div>
+                                <div class="input-item-text" style="margin-left: 0; line-height: 28px;">$!repairsFeeVo.fee</div>
+                            </div>
+						#end
+                    </div>
+                </div>
+			#end
+			#if($!{repairsAdminDetailVo.status} eq 5)
+                <div class="form-group clearfix">
+                    <div class="group-title">用户评价</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">$!{repairsAdminDetailVo.evaluateStar}星 / $!{repairsAdminDetailVo.evaluate}</div>
+                    </div>
+                </div>
+			#end
+            <div class="form-group clearfix">
+                <div class="group-title">操作记录</div>
+                <div class="group-item" style="padding: 6px 0;">
+					#foreach($!repairsOrderLogVo in $repairsOrderLogVos)
+                        <div class="clearfix">
+                            <div class="input-item-text"
+                                 style="margin-left: 0; line-height: 28px; width: 150px;">$!DateUtils.formatTimeYMDHM($!{repairsOrderLogVo.createdDate})</div>
+                            <div class="input-item-text"
+                                 style="margin-left: 0; line-height: 28px;">$!{repairsOrderLogVo.content}</div>
+                        </div>
+					#end
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+
+            }
+        };
+        DATA.init();
+    });
+</script>
+#end

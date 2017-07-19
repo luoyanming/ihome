@@ -1,0 +1,235 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看任务告警--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/assignment.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/assignment.html" class="button-link">任务</a>
+        <span class="separate">|</span>
+        <a href="/admin/assignment/warning.html" class="button-link">告警记录</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看任务告警</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!taskRecord.taskName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">种类</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!taskRecord.kindFormat</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">责任人</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!taskRecord.departmentName
+                        /$!taskRecord.employeeName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">是否公开</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;"> #if($!taskRecord.publicity gt 0)
+                        否
+                    #else
+                        是
+                    #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">执行日期</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">#if($taskRecord.executeTime) $!DateUtils.formatTimeYMDHM($!taskRecord.executeTime) #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">任务说明</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!taskRecord.taskExplains</div>
+                </div>
+            </div>
+
+        ## 任务告警
+            #if($!taskRecord.taskKind!= 13)
+                <div class="form-group clearfix">
+                    <div class="group-title">控制/设备点</div>
+                    <div class="group-item">
+                        <div class="table-wrapper table-wrapper-nobg">
+                            <table cellpadding="0" cellspacing="0" width="100%"
+                                   class="table-primary table-primary-small table-noborder" id="table-temporary">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>名称</th>
+                                    <th>地点</th>
+                                    <th>最晚完成时间</th>
+                                    <th>完成时间</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                    #if($taskRecord.equipmentControlVoList && $taskRecord.equipmentControlVoList.size()>0)
+                                        #foreach($vo in $taskRecord.equipmentControlVoList)
+                                            #if($!vo.hasWarn)
+                                            <tr class="state state-warning">
+                                            #else
+                                            <tr>
+                                            #end
+                                            <td>$!{velocityCount}</td>
+                                            <td>$!vo.name</td>
+                                            <td>$!vo.place</td>
+                                            <td>$!DateUtils.formatTimeYMDHM($!vo.finishTime)</td>
+                                            #if($vo.executeTime&&$!vo.executeTime gt 0)
+                                                <td class="state state-already">$!DateUtils.formatTimeYMDHM($!vo.executeTime)</td>
+                                            #else
+                                                <td>未完成</td>
+                                            #end
+                                        </tr>
+                                        #end
+                                    #end
+
+                                #*<tr>
+                                    <td>1</td>
+                                    <td>3幢1号变电箱</td>
+                                    <td>3幢地下2楼电梯口旁边</td>
+                                    <td>12:30之前</td>
+                                    <td class="state state-already">11:30</td>
+                                </tr>
+                                <tr class="state state-warning">
+                                    <td>2</td>
+                                    <td>3幢1号变电箱</td>
+                                    <td>3幢地下2楼电梯口旁边</td>
+                                    <td>12:30之前</td>
+                                    <td>14:30</td>
+                                </tr>
+                                <tr class="state state-warning">
+                                    <td>3</td>
+                                    <td>3幢1号变电箱</td>
+                                    <td>3幢地下2楼电梯口旁边</td>
+                                    <td>12:30之前</td>
+                                    <td>未完成</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>3幢1号变电箱</td>
+                                    <td>3幢地下2楼电梯口旁边</td>
+                                    <td>12:30之前</td>
+                                    <td>未完成</td>
+                                </tr>*#
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            #end
+        ## 任务告警 end
+            #if($!taskRecord.taskKind==13)
+            ## 录入任务告警
+                <div class="form-group clearfix">
+                    <div class="group-title">录入类型</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">$!taskRecord.enterTypeMsg</div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">分区/楼宇</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">$!taskRecord.buildingDetail</div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">完成时间</div>
+                    <div class="group-item">
+                        <div class="input-item-text state state-warning"
+                             style="margin-left: 0;">#if($taskRecord.finishTime) $!DateUtils.formatTimeYMDHM($!taskRecord.finishTime) #end</div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <div class="group-title">状态</div>
+                    <div class="group-item">
+                        <div class="input-item-text state state-warning"
+                             style="margin-left: 0;">#if($taskRecord.alreadyEnterCount lt $taskRecord.EnterCount)
+                            进行中 #elseif($taskRecord.alreadyEnterCount eq 0) 未开始 #else 已完成 #end
+                            （已录 $taskRecord.alreadyEnterCount
+                            户/应录 $taskRecord.EnterCount 户）
+                        </div>
+                    </div>
+                </div>
+            ## 录入任务告警 end
+            #end
+
+            #if($!taskWarn.status eq 1)
+                &nbsp;
+            #else
+                <div class="form-group clearfix">
+                    <div class="group-title">&nbsp;</div>
+                    <div class="group-item">
+                        <a href="/task/closeTaskWarn.html?id=$!taskWarn.id" class="button-primary-able button-grey"
+                           style="width: 200px; height: 48px; font-size: 18px; line-height: 48px;">已解决</a>
+                    </div>
+                </div>
+            #end
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var ASSIGNMENT = {
+            init: function () {
+                ASSIGNMENT.btnShowHideBind();
+            },
+            btnShowHideBind: function () {
+                var tableTemporary = $('#table-temporary'),
+                        _tr = tableTemporary.find('tbody tr'),
+                        btnShowHide = tableTemporary.find('.btn-show-hide');
+
+                btnShowHide.on('click', function () {
+                    var _this = $(this),
+                            index = _this.parent().parent().index() + 1;
+
+                    if (_this.hasClass('.button-link-disable')) {
+                        return false;
+                    }
+
+                    if (_this.html() == '展开') {
+                        _this.html('收起');
+                        _tr.eq(index).show();
+                    } else if (_this.html() == '收起') {
+                        _this.html('展开');
+                        _tr.eq(index).hide();
+                    }
+                });
+            }
+        };
+
+        ASSIGNMENT.init();
+    });
+</script>
+#end

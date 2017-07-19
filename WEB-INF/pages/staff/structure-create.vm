@@ -1,0 +1,483 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新增部门--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb clearfix">
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="/admin/staff/structure.html" class="button-link">组织架构管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">新增部门</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" id="departmentId" value="$!department.id"/>
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">部门名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name"
+                               placeholder="请输入部门名称" value="$!department.name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">岗位</div>
+                <div class="group-item">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                               id="table-department">
+                            <thead>
+                            <tr>
+                                <th>岗位</th>
+                                <th>员工</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+								#if($department.positionVoList && $department.positionVoList.size()>0)
+									#foreach($position in $department.positionVoList)
+                                    <tr data-id="$!position.positionId" data-permission="$!position.menuIds">
+                                        <td>$!position.name</td>
+                                        <td>$!position.employeeCount</td>
+                                        <td>
+                                            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+											#if($!position.employeeCount eq 0)
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+											#end
+                                        </td>
+                                    </tr>
+									#end
+								#end
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add" id="btn-department-add">添加岗位</a>
+                    </div>
+                    <p class="errMsg errMsg-departmentStr"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                       style="float: left; width: 200px; margin: 20px 0 0 0;">保存</a>
+                    <a href="/admin/staff/structure.html" class="button-link"
+                       style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="department-modal">
+    <div class="modal-header">
+        <h1>新增岗位</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">岗位名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入岗位名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix type-input" id="staff-number">
+                <div class="group-title">员工数</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0; margin-right: 30px;">2</div>
+                    <a href="javascript:void(0);" class="button-link button-link-small" id="btn-staff-list">查看员工列表</a>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">权限</div>
+                <div class="group-item">
+                    <div class="checkbox-hidden-item" id="checkbox-permission" data-text="">
+                        <label>
+                            <input name="permission" type="checkbox" value="1"/>
+                            <p class="checkbox-text">任务接收</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="2" checked="checked"/>
+                            <p class="checkbox-text">提交表单</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="3"/>
+                            <p class="checkbox-text">通知公告接收</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="4"/>
+                            <p class="checkbox-text">内部报事提交</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="5"/>
+                            <p class="checkbox-text">内部报事接收</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="6"/>
+                            <p class="checkbox-text">数据查询</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="7"/>
+                            <p class="checkbox-text">查看访客列表</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="8"/>
+                            <p class="checkbox-text">报修抢单</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="9"/>
+                            <p class="checkbox-text">任务告警</p>
+                        </label>
+                        <label>
+                            <input name="permission" type="checkbox" value="10"/>
+                            <p class="checkbox-text">投诉接收</p>
+                        </label>
+                    </div>
+                    <p class="errMsg errMsg-modal-permission"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modal-box" id="staff-list-modal">
+    <div class="modal-header">
+        <h1>查看员工列表</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix type-input">
+                <div class="group-title">某岗位</div>
+                <div class="group-item" style="width: 440px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var tableDepartment = $('#table-department');
+
+        var modalMask = $('.modal-mask'),
+                departmentModal = $('#department-modal'),
+                staffListModal = $('#staff-list-modal'),
+                departmentModalTitle = departmentModal.find('.modal-header h1'),
+                inputModalName = $('#input-modal-name'),
+                staffNumber = $('#staff-number'),
+                btnStaffList = $('#btn-staff-list'),
+                checkboxPermission = $('#checkbox-permission');
+
+
+        window.STAFF = {
+            init: function () {
+                STAFF.btnAddEditBind();
+
+                STAFF.btnStaffListBind();
+                STAFF.btnStaffModalCloseBind();
+
+                STAFF.btnModalSubmitBind();
+
+                STAFF.btnSubmitBind();
+            },
+            btnAddEditBind: function () {
+                var btnAdd = $('#btn-department-add'),
+                        btnEdit = tableDepartment.find('.btn-edit'),
+                        btnDel = tableDepartment.find('.btn-del');
+
+                btnAdd.unbind('click');
+                btnAdd.on('click', function () {
+                    STAFF.showDepartmentModal('add', undefined, undefined);
+                });
+
+                btnEdit.unbind('click');
+                btnEdit.on('click', function () {
+                    STAFF.showDepartmentModal('edit', $(this), $(this).parent().parent().index());
+                });
+
+                btnDel.unbind('click');
+                btnDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+            },
+            showDepartmentModal: function (operate, obj, index) {
+                $('.errMsg-modal-name').html('');
+                $('.errMsg-modal-permission').html('');
+
+                if (operate == 'edit') {
+                    // edit
+                    departmentModalTitle.html('编辑岗位').attr('data-index', index);
+                    departmentModalTitle.attr('data-id', obj.parent().parent().attr('data-id'));
+
+                    var currTR = obj.parent().parent(),
+                            currID = currTR.attr('data-id'),
+                            currName = currTR.find('td').eq(0).html(),
+                            currNumber = currTR.find('td').eq(1).html(),
+                            currPermission = currTR.attr('data-permission'),
+                            permissionArr = currPermission.split(','),
+                            checkboxItem = checkboxPermission.find('label');
+
+                    for (var i = 0; i < checkboxItem.length; i++) {
+                        var checkboxItemInput = checkboxItem.eq(i).find('input[name="permission"]'),
+                                _v = checkboxItemInput.val();
+
+                        checkboxItemInput.removeAttr('checked');
+                        if (permissionArr.indexOf(_v) > -1) {
+                            checkboxItemInput.parent().click();
+                        }
+                    }
+
+                    inputModalName.val(currName);
+
+                    staffNumber.find('.input-item-text').html(currNumber);
+                    if (currNumber == 0) {
+                        staffNumber.hide();
+                    } else {
+                        staffNumber.show();
+                    }
+                } else if (operate == 'add') {
+                    // add
+                    departmentModalTitle.html('新增岗位').attr('data-index', '');
+                    departmentModalTitle.attr('data-id', '');
+
+                    inputModalName.val('');
+
+                    staffNumber.find('.input-item-text').html('0');
+                    staffNumber.hide();
+
+                    checkboxPermission.find('input[name="permission"]').removeAttr('checked');
+                }
+
+                modalMask.fadeIn(200);
+                departmentModal.fadeIn(200);
+            },
+            btnStaffListBind: function () {
+                btnStaffList.on('click', function () {
+                    STAFF.getStaffList(departmentModalTitle.attr('data-id'), inputModalName.val());
+
+                    departmentModal.hide();
+                    staffListModal.fadeIn(200);
+                });
+            },
+            btnStaffModalCloseBind: function () {
+                var btnClose = staffListModal.find('.btn-close');
+
+                btnClose.unbind('click');
+                btnClose.on('click', function () {
+                    staffListModal.hide();
+                    departmentModal.fadeIn(200);
+                });
+            },
+            getStaffList: function (ID, name) {
+                staffListModal.find('.group-title').html(name);
+                // 获取员工列表
+                $.ajax({
+                    url: "/department/position/employee.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        positionId: ID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            data.list.forEach(function(element,index,array){
+                                str += '<div class="input-item-text" style="margin-left: 0; width: 110px;">'+ element.name +'</div>';
+                            });
+                            staffListModal.find('.group-item').html(str);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            btnModalSubmitBind: function () {
+                var btnModalSubmit = $('.btn-modal-submit');
+
+                btnModalSubmit.on('click', function () {
+
+                    var newID = departmentModalTitle.attr('data-id'),
+                            index = departmentModalTitle.attr('data-index'),
+                            newName = inputModalName.val(),
+                            newNumber = staffNumber.find('.input-item-text').html();
+                    newPermissionArr = [],
+                            newPermission = '';
+
+                    $('.errMsg-modal-name').html('');
+                    $('.errMsg-modal-permission').html('');
+
+                    if (!COMMON.checkNull(newName)) {
+                        COMMON.errMsg($('.errMsg-modal-name'), '请输入岗位名称');
+                        return false;
+                    }
+                    $('.errMsg-modal-name').html('');
+
+
+                    var currTR = tableDepartment.find('tbody tr').eq(index),
+                            currID = currTR.attr('data-id'),
+                            checkboxItem = checkboxPermission.find('label');
+                    for (var i = 0; i < checkboxItem.length; i++) {
+                        var checkboxItemInput = checkboxItem.eq(i).find('input[name="permission"]:checked'),
+                                _v = checkboxItemInput.val();
+                        if (_v) {
+                            newPermissionArr.push(_v);
+                        }
+                    }
+                    newPermission = newPermissionArr.join(',');
+
+                    if (!newPermission) {
+                        COMMON.errMsg($('.errMsg-modal-permission'), '请选择权限');
+                        return false;
+                    }
+                    $('.errMsg-modal-permission').html('');
+
+                    var tableStr = '';
+                    tableStr += '<tr data-id="' + newID + '" data-permission="' + newPermission + '">';
+                    tableStr += '<td>' + newName + '</td>';
+                    tableStr += '<td>' + newNumber + '</td>';
+                    tableStr += '<td>';
+                    tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    if (index == '') {
+                        tableStr += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                        tableStr += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    }
+                    tableStr += '</td>';
+                    tableStr += '</tr>';
+
+                    if (index == '') {
+                        // add
+                        tableDepartment.find('tbody').append(tableStr);
+                    } else {
+                        // edit
+                        tableDepartment.find('tbody tr').eq(index).replaceWith(tableStr);
+                    }
+
+                    STAFF.btnAddEditBind();
+                    modalMask.fadeOut(200);
+                    departmentModal.fadeOut(200);
+                });
+            },
+            btnSubmitBind: function () {
+                var btnSubmit = $('.btn-submit');
+
+                btnSubmit.on('click', function () {
+                    var _this = $(this);
+
+                    if (_this.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+
+                    var nameVal = $('#input-name').val(),
+                            departmentStr = STAFF.getDepartmentArray();
+
+                    $('.errMsg-name').html('');
+                    $('.errMsg-departmentStr').html('');
+
+                    if (!COMMON.checkNull(nameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入部门名称');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if (!departmentStr) {
+                        COMMON.errMsg($('.errMsg-departmentStr'), '请输入添加岗位');
+                        return false;
+                    }
+                    $('.errMsg-departmentStr').html('');
+
+                    _this.addClass('button-primary-disable').html('保存中...');
+
+                    $.ajax({
+                        url: "/department/saveDepartment.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: $('#departmentId').val(),
+                            name: nameVal,
+                            departmentStr: departmentStr
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-departmentStr'), data.msg);
+                                _this.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                /*if ($('#departmentId').val() > 0) {
+                                    location.href = '/admin/staff/structure/create.html?id=' + $('#departmentId').val();
+                                } else {
+                                    location.href = '/admin/staff/structure.html';
+                                }*/
+                                location.href = '/admin/staff/structure.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-departmentStr'), '保存失败，请重试！');
+                            _this.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            getDepartmentArray: function () {
+                var arr = [],
+                        tableDepartmentItem = tableDepartment.find('tbody tr');
+
+                if (!tableDepartmentItem || tableDepartmentItem.length == 0) {
+                    return false;
+                }
+
+                for (var i = 0; i < tableDepartmentItem.length; i++) {
+                    var itemTD = tableDepartmentItem.eq(i).find('td'),
+                            strName = itemTD.eq(0).html(),
+                            strID = tableDepartmentItem.eq(i).attr('data-id'),
+                            strPermission = tableDepartmentItem.eq(i).attr('data-permission');
+                    arr.push({id: strID, name: strName, permission: strPermission});
+                }
+
+                return JSON.stringify(arr);
+            }
+        };
+
+        STAFF.init();
+    });
+</script>
+#end

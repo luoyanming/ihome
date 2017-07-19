@@ -1,0 +1,115 @@
+#set($layout = '/boss/layout/common.vm')
+
+#define($title)
+<title>提现申请审批--i家帮系统后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/boss/layout/header.vm")
+#parse("/boss/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/boss/cash.html" class="button-link">提现申请</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">提现申请审批</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">项目名称</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.projectName</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">联系人</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.name</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">手机号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.mobile</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">账户余额</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">¥ $!withdraw.balance</div>
+                    <div class="tips tips-grey" style="margin: 0;">账户余额指包含本次体现金额的总账户余额</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">提现金额</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">¥ $!withdraw.amount</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">银行卡号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.bankCardNo</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">开户名</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.payee</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">所属银行</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.bankName</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">开户行</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!withdraw.subbankName</div>
+                </div>
+            </div>
+			#if($!withdraw.status eq 0 )
+                <div class="form-group clearfix">
+                    <div class="group-title">&nbsp;</div>
+                    <div class="group-item">
+                        <a href="/boss/approve/withdraw.html?id=$!{withdraw.id}&status=1"
+                           class="button-primary-able button-primary-boss-able btn-submit"
+                           style="float: left; width: 200px; margin: 20px 0 0 0;">审批通过</a>
+                        <a href="/boss/approve/withdraw.html?id=$!{withdraw.id}&status=2"
+                           class="button-primary-able button-grey btn-submit"
+                           style="float: left; width: 200px; margin: 20px 0 0 25px; height:48px; line-height: 48px; font-size: 18px;">审批不通过</a>
+                    </div>
+                </div>
+			#elseif($!withdraw.status eq 1)
+                <div class="form-group clearfix">
+                    <div class="group-title">状态</div>
+                    <div class="group-item">
+                        <div class="input-item-text state state-already" style="margin-left: 0;">通过审批</div>
+                    </div>
+                </div>
+			#else
+                <div class="form-group clearfix">
+                    <div class="group-title">状态</div>
+                    <div class="group-item">
+                        <div class="input-item-text state state-already" style="margin-left: 0;">未通过审批</div>
+                    </div>
+                </div>
+			#end
+        </div>
+    </form>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+
+    });
+</script>
+#end

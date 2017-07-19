@@ -1,0 +1,223 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>管理材料类型--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/material.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="javascript:void(0);" class="button-link button-add" id="btn-create-type"
+               style="margin: 0 26px 0 0; color: #218adb;">添加新类型</a>
+        </div>
+        <a href="/admin/material.html" class="button-link">材料管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">管理材料类型</a>
+    </article>
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+			#if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-type">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>计量单位</th>
+                        <th>创建日期</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+						#foreach($materialType in $list)
+                        <tr data-id="$!materialType.id">
+                            <td>$!materialType.name</td>
+                            <td>$!materialType.units</td>
+                            <td>$!DateUtils.formatTimeYMDHM($!materialType.createdDate)</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-del" onclick="javascript: COMMON.createConfirmation('/material/type/delete.html?id=$!materialType.id', '是否确认删除？', '确认删除', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">删除</a>
+                            </td>
+                        </tr>
+						#end
+                    </tbody>
+                </table>
+			#else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无材料类型</p></div>
+                </div>
+			#end
+        </div>
+		#parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="type-modal">
+    <div class="modal-header">
+        <h1>添加材料类型</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-name"
+                               placeholder="请输入材料名称">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">计量单位</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 110px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-unit" placeholder="请输入单位">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-unit"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnCreateType = $('#btn-create-type'),
+                tableType = $('#table-type'),
+                btnEditType = tableType.find('.btn-edit'),
+                btnEditDel = tableType.find('.btn-del');
+
+        var modalMask = $('.modal-mask'),
+                typeModal = $('#type-modal'),
+                typeModalTitle = typeModal.find('.modal-header h1'),
+                inputModalName = $('#input-modal-name'),
+                inputModalUnit = $('#input-modal-unit'),
+                btnModalSubmit = typeModal.find('.btn-modal-submit');
+
+        var MATERIAL = {
+            init: function () {
+                MATERIAL.btnBind();
+
+                MATERIAL.btnModalSubmitBind();
+            },
+            btnBind: function () {
+                btnCreateType.on('click', function () {
+                    MATERIAL.showTypeModal('add', undefined, undefined);
+                });
+
+                btnEditType.on('click', function () {
+                    MATERIAL.showTypeModal('edit', $(this), $(this).parent().parent().index());
+                });
+            },
+            showTypeModal: function (operate, obj, index) {
+                $('.errMsg-modal-name').html('');
+                $('.errMsg-modal-unit').html('');
+
+                if (operate == 'add') {
+                    typeModalTitle.html('添加材料类型').attr('data-index', '');
+
+                    inputModalName.val('');
+                    inputModalUnit.val('');
+                } else if (operate == 'edit') {
+                    typeModalTitle.html('编辑材料类型').attr('data-index', index);
+
+                    var currTR = tableType.find('tbody tr').eq(index),
+                            currName = currTR.find('td').eq(0).html(),
+                            currUnit = currTR.find('td').eq(1).html();
+                    inputModalName.val(currName);
+                    inputModalUnit.val(currUnit);
+                }
+
+                modalMask.fadeIn(200);
+                typeModal.fadeIn(200);
+            },
+            btnModalSubmitBind: function () {
+                btnModalSubmit.on('click', function () {
+                    var inputModalNameVal = inputModalName.val(),
+                            inputModalUnitVal = inputModalUnit.val(),
+                            id = '';
+
+                    if (btnModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-name').html('');
+                    $('.errMsg-modal-unit').html('');
+
+                    if (!COMMON.checkNull(inputModalNameVal)) {
+                        COMMON.errMsg($('.errMsg-modal-name'), '请输入材料名称!');
+                        return false;
+                    }
+                    $('.errMsg-modal-name').html('');
+
+                    if (!COMMON.checkNull(inputModalUnitVal)) {
+                        COMMON.errMsg($('.errMsg-modal-unit'), '请输入单位!');
+                        return false;
+                    }
+                    $('.errMsg-modal-unit').html('');
+
+                    var _index = typeModalTitle.attr('data-index');
+                    if (_index) {
+                        id = tableType.find('tbody tr').eq(_index).attr('data-id');
+                    }
+
+                    btnModalSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/material/type/create.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: id,
+                            name: inputModalNameVal,
+                            units: inputModalUnitVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-unit'), data.msg);
+                                btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-unit'), '保存失败，请重试！');
+                            btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+
+        MATERIAL.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/material/type.html',
+                {
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

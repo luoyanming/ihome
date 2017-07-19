@@ -1,0 +1,15 @@
+<header class="header clearfix">
+	<a href="javascript:void(0);" class="btn-leftnav btn-leftnav-boss">
+		<span></span>
+		<span></span>
+		<span></span>
+	</a>
+	<div class="header-right clearfix">
+		<div class="warning"></div>
+		<div class="userinfo">
+			<p class="button-link button-boss-link button-link-small link-disable user-name">$!bossUser.mobile</p>
+			<a href="/boss/editPwd.html" class="button-link button-boss-link button-link-small btn-editPwd">修改密码</a>
+			<a href="/boss/logout.html" class="button-link button-boss-link button-link-small btn-logout">退出</a>
+		</div>
+	</div>
+</header>

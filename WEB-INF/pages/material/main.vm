@@ -1,0 +1,2091 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>材料管理--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/material.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <div class="operate-group" style="float: right;">
+            <a href="/admin/material/type.html" class="button-link button-manage"
+               style="margin: 0 26px 0 0; color: #218adb;">管理材料类型</a>
+            <a href="javascript:void(0);" class="button-link button-out-warehouse"
+               style="margin: 0 26px 0 0; color: #218adb;"
+               id="btn-out-warehouse">出库</a>
+            <a href="javascript:void(0);" class="button-link button-in-warehouse"
+               style="margin: 0 26px 0 0; color: #218adb;"
+               id="btn-in-warehouse">入库</a>
+        </div>
+        <a href="javascript:void(0);" class="button-link button-link-disable">材料管理</a>
+    </article>
+
+    <form action="" method="post">
+        <article class="form-condition">
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="materialTypeId">
+                        <input type="hidden" name="materialTypeId" value="$!materialTypeId" class="input-hidden">
+                        #if($materialTypeId && $!materialTypeId gt 0 )
+                            #foreach($!materialType in $!materialTypeList)
+                                #if($!materialTypeId eq $!materialType.id)
+                                    <span class="select-placeholder">$!materialType.name</span>
+                                #end
+                            #end
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!materialTypeId eq 0) class="selected" #end>全部</li>
+                                #foreach($!materialType in $!materialTypeList)
+                                    <li data-value="$!materialType.id" #if($!materialTypeId eq $!materialType.id)
+                                        class="selected"#end>$!materialType.name</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!materialTypeId eq 0) selected #end>全部</option>
+                            #foreach($!materialType in $!materialTypeList)
+                                <option value="$!materialType.id" #if($!materialTypeId eq $!materialType.id)
+                                        selected #end>$!materialType.name</option>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="title">品牌&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" name="brand" value="$!{brand}" placeholder="请输入品牌"
+                               class="input-primary input-x-small">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="title">型号&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" name="model" value="$!{model}" placeholder="请输入型号"
+                               class="input-primary input-x-small">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="title">有货</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="inventory" style="width: 84px;">
+                        <input type="hidden" name="inventory" value="$!inventory" class="input-hidden">
+                        #if($!inventory eq 1)
+                            <span class="select-placeholder">否</span>
+                        #elseif($!inventory eq 2)
+                            <span class="select-placeholder">是</span>
+                        #else
+                            <span class="select-placeholder">全部</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!inventory eq 0) class="selected" #end>全部</li>
+                                <li data-value="1" #if($!inventory eq 1) class="selected" #end>否</li>
+                                <li data-value="2" #if($!inventory eq 2) class="selected" #end>是</li>
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!inventory eq 0) selected #end>全部</option>
+                            <option value="1" #if($!inventory eq 1) selected #end>否</option>
+                            <option value="2" #if($!inventory eq 2) selected #end>是</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+    <article class="" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            #if($list && $list.size()>0)
+                <table cellpadding="0" cellspacing="0" width="100%" class="table-primary" id="table-material">
+                    <thead>
+                    <tr>
+                        <th>材料类型</th>
+                        <th>品牌</th>
+                        <th>型号</th>
+                        <th>单位</th>
+                        <th>进货价</th>
+                        <th>售价</th>
+                        <th>库存量</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($materialItem in $list)
+                        <tr data-id="$!materialItem.id">
+                            <td>$!materialItem.typeName</td>
+                            <td>$!materialItem.brand</td>
+                            <td>$!materialItem.model</td>
+                            <td>$!materialItem.typeUnits</td>
+                            <td data-price-buy="$!materialItem.buyPrice">￥ $!materialItem.buyPrice</td>
+                            <td data-price-sell="$!materialItem.salePrice">￥$!materialItem.salePrice</td>
+                            <td>$!materialItem.amount</td>
+                            <td>
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-change">调价</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-out">出库</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="javascript:void(0);" class="button-link button-link-small btn-in">入库</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="/admin/material/history.html?id=$!materialItem.id" class="button-link button-link-small">出入库记录</a>
+                            </td>
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无材料</p></div>
+                </div>
+            #end
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+<section class="modal-mask"></section>
+
+## 调价 start
+<section class="modal-box" id="change-modal">
+    <div class="modal-header">
+        <h1>调价</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="clearfix">
+                <div style="float: left; width: 50%;">
+                    <div class="form-group clearfix">
+                        <div class="group-title" style="width: 100px;">进货价</div>
+                        <div class="group-item" style="width: 250px;">
+                            <div class="input-item-text" style="margin-left: 0;" id="price-buy-original">¥ 0.5</div>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="group-title" style="width: 100px;">调整为</div>
+                        <div class="group-item" style="width: 250px;">
+                            <div class="input-item" style="width: 110px;">
+                                <input type="text" class="input-primary input-small input-null" id="price-buy-change"
+                                       placeholder="¥ 0">
+                                <i class="icon-delete"></i>
+                            </div>
+                            <p class="errMsg errMsg-price-buy-change"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="float: left; width: 50%;">
+                    <div class="form-group clearfix">
+                        <div class="group-title" style="width: 100px;">售价</div>
+                        <div class="group-item" style="width: 250px;">
+                            <div class="input-item-text" style="margin-left: 0;" id="price-sell-original">¥ 1</div>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="group-title" style="width: 100px;">调整为</div>
+                        <div class="group-item" style="width: 250px;">
+                            <div class="input-item" style="width: 110px;">
+                                <input type="text" class="input-primary input-small input-null" id="price-sell-change"
+                                       placeholder="¥ 0">
+                                <i class="icon-delete"></i>
+                            </div>
+                            <p class="errMsg errMsg-price-sell-change"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-change-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 调价 end
+
+## 材料出库 start
+<section class="modal-box" id="out-modal">
+    <div class="modal-header">
+        <h1>材料出库</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">材料</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="out-name">扫帚/品牌A/型号B</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">当前库存</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="out-stock">10把</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">出库数量</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="out-number"
+                               placeholder="请输入出库数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text" id="out-unit">把</div>
+                    <p class="errMsg errMsg-out-number"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">出库表单</div>
+                <div class="group-item clearfix" style="padding: 11px 0;">
+                    <a href="javascript:void(0);" class="button-link button-link-small" id="btn-out-form-select"
+                       style="float: left;" data-id="">选择表单</a>
+                ##  <a href="javascript:void(0);" class="button-link button-link-normal" id="btn-out-form-select" style="float: left;" data-id="">选择表单</a>
+                    <div class="clearfix"></div>
+                    <div class="errMsg errMsg-out-form"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-out-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 材料出库 start
+
+## 材料入库 start
+<section class="modal-box" id="in-modal">
+    <div class="modal-header">
+        <h1>材料入库</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">材料</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="in-name">扫帚/品牌A/型号B</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">当前库存</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="in-stock">10把</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">入库数量</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-number"
+                               placeholder="请输入入库数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text" id="in-unit">把</div>
+                    <p class="errMsg errMsg-in-number"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">进货价</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-price-buy"
+                               placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-in-price-buy"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">售价</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-price-sell"
+                               placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-in-price-sell"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">入库来源</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-source"
+                               placeholder="请输入入库来源">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-in-source"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-in-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 材料入库 start
+
+## 出库 start
+<section class="modal-box" id="outWarehouse-modal">
+    <div class="modal-header">
+        <h1>出库</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">出库表单</div>
+                <div class="group-item clearfix" style="padding: 11px 0;">
+                    <a href="javascript:void(0);" class="button-link button-link-small"
+                       id="btn-outWarehouse-form-select"
+                       style="float: left;" data-id="">选择表单</a>
+                ##  <a href="javascript:void(0);" class="button-link button-link-normal" id="btn-outWarehouse-form-select" style="float: left;" data-id="">选择表单</a>
+                    <div class="clearfix"></div>
+                    <div class="errMsg errMsg-outWarehouse-form"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">出库清单</div>
+                <div class="group-item" style="width: 600px;">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                               id="table-outWarehouse">
+                            <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>品牌</th>
+                                <th>型号</th>
+                                <th>出库数量</th>
+                                <th>当前库存</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            ##    <tr>
+                            ##        <td data-id="1">扫帚</td>
+                            ##        <td>品牌A</td>
+                            ##        <td>型号A</td>
+                            ##        <td>3</td>
+                            ##        <td>20</td>
+                            ##        <td>
+                            ##            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                            ##            &nbsp;&nbsp;&nbsp;&nbsp;
+                            ##            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                            ##        </td>
+                            ##    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add btn-add">添加材料</a>
+                    </div>
+
+                    <div class="errMsg errMsg-table-outWarehouse"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-outWarehouse-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 出库 start
+
+## 入库 start
+<section class="modal-box" id="inWarehouse-modal">
+    <div class="modal-header">
+        <h1>入库</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">入库来源</div>
+                <div class="group-item clearfix">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="inWarehouse-source"
+                               placeholder="请输入入库来源">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-inWarehouse-source"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">入库清单</div>
+                <div class="group-item" style="width: 600px;">
+                    <div class="table-wrapper">
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                               id="table-inWarehouse">
+                            <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>品牌</th>
+                                <th>型号</th>
+                                <th>入库数量</th>
+                                <th>进货价</th>
+                                <th>售价</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            ##    <tr>
+                            ##        <td data-id="1">扫帚</td>
+                            ##        <td>品牌A</td>
+                            ##        <td>型号A</td>
+                            ##        <td>3</td>
+                            ##        <td data-price-buy="6">￥ 6</td>
+                            ##        <td data-price-sell="10">￥ 10</td>
+                            ##        <td>
+                            ##            <a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>
+                            ##            &nbsp;&nbsp;&nbsp;&nbsp;
+                            ##            <a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>
+                            ##        </td>
+                            ##    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add btn-add">添加材料</a>
+                    </div>
+
+                    <div class="errMsg errMsg-table-inWarehouse"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title" style="width: 100px;">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-inWarehouse-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 入库 start
+
+## 选择表单 end
+<section class="modal-box" id="form-select-modal">
+    <div class="modal-header">
+        <h1>选择表单</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content" style="padding: 0;">
+        <article class="form-condition" style="padding: 0 16px;">
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" style="140px;" id="select-modal-type">
+                        <input type="hidden" name="" class="input-hidden">
+                        <span class="select-placeholder">全部</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($formTypeList && $formTypeList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($formTypeList in $formTypeList)
+                                        <li data-value="$!formTypeList.id">$!formTypeList.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($formTypeList && $formTypeList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($formType in $formTypeList)
+                                    <option value="$!formType.id">$!formType.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">提交者</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" style="width: 124px;" id="select-modal-department">
+                        <input type="hidden" name="departmentid" class="input-hidden">
+                        <span class="select-placeholder">全部</span>
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                #if($departmentList && $departmentList.size()>0)
+                                    <li data-value="">全部</li>
+                                    #foreach($department in $departmentList)
+                                        <li data-value="$!department.id" #if($!paramDepartmentId==$!department.id)
+                                            class="selected" #end>$!department.name</li>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            #if($departmentList && $departmentList.size()>0)
+                                <option value="">全部</option>
+                                #foreach($department in $departmentList)
+                                    <option value="$!department.id" #if($!paramDepartmentId==$!department.id)
+                                            selected #end>$!department.name</option>
+                                #end
+                            #else
+                                <li data-value="" class="selected">暂无</li>
+                            #end
+                        </select>
+                    </div>
+
+                    <div class="select-primary select-small" style="width: 84px; display: none;"
+                         id="select-modal-committer">
+                    ##    <input type="hidden" name="" class="input-hidden">
+                    ##    <span class="select-placeholder">全部</span>
+                    ##    <div class="select-options light-overscroll">
+                    ##        <ul>
+                    ##            <li data-value="" class="selected">全部</li>
+                    ##            <li data-value="0">正常</li>
+                    ##            <li data-value="1">异常</li>
+                    ##        </ul>
+                    ##    </div>
+                    ##    <select class="select-select">
+                    ##        <option value="" selected="">全部</option>
+                    ##        <option value="0">正常</option>
+                    ##        <option value="1">异常</option>
+                    ##    </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search">
+                </div>
+            </div>
+        </article>
+
+        <div class="table-wrapper light-overscroll" style="min-height: 250px; max-height: 350px;">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small"
+                   id="table-form-select">
+                <thead>
+                <tr>
+                    <th>类型</th>
+                    <th>提交者</th>
+                    <th>提交时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr data-id="1">
+                    <td>施工许可证</td>
+                    <td>保安部李某某</td>
+                    <td>2016/12/31 08:02:31</td>
+                    <td>
+                        <a href="javascript:void(0);" class="button-link button-link-small">查看</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+## 选择表单 end
+
+## 添加、编辑出库材料 start
+<section class="modal-box" id="out-material-modal">
+    <div class="modal-header">
+        <h1>添加出库材料</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" id="select-out-material-category">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    #if($materialTypeList && $materialTypeList.size()>0)
+                                        <li data-value="">全部</li>
+                                        #foreach($materialType in $materialTypeList)
+                                            <li data-value="$!materialType.id">$!materialType.name</li>
+                                        #end
+                                    #else
+                                        <li data-value="" class="selected">暂无</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                #if($materialTypeList && $materialTypeList.size()>0)
+                                    <option value="">全部</option>
+                                    #foreach($materialType in $materialTypeList)
+                                        <option value="$!materialType.id">$!materialType.name</option>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </select>
+                        </div>
+
+                        <div class="select-primary" id="select-out-material-brand">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">请选择</li>
+                                    <li data-value="1">品牌1</li>
+                                    <li data-value="2">品牌2</li>
+                                    <li data-value="3">品牌3</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>请选择</option>
+                                <option value="1">品牌1</option>
+                                <option value="2">品牌2</option>
+                                <option value="3">品牌3</option>
+                            </select>
+                        </div>
+
+                        <div class="select-primary" id="select-out-material-model" >
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    <li data-value="" class="selected">请选择</li>
+                                    <li data-value="1">型号1</li>
+                                    <li data-value="2">型号2</li>
+                                    <li data-value="3">型号3</li>
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                <option value="" selected>请选择</option>
+                                <option value="1">型号1</option>
+                                <option value="2">型号2</option>
+                                <option value="3">型号3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="errMsg errMsg-out-material-select"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">出库数量</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="out-material-number"
+                               placeholder="请输入出库数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-out-material-number"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">当前库存</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;" id="out-material-stock">0</div>
+                    <div class="errMsg errMsg-out-material-submit"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-out-material-submit"
+                       style="float: left; width: 88px; margin: 0 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 添加、编辑出库材料 start
+
+## 添加、编辑入库材料 start
+<section class="modal-box" id="in-material-modal">
+    <div class="modal-header">
+        <h1>添加出库材料</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="select-box clearfix">
+                        <div class="select-primary" id="select-in-material-category">
+                            <input type="hidden" name="" class="input-hidden">
+                            <span class="select-placeholder">请选择</span>
+                            <div class="select-options light-overscroll">
+                                <ul>
+                                    #if($materialTypeList && $materialTypeList.size()>0)
+                                        <li data-value="">全部</li>
+                                        #foreach($materialType in $materialTypeList)
+                                            <li data-value="$!materialType.id">$!materialType.name</li>
+                                        #end
+                                    #else
+                                        <li data-value="" class="selected">暂无</li>
+                                    #end
+                                </ul>
+                            </div>
+                            <select class="select-select">
+                                #if($materialTypeList && $materialTypeList.size()>0)
+                                    <option value="">全部</option>
+                                    #foreach($materialType in $materialTypeList)
+                                        <option value="$!materialType.id">$!materialType.name</option>
+                                    #end
+                                #else
+                                    <li data-value="" class="selected">暂无</li>
+                                #end
+                            </select>
+                        </div>
+                    </div>
+                    <div class="errMsg errMsg-in-material-select"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">品牌</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-material-brand"
+                               placeholder="请输入品牌">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-in-material-brand"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">型号</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-material-model"
+                               placeholder="请输入型号">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-in-material-model"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">入库数量</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-material-number"
+                               placeholder="请输入入库数量">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-in-material-number"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">进货价</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-material-price-buy"
+                               placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-in-material-price-buy"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">售价</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 140px;">
+                        <input type="text" class="input-primary input-small input-null" id="in-material-price-sell"
+                               placeholder="¥ 0.0">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-in-material-price-sell"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able" id="btn-in-material-submit"
+                       style="float: left; width: 88px; margin: 0 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+## 添加、编辑入库材料 start
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnOutWarehouse = $('#btn-out-warehouse'),
+                btnInWarehouse = $('#btn-in-warehouse'),
+                tableMaterial = $('#table-material'),
+                btnChange = tableMaterial.find('.btn-change'),
+                btnOut = tableMaterial.find('.btn-out'),
+                btnIn = tableMaterial.find('.btn-in');
+
+        var modalMask = $('.modal-mask');
+
+        var changeModal = $('#change-modal'),
+                changeModalTitle = changeModal.find('.modal-header h1'),
+                priceBuyOriginal = $('#price-buy-original'),
+                priceBuyChange = $('#price-buy-change'),
+                priceSellOriginal = $('#price-sell-original'),
+                priceSellChange = $('#price-sell-change'),
+                btnChangeSubmit = $('#btn-change-submit');
+
+        var formSelectModal = $('#form-select-modal'),
+                btnFormSelectModalClose = formSelectModal.find('.btn-close'),
+                formSelectModalTitle = formSelectModal.find('.modal-header h1'),
+                selectModalType = $('#select-modal-type'),
+                selectModalDepartment = $('#select-modal-department'),
+                selectModalCommitter = $('#select-modal-committer'),
+                btnFormSelectSearch = formSelectModal.find('.btn-search'),
+                tableFormSelect = $('#table-form-select');
+
+        var outModal = $('#out-modal'),
+                outModalTitle = outModal.find('.modal-header h1'),
+                outName = $('#out-name'),
+                outStock = $('#out-stock'),
+                outNumber = $('#out-number'),
+                outUnit = $('#out-unit'),
+                btnOutFormSelect = $('#btn-out-form-select'),
+                btnOutSubmit = $('#btn-out-submit');
+
+        var inModal = $('#in-modal'),
+                inModalTitle = outModal.find('.modal-header h1'),
+                inName = $('#in-name'),
+                inStock = $('#in-stock'),
+                inNumber = $('#in-number'),
+                inUnit = $('#in-unit'),
+                inPriceBuy = $('#in-price-buy'),
+                inPriceSell = $('#in-price-sell'),
+                inSource = $('#in-source'),
+                btnInSubmit = $('#btn-in-submit');
+
+        var outWarehouseModal = $('#outWarehouse-modal'),
+                outWarehouseModalTitle = outWarehouseModal.find('.modal-header h1'),
+                btnOutWarehouseFormSelect = $('#btn-outWarehouse-form-select'),
+                tableOutWarehouse = $('#table-outWarehouse'),
+                btnTableOutWarehouseAdd = outWarehouseModal.find('.btn-add'),
+                btnOutWarehouseSubmit = $('#btn-outWarehouse-submit');
+
+        var inWarehouseModal = $('#inWarehouse-modal'),
+                inWarehouseModalTitle = inWarehouseModal.find('.modal-header h1'),
+                inWarehouseSource = $('#inWarehouse-source'),
+                tableInWarehouse = $('#table-inWarehouse'),
+                btnTableInWarehouseAdd = inWarehouseModal.find('.btn-add'),
+                btnInWarehouseSubmit = $('#btn-inWarehouse-submit');
+
+        var outMaterialModal = $('#out-material-modal'),
+                outMaterialModalTitle = outMaterialModal.find('.modal-header h1'),
+                btnOutMaterialModalClose = outMaterialModal.find('.btn-close'),
+                selectOutMaterialCategory = $('#select-out-material-category'),
+                selectOutMaterialBrand = $('#select-out-material-brand'),
+                selectOutMaterialModel = $('#select-out-material-model'),
+                outMaterialNumber = $('#out-material-number'),
+                outMaterialStock = $('#out-material-stock'),
+                btnOutMaterialSubmit = $('#btn-out-material-submit');
+
+        var inMaterialModal = $('#in-material-modal'),
+                inMaterialModalTitle = inMaterialModal.find('.modal-header h1'),
+                btnInMaterialModalClose = inMaterialModal.find('.btn-close'),
+                selectInMaterialCategory = $('#select-in-material-category'),
+                inMaterialBrand = $('#in-material-brand'),
+                inMaterialModel = $('#in-material-model'),
+                inMaterialNumber = $('#in-material-number'),
+                inMaterialPriceBuy = $('#in-material-price-buy'),
+                inMaterialPriceSell = $('#in-material-price-sell'),
+                btnInMaterialSubmit = $('#btn-in-material-submit');
+
+        var MATERIAL = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+                COMMON.selectBind(selectModalDepartment, MATERIAL.getCommitterList);
+
+                MATERIAL.btnBind();
+
+                MATERIAL.getTableFormSelectData(undefined);
+
+                MATERIAL.btnChangeSubmitBind();
+                MATERIAL.btnOutSubmitBind();
+                MATERIAL.btnInSubmitBind();
+                MATERIAL.btnOutMaterialSubmitBind();
+                MATERIAL.btnInMaterialSubmitBind();
+                MATERIAL.btnOutWarehouseSubmitBind();
+                MATERIAL.btnInWarehouseSubmitBind();
+            },
+            btnBind: function () {
+                btnOutWarehouse.on('click', function () {
+                    $('.errMsg-outWarehouse-form').html('');
+                    $('.errMsg-table-outWarehouse').html('');
+
+                    btnOutWarehouseFormSelect.removeClass('button-link-normal').addClass('button-link-small').attr('data-id', '');
+                    tableOutWarehouse.find('tbody').html('');
+
+                    modalMask.fadeIn(200);
+                    outWarehouseModal.fadeIn(200);
+                });
+                btnOutWarehouseFormSelect.on('click', function () {
+                    btnFormSelectModalClose.unbind('click');
+                    btnFormSelectModalClose.on('click', function () {
+                        formSelectModal.hide();
+                        outWarehouseModal.fadeIn(200);
+                    });
+
+                    formSelectModalTitle.attr('data-type', 'outWarehouse');
+
+                    MATERIAL.btnTableFormSelectBind();
+
+                    outWarehouseModal.hide();
+                    formSelectModal.fadeIn(200);
+                });
+                btnTableOutWarehouseAdd.on('click', function () {
+                    btnOutMaterialModalClose.unbind('click');
+                    btnOutMaterialModalClose.on('click', function () {
+                        outMaterialModal.hide();
+                        outWarehouseModal.fadeIn(200);
+                    });
+
+                    MATERIAL.showOutMaterialModal('add', undefined, undefined);
+                });
+
+                btnInWarehouse.on('click', function () {
+                    $('.errMsg-inWarehouse-source').html('');
+                    $('.errMsg-table-inWarehouse').html('');
+
+                    inWarehouseSource.val('');
+                    tableInWarehouse.find('tbody').html('');
+
+                    modalMask.fadeIn(200);
+                    inWarehouseModal.fadeIn(200);
+                });
+                btnTableInWarehouseAdd.on('click', function () {
+                    btnInMaterialModalClose.unbind('click');
+                    btnInMaterialModalClose.on('click', function () {
+                        inMaterialModal.hide();
+                        inWarehouseModal.fadeIn(200);
+                    });
+
+                    MATERIAL.showInMaterialModal('add', undefined, undefined);
+                });
+
+                btnChange.on('click', function () {
+                    $('.errMsg-price-buy-change').html('');
+                    $('.errMsg-price-sell-change').html('');
+
+                    var currTR = $(this).parent().parent(),
+                            currID = currTR.attr('data-id'),
+                            priceBuy = currTR.find('td').eq(4).attr('data-price-buy'),
+                            priceSell = currTR.find('td').eq(5).attr('data-price-sell');
+                    priceBuyOriginal.html('￥ ' + priceBuy);
+                    priceSellOriginal.html('￥ ' + priceSell);
+
+                    changeModalTitle.attr('data-id', currID);
+                    priceBuyChange.val('');
+                    priceSellChange.val('');
+
+                    modalMask.fadeIn(200);
+                    changeModal.fadeIn(200);
+                });
+
+                btnOut.on('click', function () {
+                    var currTR = $(this).parent().parent(),
+                            currID = currTR.attr('data-id'),
+                            currCate = currTR.find('td').eq(0).html(),
+                            currBrand = currTR.find('td').eq(1).html(),
+                            currModel = currTR.find('td').eq(2).html(),
+                            currUnit = currTR.find('td').eq(3).html(),
+                            currNumber = currTR.find('td').eq(6).html();
+
+                    outModalTitle.attr('data-id', currID);
+                    outName.html(currCate + '/' + currBrand + '/' + currModel);
+                    outStock.html(currNumber + currUnit);
+                    outNumber.val('');
+                    outUnit.html(currUnit);
+
+                    $('.errMsg-out-number').html('');
+                    $('.errMsg-out-form').html('');
+
+
+                    modalMask.fadeIn(200);
+                    outModal.fadeIn(200);
+                });
+                btnOutFormSelect.on('click', function () {
+                    btnFormSelectModalClose.unbind('click');
+                    btnFormSelectModalClose.on('click', function () {
+                        formSelectModal.hide();
+                        outModal.fadeIn(200);
+                    });
+
+                    formSelectModalTitle.attr('data-type', 'out');
+
+                    MATERIAL.btnTableFormSelectBind();
+
+                    outModal.hide();
+                    formSelectModal.fadeIn(200);
+                });
+
+                btnIn.on('click', function () {
+                    var currTR = $(this).parent().parent(),
+                            currID = currTR.attr('data-id'),
+                            currCate = currTR.find('td').eq(0).html(),
+                            currBrand = currTR.find('td').eq(1).html(),
+                            currModel = currTR.find('td').eq(2).html(),
+                            currUnit = currTR.find('td').eq(3).html(),
+                            currNumber = currTR.find('td').eq(6).html();
+
+                    inModalTitle.attr('data-id', currID);
+                    inName.html(currCate + '/' + currBrand + '/' + currModel);
+                    inStock.html(currNumber + currUnit);
+                    inNumber.val('');
+                    inUnit.html(currUnit);
+                    inPriceBuy.val('');
+                    inPriceSell.val('');
+                    inSource.val('');
+
+                    $('.errMsg-in-number').html('');
+                    $('.errMsg-in-price-buy').html('');
+                    $('.errMsg-in-price-sell').html('');
+                    $('.errMsg-in-source').html('');
+
+
+                    modalMask.fadeIn(200);
+                    inModal.fadeIn(200);
+                });
+
+                btnFormSelectSearch.on('click', function () {
+                    var typeID = selectModalType.find('.input-hidden').val(),
+                            departmentID = selectModalDepartment.find('.input-hidden').val(),
+                            committerID = selectModalCommitter.find('.input-hidden').val(),
+                            searchArr = [];
+                    searchArr.push({
+                        typeid: typeID,
+                        departmentid: departmentID,
+                        committerid: committerID
+                    });
+
+                    MATERIAL.getTableFormSelectData(JSON.stringify(searchArr));
+                });
+            },
+            showOutMaterialModal: function (operate, obj, index) {
+                $('#errMsg-out-material-select').html('');
+                $('#errMsg-out-material-number').html('');
+                $('#errMsg-out-material-submit').html('');
+
+                if (operate == 'add') {
+                    outMaterialModalTitle.html('添加出库材料').attr('data-index', '');
+
+                    selectOutMaterialCategory.find('.input-hidden').val('');
+                    selectOutMaterialCategory.find('.select-placeholder').html('请选择');
+                    selectOutMaterialCategory.find('.select-options ul li.selected').removeClass('selected');
+                    selectOutMaterialCategory.find('.select-options ul li').eq(0).addClass('selected');
+                    selectOutMaterialCategory.find('.select-select option').eq(0).attr('selected', true);
+                    COMMON.selectBind(selectOutMaterialCategory, MATERIAL.getOutMaterialBrandList);
+
+                    selectOutMaterialBrand.html('').hide();
+                    selectOutMaterialModel.html('').hide();
+
+                    outMaterialNumber.val('');
+                    outMaterialStock.html('0');
+                } else if (operate == 'edit') {
+                    outMaterialModalTitle.html('编辑出库材料').attr('data-index', index);
+
+                    var currTR = tableOutWarehouse.find('tbody tr').eq(index),
+                            currCateID = currTR.find('td').eq(0).attr('data-id'),
+                            currCateText = currTR.find('td').eq(0).html(),
+                            currBrand = currTR.find('td').eq(1).html(),
+                            currModel = currTR.find('td').eq(2).html(),
+                            currNumber = currTR.find('td').eq(3).html(),
+                            currStock = currTR.find('td').eq(4).html();
+
+                    selectOutMaterialCategory.find('.input-hidden').val(currCateID);
+                    selectOutMaterialCategory.find('.select-placeholder').html(currCateText);
+                    selectOutMaterialCategory.find('.select-options ul li.selected').removeClass('selected');
+                    selectOutMaterialCategory.find('.select-options ul li[data-value="' + currCateID + '"]').addClass('selected');
+                    selectOutMaterialCategory.find('.select-select option[value="' + currCateID + '"]').attr('selected', true);
+
+                    //通过类型id获取品牌列表
+                    $.ajax({
+                        url: "/material/getMaterialBrand.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: currCateID
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+
+                            } else {
+                                var str = '';
+                                str += '<input type="hidden" name="" class="input-hidden">';
+                                str += '<span class="select-placeholder select-yes">请选择</span>';
+                                str += '<div class="select-options light-overscroll">';
+                                str += '<ul>';
+                                str += '<li data-value="" class="selected">请选择</li>';
+                                for (var i = 0; i < data.list.length; i++) {
+                                    str += '<li data-value="' + data.list[i].id + '">' + data.list[i].brand + '</li>';
+                                }
+                                str += '</ul>';
+                                str += '</div>';
+                                str += '<select class="select-select">';
+                                str += '<option value="">请选择</option>';
+                                for (var j = 0; j < data.list.length; j++) {
+                                    if (currBrand == data.list[j].brand) {
+                                        str += '<option value="' + data.list[j].id + '" selected>' + data.list[j].brand + '</option>';
+                                    } else {
+                                        str += '<option value="' + data.list[j].id + '">' + data.list[j].brand + '</option>';
+                                    }
+                                }
+                                str += '</select>';
+
+                                selectOutMaterialBrand.html(str).show();
+                                COMMON.selectBind(selectOutMaterialBrand, MATERIAL.getOutMaterialModelList);
+
+                                var currBrandID = selectOutMaterialBrand.find('.select-select option:checked').attr('value');
+                                selectOutMaterialBrand.find('.input-hidden').val(currBrandID);
+                                selectOutMaterialBrand.find('.select-placeholder').html(currBrand);
+                                selectOutMaterialBrand.find('.select-options ul li.selected').removeClass('selected');
+                                selectOutMaterialBrand.find('.select-options ul li[data-value="' + currBrandID + '"]').addClass('selected');
+                                selectOutMaterialBrand.find('.select-select option[value="' + currBrandID + '"]').attr('selected', true);
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    });
+
+
+                    //通过品牌text获取型号列表
+                    $.ajax({
+                        url: "/material/getMaterialModel.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: currBrand
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+
+                            } else {
+                                var str = '';
+                                str += '<input type="hidden" name="" class="input-hidden">';
+                                str += '<span class="select-placeholder select-yes">请选择</span>';
+                                str += '<div class="select-options light-overscroll">';
+                                str += '<ul>';
+                                str += '<li data-value="" class="selected">请选择</li>';
+                                for (var i = 0; i < data.list.length; i++) {
+                                    str += '<li data-value="' + data.list[i].id + '">' + data.list[i].model + '</li>';
+                                }
+                                str += '</ul>';
+                                str += '</div>';
+                                str += '<select class="select-select">';
+                                str += '<option value="" selected>请选择</option>';
+                                for (var j = 0; j < data.list.length; j++) {
+                                    if (currModel == data.list[j].model) {
+                                        str += '<option value="' + data.list[i].id + '" selected>' + data.list[j].model + '</option>';
+                                    } else {
+                                        str += '<option value="' + data.list[i].id + '">' + data.list[j].model + '</option>';
+                                    }
+                                }
+                                str += '</select>';
+
+                                selectOutMaterialModel.html(str).show();
+                                COMMON.selectBind(selectOutMaterialModel, MATERIAL.getOutMaterialStock);
+
+                                var currModelID = selectOutMaterialModel.find('.select-select option:checked').attr('value');
+                                selectOutMaterialModel.find('.input-hidden').val(currModelID);
+                                selectOutMaterialModel.find('.select-placeholder').html(currModel);
+                                selectOutMaterialModel.find('.select-options ul li.selected').removeClass('selected');
+                                selectOutMaterialModel.find('.select-options ul li[data-value="' + currModelID + '"]').addClass('selected');
+                                selectOutMaterialModel.find('.select-select option[value="' + currModelID + '"]').attr('selected', true);
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    });
+
+                    outMaterialNumber.val(currNumber);
+                    outMaterialStock.html(currStock);
+                }
+
+                outWarehouseModal.hide();
+                outMaterialModal.fadeIn(200);
+            },
+            showInMaterialModal: function (operate, obj, index) {
+                $('#errMsg-in-material-select').html('');
+                $('#errMsg-in-material-brand').html('');
+                $('#errMsg-in-material-model').html('');
+                $('#errMsg-in-material-number').html('');
+                $('#errMsg-in-material-price-buy').html('');
+                $('#errMsg-in-material-price-sell').html('');
+
+                if (operate == 'add') {
+                    inMaterialModalTitle.html('添加入库材料').attr('data-index', '');
+
+                    selectInMaterialCategory.find('.input-hidden').val('');
+                    selectInMaterialCategory.find('.select-placeholder').html('请选择');
+                    selectInMaterialCategory.find('.select-options ul li.selected').removeClass('selected');
+                    selectInMaterialCategory.find('.select-options ul li').eq(0).addClass('selected');
+                    selectInMaterialCategory.find('.select-select option').eq(0).attr('selected', true);
+                    COMMON.selectBind(selectInMaterialCategory, undefined);
+
+                    inMaterialBrand.val('');
+                    inMaterialModel.val('');
+                    inMaterialNumber.val('');
+                    inMaterialPriceBuy.val('');
+                    inMaterialPriceSell.val('');
+                } else if (operate == 'edit') {
+                    inMaterialModalTitle.html('编辑入库材料').attr('data-index', index);
+
+                    var currTR = tableInWarehouse.find('tbody tr').eq(index),
+                            currCateID = currTR.find('td').eq(0).attr('data-id'),
+                            currCateText = currTR.find('td').eq(0).html(),
+                            currBrand = currTR.find('td').eq(1).html(),
+                            currModel = currTR.find('td').eq(2).html(),
+                            currNumber = currTR.find('td').eq(3).html(),
+                            currPriceBuy = currTR.find('td').eq(4).attr('data-price-buy'),
+                            currPriceSell = currTR.find('td').eq(5).attr('data-price-sell');
+
+                    selectInMaterialCategory.find('.input-hidden').val(currCateID);
+                    selectInMaterialCategory.find('.select-placeholder').html(currCateText);
+                    selectInMaterialCategory.find('.select-options ul li.selected').removeClass('selected');
+                    selectInMaterialCategory.find('.select-options ul li[data-value="' + currCateID + '"]').addClass('selected');
+                    selectInMaterialCategory.find('.select-select option[value="' + currCateID + '"]').attr('selected', true);
+
+                    inMaterialBrand.val(currBrand);
+                    inMaterialModel.val(currModel);
+                    inMaterialNumber.val(currNumber);
+                    inMaterialPriceBuy.val(currPriceBuy);
+                    inMaterialPriceSell.val(currPriceSell);
+                }
+
+                inWarehouseModal.hide();
+                inMaterialModal.fadeIn(200);
+            },
+            getOutMaterialBrandList: function (CID) {
+                if (CID == '') {
+                    selectOutMaterialBrand.html('').hide();
+                    selectOutMaterialModel.html('').hide();
+                    return false;
+                }
+
+                //通过类型id获取品牌列表
+                $.ajax({
+                    url: "/material/getMaterialBrand.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        id: CID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            if (data.list.length == 0) {
+                                return false;
+                            }
+
+                            var str = '';
+                            str += '<input type="hidden" name="" class="input-hidden">';
+                            str += '<span class="select-placeholder">请选择</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">请选择</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].brand + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>请选择</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].brand + '</option>';
+                            }
+                            str += '</select>';
+
+                            selectOutMaterialBrand.html(str).show();
+                            COMMON.selectBind(selectOutMaterialBrand, MATERIAL.getOutMaterialModelList);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            getOutMaterialModelList: function (BID) {
+                if (BID == '') {
+                    selectOutMaterialModel.html('').hide();
+                    return false;
+                }
+
+                var BText = selectOutMaterialBrand.find('.select-options ul li[data-value="' + BID + '"]').html();
+
+                //通过品牌text获取型号列表
+                $.ajax({
+                    url: "/material/getMaterialModel.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        id: BID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="" class="input-hidden">';
+                            str += '<span class="select-placeholder">请选择</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">请选择</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].model + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected>请选择</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].model + '</option>';
+                            }
+                            str += '</select>';
+
+                            selectOutMaterialModel.html(str).show();
+                            COMMON.selectBind(selectOutMaterialModel, MATERIAL.getOutMaterialStock);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            getOutMaterialStock: function () {
+                var cID = selectOutMaterialModel.find('.input-hidden').val();
+
+                // 通过类别id，品牌text，型号text 获取当前库存数量
+                $.ajax({
+                    url: "/material/getMaterialAmount.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        id: cID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            outMaterialStock.html(data.amount);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            btnTableOutWarehouseEditDelBind: function () {
+                var btnTableOutWarehouseEdit = tableOutWarehouse.find('.btn-edit'),
+                        btnTableOutWarehouseDel = tableOutWarehouse.find('.btn-del');
+
+                btnTableOutWarehouseEdit.unbind('click');
+                btnTableOutWarehouseEdit.on('click', function () {
+                    MATERIAL.showOutMaterialModal('edit', $(this), $(this).parent().parent().index());
+                });
+
+                btnTableOutWarehouseDel.unbind('click');
+                btnTableOutWarehouseDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+            },
+            btnTableInWarehouseEditDelBind: function () {
+                var btnTableInWarehouseEdit = tableInWarehouse.find('.btn-edit'),
+                        btnTableInWarehouseDel = tableInWarehouse.find('.btn-del');
+
+                btnTableInWarehouseEdit.unbind('click');
+                btnTableInWarehouseEdit.on('click', function () {
+                    MATERIAL.showInMaterialModal('edit', $(this), $(this).parent().parent().index());
+                });
+
+                btnTableInWarehouseDel.unbind('click');
+                btnTableInWarehouseDel.on('click', function () {
+                    $(this).parent().parent().remove();
+                });
+            },
+            getTableFormSelectData: function (searchStr) {
+                // 正常的时候searchStr传undefined，搜索的时候searchStr有值
+                $.ajax({
+                    url: "/form/formList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        searchStr: searchStr
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            if (data.list.length == 0) {
+                                formSelectModal.find('.table-primary').hide();
+                                formSelectModal.find('.table-primary').before('<div class="table-nodata"><p>暂无相关数据</p></div>');
+                                return false;
+                            }
+
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr data-id="' + data.list[i].id + '">';
+                                str += '<td>' + data.list[i].typeName + '</td>';
+                                str += '<td>' + data.list[i].employeeInfo.departmentName + data.list[i].employeeInfo.employeeName + '</td>';
+                                str += '<td>';
+                                str += '<a href="/admin/form/detail.html?id=' + data.list[i].id + '" target="_blank" class="button-link button-link-small">查看</a>';
+                                str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>';
+                                str += '</td>';
+                                str += '</tr>';
+                            }
+                            formSelectModal.find('.table-nodata').remove();
+                            formSelectModal.find('.table-primary').show();
+                            tableFormSelect.html(str);
+
+                            MATERIAL.btnTableFormSelectBind();
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            getCommitterList: function (DID) {
+                if (DID == '') {
+                    selectModalCommitter.html('').hide();
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/department/propertyEmployeeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        departmentId: DID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            str += '<input type="hidden" name="committerid" class="input-hidden">';
+                            str += '<span class="select-placeholder">全部</span>';
+                            str += '<div class="select-options light-overscroll">';
+                            str += '<ul>';
+                            str += '<li data-value="" class="selected">全部</li>';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<li data-value="' + data.list[i].id + '">' + data.list[i].name + '</li>';
+                            }
+                            str += '</ul>';
+                            str += '</div>';
+                            str += '<select class="select-select">';
+                            str += '<option value="" selected="">全部</option>';
+                            for (var j = 0; j < data.list.length; j++) {
+                                str += '<option value="' + data.list[j].id + '">' + data.list[j].name + '</option>';
+                            }
+                            str += '</select>';
+
+                            selectModalCommitter.html(str).show();
+                            COMMON.selectBind(selectModalCommitter, undefined);
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            btnTableFormSelectBind: function () {
+                var btnTableFormSelect = tableFormSelect.find('.btn-select'),
+                        type = formSelectModalTitle.attr('data-type');
+
+                btnTableFormSelect.unbind('click');
+                if (type == 'out') {
+                    btnTableFormSelect.on('click', function () {
+                        var currTR = $(this).parent().parent(),
+                                currID = currTR.attr('data-id'),
+                                currName = currTR.find('td').eq(0).html();
+
+                        btnOutFormSelect.removeClass('button-link-small').addClass('link-normal').html(currName).attr('data-id', currID).css('margin', 0);
+                        $('.errMsg-out-form').html('');
+
+                        formSelectModal.hide();
+                        outModal.fadeIn(200);
+                    });
+                } else if (type == 'outWarehouse') {
+                    btnTableFormSelect.on('click', function () {
+                        var currTR = $(this).parent().parent(),
+                                currID = currTR.attr('data-id'),
+                                currName = currTR.find('td').eq(0).html();
+
+                        btnOutWarehouseFormSelect.removeClass('button-link-small').addClass('link-normal').html(currName).attr('data-id', currID).css('margin', 0);
+                        $('.errMsg-outWarehouse-form').html('');
+
+                        formSelectModal.hide();
+                        outWarehouseModal.fadeIn(200);
+                    });
+                }
+            },
+            btnChangeSubmitBind: function () {
+                btnChangeSubmit.on('click', function () {
+                    var priceBuyChangeVal = priceBuyChange.val(),
+                            priceSellChangeVal = priceSellChange.val();
+
+                    if (btnChangeSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-price-buy-change').html('');
+                    $('.errMsg-price-sell-change').html('');
+
+                    if (!COMMON.checkNull(priceBuyChangeVal)) {
+                        COMMON.errMsg($('.errMsg-price-buy-change'), '请输入进货价调价!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(priceBuyChangeVal)) {
+                        COMMON.errMsg($('.errMsg-price-buy-change'), '进货价必须是大于0数字!');
+                        return false;
+                    }
+                    $('.errMsg-price-buy-change').html('');
+
+                    if (!COMMON.checkNull(priceSellChangeVal)) {
+                        COMMON.errMsg($('.errMsg-price-sell-change'), '请输入售价调价!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(priceSellChangeVal)) {
+                        COMMON.errMsg($('.errMsg-price-sell-change'), '售价必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-price-sell-change').html('');
+
+                    btnChangeSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/material/modiPrice.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: changeModalTitle.attr('data-id'),
+                            priceBuy: priceBuyChangeVal,
+                            priceSell: priceSellChangeVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-price-buy-change'), data.msg);
+                                btnChangeSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-price-buy-change'), '保存失败，请重试！');
+                            btnChangeSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnOutSubmitBind: function () {
+                btnOutSubmit.on('click', function () {
+                    var outNumberVal = outNumber.val(),
+                            outFormID = btnOutFormSelect.attr('data-id');
+
+                    if (btnOutSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-out-number').html('');
+                    $('.errMsg-out-form').html('');
+
+                    if (!COMMON.checkNull(outNumberVal)) {
+                        COMMON.errMsg($('.errMsg-out-number'), '请输入出库数量!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(outNumberVal)) {
+                        COMMON.errMsg($('.errMsg-out-number'), '出库数量必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-out-number').html('');
+
+                    if (!COMMON.checkNull(outFormID)) {
+                        COMMON.errMsg($('.errMsg-out-form'), '请选择出库表单!');
+                        return false;
+                    }
+                    $('.errMsg-out-form').html('');
+
+                    btnOutSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/material/materialOutWarehouse.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: outModalTitle.attr('data-id'),
+                            number: outNumberVal,
+                            formid: outFormID
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-out-form'), data.msg);
+                                btnOutSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-out-form'), '保存失败，请重试！');
+                            btnOutSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnInSubmitBind: function () {
+                btnInSubmit.on('click', function () {
+                    var inNumberVal = inNumber.val(),
+                            inPriceBuyVal = inPriceBuy.val(),
+                            inPriceSellVal = inPriceSell.val(),
+                            inSourceVal = inSource.val();
+
+                    if (btnInSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-in-number').html('');
+                    $('.errMsg-in-price-buy').html('');
+                    $('.errMsg-in-price-sell').html('');
+                    $('.errMsg-in-source').html('');
+
+                    if (!COMMON.checkNull(inNumberVal)) {
+                        COMMON.errMsg($('.errMsg-in-number'), '请输入入库数量!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(inNumberVal)) {
+                        COMMON.errMsg($('.errMsg-in-number'), '入库数量必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-in-number').html('');
+
+                    if (!COMMON.checkNull(inPriceBuyVal)) {
+                        COMMON.errMsg($('.errMsg-in-price-buy'), '请输入进货价!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(inPriceBuyVal)) {
+                        COMMON.errMsg($('.errMsg-in-price-buy'), '进货价必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-in-price-buy').html('');
+
+                    if (!COMMON.checkNull(inPriceSellVal)) {
+                        COMMON.errMsg($('.errMsg-in-price-sell'), '请输入售价!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(inPriceSellVal)) {
+                        COMMON.errMsg($('.errMsg-in-price-sell'), '售价必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-in-price-sell').html('');
+
+                    if (!COMMON.checkNull(inSourceVal)) {
+                        COMMON.errMsg($('.errMsg-in-source'), '请输入入库来源!');
+                        return false;
+                    }
+                    $('.errMsg-in-source').html('');
+
+                    btnInSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/material/materialInWarehouse.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: inModalTitle.attr('data-id'),
+                            number: inNumberVal,
+                            priceBuy: inPriceBuyVal,
+                            priceSell: inPriceSellVal,
+                            source: inSourceVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-in-source'), data.msg);
+                                btnInSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-in-source'), '保存失败，请重试！');
+                            btnInSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnOutMaterialSubmitBind: function () {
+                btnOutMaterialSubmit.on('click', function () {
+                    var cateID = selectOutMaterialCategory.find('.input-hidden').val(),
+                            cateText = selectOutMaterialCategory.find('.select-placeholder').html(),
+                            brandID = selectOutMaterialBrand.find('.input-hidden').val(),
+                            brandText = selectOutMaterialBrand.find('.select-placeholder').html(),
+                            modelID = selectOutMaterialModel.find('.input-hidden').val(),
+                            modelText = selectOutMaterialModel.find('.select-placeholder').html(),
+                            number = outMaterialNumber.val(),
+                            stock = outMaterialStock.html();
+
+                    $('#errMsg-out-material-select').html('');
+                    $('#errMsg-out-material-number').html('');
+                    $('#errMsg-out-material-submit').html('');
+
+                    if (!cateID || cateID == undefined) {
+                        COMMON.errMsg($('.errMsg-out-material-select'), '请选择类型!');
+                        return false;
+                    }
+                    if (!brandText || brandText == undefined || brandText == '请选择') {
+                        if(selectOutMaterialBrand.is(':hidden')) {
+                            COMMON.errMsg($('.errMsg-out-material-select'), '无库存!');
+                            return false;
+                        }
+
+                        COMMON.errMsg($('.errMsg-out-material-select'), '请选择品牌!');
+                        return false;
+                    }
+                    if (!modelText || modelText == undefined || modelText == '请选择') {
+                        COMMON.errMsg($('.errMsg-out-material-select'), '请选择型号!');
+                        return false;
+                    }
+                    $('.errMsg-out-material-select').html('');
+
+                    if (!COMMON.checkNull(number)) {
+                        COMMON.errMsg($('.errMsg-out-material-number'), '请输入出库数量!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(number)) {
+                        COMMON.errMsg($('.errMsg-out-material-number'), '出库数量必须是大于0的数字!');
+                        return false;
+                    }
+                    if (number > parseInt(stock)) {
+                        COMMON.errMsg($('.errMsg-out-material-number'), '出库数量不能大于当前库存数量!');
+                        return false;
+                    }
+                    $('.errMsg-out-material-number').html('');
+
+                    var str = '';
+                    str += '<tr>';
+                    str += '<td data-id="' + cateID + '">' + cateText + '</td>';
+                    str += '<td>' + brandText + '</td>';
+                    str += '<td data-id="'+ modelID +'">' + modelText + '</td>';
+                    str += '<td>' + number + '</td>';
+                    str += '<td>' + stock + '</td>';
+                    str += '<td>';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    str += '</td>';
+                    str += '</tr>';
+
+                    var index = outMaterialModalTitle.attr('data-index');
+                    if (index == '') {
+                        tableOutWarehouse.find('tbody').append(str);
+                    } else {
+                        tableOutWarehouse.find('tbody tr').eq(index).replaceWith(str);
+                    }
+
+                    MATERIAL.btnTableOutWarehouseEditDelBind();
+                    $('.errMsg-table-outWarehouse').html('');
+
+                    outMaterialModal.hide();
+                    outWarehouseModal.fadeIn(200);
+                });
+            },
+            btnInMaterialSubmitBind: function () {
+                btnInMaterialSubmit.on('click', function () {
+                    var cateID = selectInMaterialCategory.find('.input-hidden').val(),
+                            cateText = selectInMaterialCategory.find('.select-placeholder').html(),
+                            brandText = inMaterialBrand.val(),
+                            modelText = inMaterialModel.val(),
+                            number = inMaterialNumber.val(),
+                            priceBuy = inMaterialPriceBuy.val(),
+                            priceSell = inMaterialPriceSell.val();
+
+                    $('#errMsg-in-material-select').html('');
+                    $('#errMsg-in-material-brand').html('');
+                    $('#errMsg-in-material-model').html('');
+                    $('#errMsg-in-material-number').html('');
+                    $('#errMsg-in-material-price-buy').html('');
+                    $('#errMsg-in-material-price-sell').html('');
+
+                    if (!cateID || cateID == undefined) {
+                        COMMON.errMsg($('.errMsg-in-material-select'), '请选择类型!');
+                        return false;
+                    }
+                    $('.errMsg-in-material-select').html('');
+
+                    if (!COMMON.checkNull(brandText)) {
+                        COMMON.errMsg($('.errMsg-in-material-brand'), '请输入品牌!');
+                        return false;
+                    }
+                    $('.errMsg-in-material-brand').html('');
+
+                    if (!COMMON.checkNull(modelText)) {
+                        COMMON.errMsg($('.errMsg-in-material-model'), '请输入型号!');
+                        return false;
+                    }
+                    $('.errMsg-in-material-model').html('');
+
+                    if (!COMMON.checkNull(number)) {
+                        COMMON.errMsg($('.errMsg-in-material-number'), '请输入入库数量!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(number)) {
+                        COMMON.errMsg($('.errMsg-in-material-number'), '入库数量必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-in-material-number').html('');
+
+                    if (!COMMON.checkNull(priceBuy)) {
+                        COMMON.errMsg($('.errMsg-in-material-price-buy'), '请输入进货价!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(priceBuy)) {
+                        COMMON.errMsg($('.errMsg-in-material-price-buy'), '进货价必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-in-material-price-buy').html('');
+
+                    if (!COMMON.checkNull(priceSell)) {
+                        COMMON.errMsg($('.errMsg-in-material-price-sell'), '请输入售价!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(priceSell)) {
+                        COMMON.errMsg($('.errMsg-in-material-price-sell'), '售价必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-in-material-price-sell').html('');
+
+                    var str = '';
+                    str += '<tr>';
+                    str += '<td data-id="' + cateID + '">' + cateText + '</td>';
+                    str += '<td>' + brandText + '</td>';
+                    str += '<td>' + modelText + '</td>';
+                    str += '<td>' + number + '</td>';
+                    str += '<td data-price-buy="' + priceBuy + '">￥ ' + priceBuy + '</td>';
+                    str += '<td data-price-sell="' + priceSell + '">￥ ' + priceSell + '</td>';
+                    str += '<td>';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-edit">编辑</a>';
+                    str += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    str += '<a href="javascript:void(0);" class="button-link button-link-small btn-del">删除</a>';
+                    str += '</td>';
+                    str += '</tr>';
+
+                    var index = inMaterialModalTitle.attr('data-index');
+                    if (index == '') {
+                        tableInWarehouse.find('tbody').append(str);
+                    } else {
+                        tableInWarehouse.find('tbody tr').eq(index).replaceWith(str);
+                    }
+
+                    MATERIAL.btnTableInWarehouseEditDelBind();
+                    $('.errMsg-table-inWarehouse').html('');
+
+                    inMaterialModal.hide();
+                    inWarehouseModal.fadeIn(200);
+                });
+            },
+            btnOutWarehouseSubmitBind: function () {
+                btnOutWarehouseSubmit.on('click', function () {
+                    var outWarehouseFormSelectID = btnOutWarehouseFormSelect.attr('data-id'),
+                            outWarehouseStr = '';
+
+                    if (btnOutWarehouseSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-outWarehouse-form').html('');
+                    $('.errMsg-table-outWarehouse').html('');
+
+                    if (!COMMON.checkNull(outWarehouseFormSelectID)) {
+                        COMMON.errMsg($('.errMsg-outWarehouse-form'), '请选择出库表单!');
+                        return false;
+                    }
+                    $('.errMsg-outWarehouse-form').html('');
+
+                    var tableOutWarehouseItem = tableOutWarehouse.find('tbody tr'),
+                            outWarehouseArr = [];
+                    if (!tableOutWarehouseItem || tableOutWarehouseItem.length == 0) {
+                        outWarehouseStr = '';
+                    } else {
+                        for (var i = 0; i < tableOutWarehouseItem.length; i++) {
+                            var currTR = tableOutWarehouseItem.eq(i),
+                                    currModelID = currTR.find('td').eq(2).attr('data-id'),
+                                    currNumber = currTR.find('td').eq(3).html();
+                            outWarehouseArr.push({
+                                materialId: currModelID,
+                                number: currNumber
+                            });
+                        }
+                        outWarehouseStr = JSON.stringify(outWarehouseArr);
+                    }
+                    if (!outWarehouseStr) {
+                        COMMON.errMsg($('.errMsg-table-outWarehouse'), '请添加材料!');
+                        return false;
+                    }
+                    $('.errMsg-table-outWarehouse').html('');
+
+                    btnOutWarehouseSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/material/outWarehouse.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            formid: outWarehouseFormSelectID,
+                            outWarehouseStr: outWarehouseStr
+
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-table-outWarehouse'), data.msg);
+                                btnOutWarehouseSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-table-outWarehouse'), '保存失败，请重试！');
+                            btnOutWarehouseSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            btnInWarehouseSubmitBind: function () {
+                btnInWarehouseSubmit.on('click', function () {
+                    var inWarehouseSourceVal = inWarehouseSource.val(),
+                            inWarehouseStr = '';
+
+                    if (btnInWarehouseSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-inWarehouse-source').html('');
+                    $('.errMsg-table-inWarehouse').html('');
+
+                    if (!COMMON.checkNull(inWarehouseSourceVal)) {
+                        COMMON.errMsg($('.errMsg-inWarehouse-source'), '请输入入库来源!');
+                        return false;
+                    }
+                    $('.errMsg-inWarehouse-source').html('');
+
+                    var tableInWarehouseItem = tableInWarehouse.find('tbody tr'),
+                            inWarehouseArr = [];
+                    if (!tableInWarehouseItem || tableInWarehouseItem.length == 0) {
+                        inWarehouseStr = '';
+                    } else {
+                        for (var i = 0; i < tableInWarehouseItem.length; i++) {
+                            var currTR = tableInWarehouseItem.eq(i),
+                                    currCateID = currTR.find('td').eq(0).attr('data-id'),
+                                    currBrandText = currTR.find('td').eq(1).html(),
+                                    currModelText = currTR.find('td').eq(2).html(),
+                                    currNumber = currTR.find('td').eq(3).html();
+                            currPriceBuy = currTR.find('td').eq(4).attr('data-price-buy');
+                            currPriceSell = currTR.find('td').eq(5).attr('data-price-sell');
+                            inWarehouseArr.push({
+                                cateid: currCateID,
+                                brand: currBrandText,
+                                model: currModelText,
+                                number: currNumber,
+                                pricebuy: currPriceBuy,
+                                pricesell: currPriceSell
+                            });
+                        }
+                        inWarehouseStr = JSON.stringify(inWarehouseArr);
+                    }
+                    if (!inWarehouseStr) {
+                        COMMON.errMsg($('.errMsg-table-inWarehouse'), '请添加材料!');
+                        return false;
+                    }
+                    $('.errMsg-table-inWarehouse').html('');
+
+                    btnInWarehouseSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/material/inWarehouse.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            source: inWarehouseSourceVal,
+                            inWarehouseStr: inWarehouseStr
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-table-inWarehouse'), data.msg);
+                                btnInWarehouseSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = location.href;
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-table-inWarehouse'), '保存失败，请重试！');
+                            btnInWarehouseSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+
+        MATERIAL.init();
+    });
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/material.html',
+                {
+                    materialTypeId: '$!materialTypeId',
+                    brand: '$!brand',
+                    model: '$!model',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

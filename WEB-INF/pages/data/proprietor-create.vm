@@ -1,0 +1,626 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新建房间--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/proprietor.html" class="button-link">业主管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">新建房间</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" id="roomID" value="$!room.id">
+        <div class="form-part">
+
+            <div class="form-group clearfix">
+                <div class="group-title">分区</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-subarea">
+                        #if($room.id && $!room.id gt 0)
+                            <label style="margin-bottom: 10px;">
+                                <input name="subarea" type="radio" value="$!room.buildingId" checked/>
+                                <p class="radio-text">$!room.buildingName</p>
+                            </label>
+
+                        #else
+                            #if($buildingList && $buildingList.size()>0)
+                                #foreach($building in $buildingList)
+                                    <label style="margin-bottom: 10px;">
+                                        <input name="subarea" type="radio" value="$!building.id"/>
+                                        <p class="radio-text">$!building.name</p>
+                                    </label>
+                                #end
+                            #end
+                        #end
+                    </div>
+                    <div class="errMsg errMsg-subarea"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" #if(!$room.id ) style="display: none;" #end>
+                <div class="group-title">楼宇</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-building">
+                        #if($room.id && $!room.id gt 0)
+                            <label>
+                                <input name="building" type="radio" value="$!room.buildingCellId" checked/>
+                                <p class="radio-text">$!room.buildingCellName</p>
+                            </label>
+                        #end
+                    </div>
+                    <div class="errMsg errMsg-building"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" #if(!$room.id ) style="display: none;" #end>
+                <div class="group-title">单元</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-unit">
+                        #if($room.id && $!room.id gt 0)
+                            <label>
+                                <input name="unit" type="radio" value="$!room.buildingUnitId" checked/>
+                                <p class="radio-text">$!room.buildingUnitName</p>
+                            </label>
+                        #end
+                    </div>
+                    <div class="errMsg errMsg-unit"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix" #if(!$room.id ) style="display: none;" #end>
+                <div class="group-title">房间号</div>
+                <div class="group-item">
+                ##    <div class="input-item" style="width: 360px;">
+                ##        <input type="text" class="input-primary input-small input-null" id="room-number"
+                ##               placeholder="请输入房间号">
+                ##        <i class="icon-delete"></i>
+                ##    </div>
+                    <div class="radio-hidden-item" id="radio-room-number">
+                        #if($room.id && $!room.id gt 0)
+                            <label>
+                                <input name="roomNumber" type="radio" value="$!room.num" checked/>
+                                <p class="radio-text">$!room.num</p>
+                            </label>
+                        #end
+                    ##  <label>
+                    ##      <input name="roomNumber" type="radio" value="1" />
+                    ##      <p class="radio-text">1101室</p>
+                    ##  </label>
+                    </div>
+                    <div class="errMsg errMsg-room-number"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">面积</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 102px;">
+                        <input type="text" class="input-primary input-small input-null" id="areas" placeholder="xx"
+                               value="$!room.area">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item-text">㎡</div>
+                    <div class="clearfix"></div>
+                    <div class="errMsg errMsg-areas"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">业主</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 150px;">
+                        <input type="text" class="input-primary input-small input-null" id="name" placeholder="请输入业主姓名"
+                               value="$!room.ownersName">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="input-item" style="width: 200px; margin: 0 0 0 10px;">
+                        <input type="text" class="input-primary input-small input-null" id="mobile"
+                               placeholder="请输入业主电话" value="$!room.ownersMobile">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-people"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">车辆</div>
+                <div class="group-item" id="cars">
+                    #if($room.id && $!room.id gt 0)
+                        #if($carList && $carList.size() gt 0)
+                            #foreach($car in $carList)
+                                <div class="input-item" style="width: 360px;">
+                                    <input type="text" class="input-primary input-small input-null" name=""
+                                           placeholder="请输入车牌号" value="$!car.num">
+                                    <i class="btn-delete"></i>
+                                </div>
+                            #end
+                        #else
+                            <div class="input-item" style="width: 360px;">
+                                <input type="text" class="input-primary input-small input-null" name=""
+                                       placeholder="请输入车牌号">
+                                <i class="btn-delete"></i>
+                            </div>
+                        #end
+                    #else
+                        <div class="input-item" style="width: 360px;">
+                            <input type="text" class="input-primary input-small input-null" name=""
+                                   placeholder="请输入车牌号">
+                            <i class="btn-delete"></i>
+                        </div>
+                    #end
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add" id="btn-car-add">添加新车辆</a>
+                    </div>
+                    <div class="errMsg errMsg-cars"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">车位</div>
+                <div class="group-item" id="parkinglots">
+                    #if($room.id && $!room.id gt 0)
+                        #if($carportList && $carportList.size() gt 0)
+                            #foreach($carport in $carportList)
+                                <div class="parkinglot-item" style="position: relative; width: 360px;">
+                                    <div class="input-item" style="width: 250px;">
+                                        <input type="text" class="input-primary input-small input-null" name=""
+                                               placeholder="请输入车位具体地址" value="$!carport.place">
+                                    </div>
+                                    <div class="select-primary" style="width: 100px; margin: 0 0 0 10px;">
+                                        <input type="hidden" name="" class="input-hidden" value="$!carport.type">
+                                        <span class="select-placeholder">#if($!carport.type eq 0) 自有产权 #else
+                                            公有产权 #end </span>
+                                        <div class="select-options light-overscroll">
+                                            <ul>
+                                                <li data-value="0" #if($!carport.type eq 0) class="selected" #end>自有产权
+                                                </li>
+                                                <li data-value="1" #if($!carport.type eq 1) class="selected" #end>公有产权
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <select class="select-select">
+                                            <option value="0" #if($!carport.type eq 0) selected #end>自有产权</option>
+                                            <option value="1" #if($!carport.type eq 0) selected #end>公有产权</option>
+                                        </select>
+                                    </div>
+                                    <i class="btn-delete"></i>
+                                </div>
+                            #end
+                        #else
+                            <div class="parkinglot-item" style="position: relative; width: 360px;">
+                                <div class="input-item" style="width: 250px;">
+                                    <input type="text" class="input-primary input-small input-null" name=""
+                                           placeholder="请输入车位具体地址">
+                                </div>
+                                <div class="select-primary" style="width: 100px; margin: 0 0 0 10px;">
+                                    <input type="hidden" name="" class="input-hidden" value="0">
+                                    <span class="select-placeholder">自有产权</span>
+                                    <div class="select-options light-overscroll">
+                                        <ul>
+                                            <li data-value="0" class="selected">自有产权</li>
+                                            <li data-value="1">公有产权</li>
+                                        </ul>
+                                    </div>
+                                    <select class="select-select">
+                                        <option value="0" selected>自有产权</option>
+                                        <option value="1">公有产权</option>
+                                    </select>
+                                </div>
+                                <i class="btn-delete"></i>
+                            </div>
+                        #end
+                    #else
+                        <div class="parkinglot-item" style="position: relative; width: 360px;">
+                            <div class="input-item" style="width: 250px;">
+                                <input type="text" class="input-primary input-small input-null" name=""
+                                       placeholder="请输入车位具体地址">
+                            </div>
+                            <div class="select-primary" style="width: 100px; margin: 0 0 0 10px;">
+                                <input type="hidden" name="" class="input-hidden" value="0">
+                                <span class="select-placeholder">自有产权</span>
+                                <div class="select-options light-overscroll">
+                                    <ul>
+                                        <li data-value="0" class="selected">自有产权</li>
+                                        <li data-value="1">公有产权</li>
+                                    </ul>
+                                </div>
+                                <select class="select-select">
+                                    <option value="0" selected>自有产权</option>
+                                    <option value="1">公有产权</option>
+                                </select>
+                            </div>
+                            <i class="btn-delete"></i>
+                        </div>
+                    #end
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="button-link button-add" id="btn-parkinglot-add">添加新车位</a>
+                    </div>
+                    <div class="errMsg errMsg-parkinglots"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                       style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+                    <a href="/admin/data/proprietor.html" class="button-link"
+                       style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var radioSubarea = $('#radio-subarea'),
+                radioBuilding = $('#radio-building'),
+                radioUnit = $('#radio-unit'),
+                radioRoomNumber = $('#radio-room-number'),
+                btnSubmit = $('.btn-submit'),
+                btnCarAdd = $('#btn-car-add'),
+                btnParkinglotAdd = $('#btn-parkinglot-add');
+
+        var DATA = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+
+                DATA.radioSubareaBind();
+
+                DATA.radioBuildingBind();
+
+                DATA.btnCarAddBind();
+
+                DATA.btnParkinglotAddBind();
+
+                DATA.btnDeleteBind();
+
+                DATA.btnSubmitBind();
+            },
+            radioSubareaBind: function () {
+                var labelSubarea = radioSubarea.find('label');
+
+                labelSubarea.on('click', function () {
+                    var labelSubareaInput = $(this).find('input');
+
+                    if (labelSubareaInput.attr('checked')) {
+                        return false;
+                    }
+
+                    var subareaVal = labelSubareaInput.val();
+                    DATA.getRadioBuildingList(subareaVal);
+                });
+            },
+            getRadioBuildingList: function (subareaID) {
+                $('.errMsg-building').html('');
+
+                $.ajax({
+                    url: "/building/buildingCellList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingId: subareaID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-building'), data.msg);
+                        } else {
+                            var buildingStr = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                buildingStr += '<label>';
+                                buildingStr += '<input name="building" type="radio" value="' + data.list[i].id + '" />';
+                                buildingStr += '<p class="radio-text">' + data.list[i].name + '</p>';
+                                buildingStr += '</label>';
+                            }
+                            radioBuilding.html(buildingStr);
+                            radioBuilding.parent().parent().show();
+                            radioUnit.html('');
+                            radioUnit.parent().parent().hide();
+                            radioRoomNumber.html('');
+                            radioRoomNumber.parent().parent().hide();
+                            DATA.radioBuildingBind();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-building'), '获取楼宇失败，请刷新页面重试！');
+                    }
+                });
+            },
+            radioBuildingBind: function () {
+                var labelBuilding = radioBuilding.find('label');
+
+                labelBuilding.on('click', function () {
+                    var labelBuildingInput = $(this).find('input');
+
+                    if (labelBuildingInput.attr('checked')) {
+                        return false;
+                    }
+
+                    var buildingVal = labelBuildingInput.val();
+                    DATA.getRadioUnitList(buildingVal);
+                });
+            },
+            getRadioUnitList: function (buildingID) {
+                $('.errMsg-unit').html('');
+
+                $.ajax({
+                    url: "/building/buildingUnitList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingCellId: buildingID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-unit'), data.msg);
+                        } else {
+                            var unitStr = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                unitStr += '<label>';
+                                unitStr += '<input name="unit" type="radio" value="' + data.list[i].id + '" />';
+                                unitStr += '<p class="radio-text">' + data.list[i].name + '</p>';
+                                unitStr += '</label>';
+                            }
+                            radioUnit.html(unitStr);
+                            radioUnit.parent().parent().show();
+                            radioRoomNumber.html('');
+                            radioRoomNumber.parent().parent().hide();
+                            DATA.radioUnitBind();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-unit'), '获取单元失败，请刷新页面重试！');
+                    }
+                });
+            },
+            radioUnitBind: function () {
+                var labelUnit = radioUnit.find('label');
+
+                labelUnit.on('click', function () {
+                    var labelUnitInput = $(this).find('input');
+
+                    if (labelUnitInput.attr('checked')) {
+                        return false;
+                    }
+
+                    var unitVal = labelUnitInput.val();
+                    DATA.getRadioRoomNumberList(unitVal);
+                });
+            },
+            getRadioRoomNumberList: function (unitID) {
+                $('.errMsg-room-number').html('');
+
+                $.ajax({
+                    url: "/room/list.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        buildingId: radioSubarea.find('input[name="subarea"]:checked').val(),
+                        buildingCellId: radioBuilding.find('input[name="building"]:checked').val(),
+                        buildingUnitId: unitID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-room-number'), data.msg);
+                        } else {
+                            var roomNumberStr = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                roomNumberStr += '<label>';
+                                roomNumberStr += '<input name="roomNumber" type="radio" value="' + data.list[i].num + '" />';
+                                roomNumberStr += '<p class="radio-text">' + data.list[i].num + '</p>';
+                                roomNumberStr += '</label>';
+                            }
+                            radioRoomNumber.html(roomNumberStr);
+                            radioRoomNumber.parent().parent().show();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-room-number'), '获取房间号失败，请刷新页面重试！');
+                    }
+                });
+            },
+            btnCarAddBind: function () {
+                btnCarAdd.on('click', function () {
+                    var carStr = '';
+                    carStr += '<div class="input-item" style="width: 360px;">';
+                    carStr += '<input type="text" class="input-primary input-small input-null" name="" placeholder="请输入车牌号">';
+                    carStr += '<i class="btn-delete"></i>';
+                    carStr += '</div>';
+
+                    $(this).parent().before(carStr);
+                    DATA.btnDeleteBind();
+                });
+            },
+            btnParkinglotAddBind: function () {
+                btnParkinglotAdd.on('click', function () {
+                    var parkinglotStr = '';
+                    parkinglotStr += '<div class="parkinglot-item" style="position: relative; width: 360px;">';
+                    parkinglotStr += '<div class="input-item" style="width: 250px;">';
+                    parkinglotStr += '<input type="text" class="input-primary input-small input-null" placeholder="请输入车位具体地址">';
+                    parkinglotStr += '</div>';
+                    parkinglotStr += '<div class="select-primary" style="width: 100px; margin: 0 0 0 10px;">';
+                    parkinglotStr += '<input type="hidden" name="" class="input-hidden" value="0">';
+                    parkinglotStr += '<span class="select-placeholder">自有产权</span>';
+                    parkinglotStr += '<div class="select-options light-overscroll">';
+                    parkinglotStr += '<ul>';
+                    parkinglotStr += '<li data-value="0" class="selected">自有产权</li>';
+                    parkinglotStr += '<li data-value="1">公有产权</li>';
+                    parkinglotStr += '</ul>';
+                    parkinglotStr += '</div>';
+                    parkinglotStr += '<select class="select-select">';
+                    parkinglotStr += '<option value="0" selected>自有产权</option>';
+                    parkinglotStr += '<option value="1">公有产权</option>';
+                    parkinglotStr += '</select>';
+                    parkinglotStr += '</div>';
+                    parkinglotStr += '<i class="btn-delete"></i>';
+                    parkinglotStr += '</div>';
+
+                    $(this).parent().before(parkinglotStr);
+                    COMMON.selectBind($('.select-primary'), undefined);
+                    DATA.btnDeleteBind();
+                });
+            },
+            btnDeleteBind: function () {
+                var btnDelete = $('.btn-delete');
+
+                btnDelete.unbind('click');
+                btnDelete.on('click', function () {
+                    $(this).parent().remove();
+                });
+            },
+            btnSubmitBind: function () {
+                btnSubmit.on('click', function () {
+                    var subareaValue = $('#radio-subarea input[name="subarea"]:checked').val(),
+                            buildingValue = $('#radio-building input[name="building"]:checked').val(),
+                            unitValue = $('#radio-unit input[name="unit"]:checked').val(),
+                            roomNumberValue = $('#radio-room-number input[name="roomNumber"]:checked').val(),
+                            areasValue = $('#areas').val(),
+                            nameValue = $('#name').val(),
+                            mobileValue = $('#mobile').val(),
+                            carsValue = '';
+                    parkinglotsValue = '';
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-subarea').html('');
+                    $('.errMsg-building').html('');
+                    $('.errMsg-unit').html('');
+                    $('.errMsg-room-number').html('');
+                    $('.errMsg-areas').html('');
+                    $('.errMsg-people').html('');
+                    $('.errMsg-cars').html('');
+                    $('.errMsg-parkinglots').html('');
+
+                    console.log("---------------->subareaValue=" + subareaValue)
+                    if (!subareaValue) {
+                        COMMON.errMsg($('.errMsg-subarea'), '请选择分区!');
+                        return false;
+                    }
+                    $('.errMsg-subarea').html('');
+                    if (!buildingValue) {
+                        COMMON.errMsg($('.errMsg-building'), '请选择楼宇!');
+                        return false;
+                    }
+                    $('.errMsg-building').html('');
+                    if (!unitValue) {
+                        COMMON.errMsg($('.errMsg-unit'), '请选择单元!');
+                        return false;
+                    }
+                    $('.errMsg-unit').html('');
+
+                    if (!roomNumberValue) {
+                        COMMON.errMsg($('.errMsg-room-number'), '请输入房间号!');
+                        return false;
+                    }
+                    $('.errMsg-room-number').html('');
+
+                    if (!COMMON.checkNull(areasValue)) {
+                        COMMON.errMsg($('.errMsg-areas'), '请输入房间面积!');
+                        return false;
+                    }
+                    if (!COMMON.checkPositive(areasValue)) {
+                        COMMON.errMsg($('.errMsg-areas'), '房间面积必须是大于0的数字!');
+                        return false;
+                    }
+                    $('.errMsg-areas').html('');
+
+                    if (!COMMON.checkNull(nameValue)) {
+                        COMMON.errMsg($('.errMsg-people'), '请输入业主姓名!');
+                        return false;
+                    }
+                    if (!COMMON.checkNull(mobileValue)) {
+                        COMMON.errMsg($('.errMsg-people'), '请输入业主电话!');
+                        return false;
+                    }
+                    $('.errMsg-people').html('');
+
+                    var carsItem = $('#cars .input-item'),
+                            carsArr = [];
+                    for (var i = 0; i < carsItem.length; i++) {
+                        var _cval = carsItem.eq(i).find('.input-primary').val();
+                        if (COMMON.checkNull(_cval)) {
+                            carsArr.push(_cval);
+                        }
+                    }
+                    carsValue = carsArr.join(',');
+                    /*if (!COMMON.checkNull(carsValue)) {
+                        COMMON.errMsg($('.errMsg-cars'), '请添加新车辆!');
+                        return false;
+                    }
+                    $('.errMsg-cars').html('');*/
+
+                    var parkinglotsItem = $('#parkinglots .parkinglot-item'),
+                            parkinglotsArr = [];
+                    for (var j = 0; j < parkinglotsItem.length; j++) {
+                        var _pval = parkinglotsItem.eq(j).find('.input-item .input-primary').val(),
+                                _sval = parkinglotsItem.eq(j).find('.select-primary .input-hidden').val();
+                        if (COMMON.checkNull(_pval)) {
+                            parkinglotsArr.push({place: _pval, type: _sval});
+                        }
+                    }
+                    parkinglotsValue = JSON.stringify(parkinglotsArr);
+                    /*if (!parkinglotsValue) {
+                        COMMON.errMsg($('.errMsg-parkinglots'), '请添加新车位!');
+                        return false;
+                    }
+                    $('.errMsg-parkinglots').html('');*/
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+
+                    var roomId = $('#roomID').val();
+                    if (roomId == null || roomId == undefined || roomId == '') {
+                        roomId = 0;
+                    }
+                    $.ajax({
+                        url: "/room/saveRoom.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: roomId,
+                            buildingId: subareaValue,
+                            buildingCellId: buildingValue,
+                            buildingUnitId: unitValue,
+                            roomNumber: roomNumberValue,
+                            areas: areasValue,
+                            name: nameValue,
+                            mobile: mobileValue,
+                            cars: carsValue,
+                            carports: parkinglotsValue
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-parkinglots'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/data/proprietor.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-parkinglots'), '创建失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

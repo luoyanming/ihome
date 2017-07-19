@@ -1,0 +1,399 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>投诉--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+	<article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">投诉</a>
+    </article>
+
+    <div class="complaint-container">
+        <!-- <div class="common-title fs14">数据统计&nbsp;&nbsp;|&nbsp;&nbsp;<span class="col-333">投诉</span></div> -->
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日投诉情况</div>
+                <div class="clearfix">
+                    <div class="pull-left left-container">
+                        <div class="fs14">更新时间：14:53</div>
+                    </div>
+                    <div class="pull-left complaint_count" id="complaint_count" style="width: 90%; height:300px; float: right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">投诉明细</div>
+            <form action="" method="get">
+                <article class="form-condition">
+                    <div class="condition-group clearfix">
+                        <div class="title">投诉类型</div>
+                        <div class="select-box clearfix">
+                            <div class="select-primary select-small" id="complaintsTypeId" style="min-width: 120px;">
+                                <input type="hidden" name="complaintsTypeId" value="$!complaintsTypeId" class="input-hidden">
+									#if($complaintsTypeId && $!complaintsTypeId gt 0 )
+										#foreach($!complaintsType in $!complaintsTypeVo)
+											#if($!complaintsTypeId eq $!complaintsType.id)
+                                    <span class="select-placeholder">$!complaintsType.name</span>
+											#end
+										#end
+									#else
+                            <span class="select-placeholder">全部</span>
+									#end
+                                <div class="select-options light-overscroll">
+									
+									<ul>
+                                <li data-value="0" #if($!complaintsTypeId eq 0) class="selected" #end>全部</li>
+								#foreach($!complaintsType in $!complaintsTypeVo)
+                                    <li data-value="$!complaintsType.id" #if($!complaintsTypeId eq $!complaintsType.id)
+                                        class="selected"#end>$!complaintsType.name</li>
+								#end
+                            </ul>
+									
+                                </div>
+								
+								<select class="select-select">
+                                    <option value="0" #if($!complaintsTypeId eq 0) selected #end>全部</option>
+							#foreach($!complaintsType in $!complaintsTypeVo)
+                                <option value="$!repairsType.id" #if($!complaintsTypeId eq $!complaintsType.id)
+                                        selected #end>$!complaintsType.name</option>
+							#end
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">日期&nbsp;&nbsp;</div>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateStarInt" value="$!{createdDateStarInt}" placeholder="xxxx年xx月xx日">
+                        </div>
+                        <span class="text"> - </span>
+                        <div class="input-item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="createdDateEndInt" value="$!{createdDateEndInt}" placeholder="xxxx年xx月xx日">
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="complaint_detail_form" id="complaint_detail_form" style="width: 100%; margin-bottom:40px;height: 300px;"></div>
+            <div class="bottom-detail clearfix">
+                <div class="table" style="width: 100%;">
+                    <article class="">
+                        <div class="table-wrapper">
+                            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                                <thead>
+									#if($list && $list.size()>0)
+										<tr>
+                                    <th>日期</th>
+                                    <th>投诉类型</th>
+                                    <th>提交</th>
+                                </tr>
+                                </thead>
+								<tbody >
+                                #foreach($item in $list)
+									<tr>
+									<td>$!DateUtils.formatTimeInSecond($item.date)</td>
+                                    #if($complaintsTypeId && $!complaintsTypeId gt 0 )
+										#foreach($!complaintsType in $!complaintsTypeVo)
+											#if($!complaintsTypeId eq $!complaintsType.id)
+												<td>$!complaintsType.name</td>
+											#end
+										#end
+									#else
+										<td>全部</td>
+									#end
+                                    <td>$item.count</td>
+									</tr>
+                                #end
+                                </tbody>
+								#end
+                            </table>
+                        </div>
+						#parse("/layout/pagination.vm")
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+
+			STATISTICS.getComplainBarData();
+			STATISTICS.getComplainLineData();
+		},
+		getComplainBarData: function() {
+			 $.ajax({
+	             url: "../../complaints/queryTodayComplainStatistics.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+						var complainChartBarArr1 = data.data.complainChartBarArr1,
+							complainChartBarArr2 = data.data.complainChartBarArr2;
+
+	            		STATISTICS.complainChartBarBind(complainChartBarArr1, complainChartBarArr2);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		getComplainLineData: function() {
+			 $.ajax({
+	             url: "/complaints/queryComplainStatistics.html",
+	             dataType:"json",
+	             type:"post",
+	             data: {
+	                complaintsTypeId: '$!complaintsTypeId',
+                    createdDateStarInt: '$!createdDateStarInt',
+                    createdDateEndInt: '$!createdDateEndInt'
+	             },
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		 var chartArr1 = data.data.count,
+						 	chartArr2 = data.data.date;
+	            		//var complainChartLineArr1 = [1000,400,230,800,300,180,380,280,220,500,200,500,1000,1250,1300,700,600,300,350,450,200,750,900,800,1000,1250,1300,700,600,300];
+
+	            		STATISTICS.complainChartLineBind(chartArr1,chartArr2);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		complainChartBarBind: function(titleArr, bArr) {
+			var myChart = echarts.init(document.getElementById('complaint_count'));
+
+	        var option = {
+
+	            tooltip : {
+	                trigger: 'axis',
+	                axisPointer :{
+	                    type: "none"   //没有指示线
+	                }
+	            },
+
+	            calculable : true,
+
+	            xAxis : [
+	                {
+	                    type : 'category',
+						data: titleArr,
+	                    splitLine : {
+	                        show:false
+	                    },
+	                    axisLine: {
+	                        show: true,
+	                        lineStyle:{
+	                            color:'#a3a3a3'  //X轴颜色
+	                        }
+	                    },
+	                    axisLabel: {
+	                        show: true,
+	                        textStyle: {
+	                            color: '#8f8f8f'  //X轴字体颜色
+	                        }
+	                    }
+	                }
+	            ],
+
+	            yAxis : [
+	                {
+	                    type : 'value',
+	                    splitLine : {
+	                        show:true,
+	                        lineStyle: {
+	                            color: '#e5e5e5',
+	                            type: 'dotted',
+	                            width: 2
+	                        }
+	                    },
+
+	                    axisLine: {
+	                        show: true,
+	                        lineStyle:{
+	                            color:'#a3a3a3'  //X轴颜色
+	                        }
+	                    },
+
+	                    axisLabel: {
+	                        show: true,
+	                        textStyle: {
+	                            color: '#8f8f8f'  //X轴字体颜色
+	                        }
+	                    }
+	                }
+	            ],
+
+	            series : [
+	                {
+	                    name:'投诉量',
+	                    type:'bar',
+	                    data: bArr,
+	                    barWidth : 40,
+	                    itemStyle: {
+	                        normal: {
+	                            color : "rgba(80,172,252,0.80)" , //圆柱颜色
+	                            label: {
+	                                show: true,
+	                                position: 'top',
+	                                textStyle: {
+	                                    color: '#666666'  //顶部数值颜色
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            ]
+	        };
+
+	        myChart.setOption(option);
+		},
+		complainChartLineBind: function(lArr1,lArr2) {
+			var myChart = echarts.init(document.getElementById('complaint_detail_form'));
+
+			var dateNum = [];
+	        for(var i = 0; i<lArr2.length; i++){
+			dateNum.push(lArr2[i]);
+		    }
+	        
+	        var option = {
+	            tooltip: {    //提示框组件
+	                trigger: 'axis', //鼠标跟随可以显示不同时刻的状态
+	                axisPointer :{
+	                    type: "none"   //没有指示线
+	                }
+	            },
+
+	            legend: {
+	                data:['提交数'],
+	                x:'right'
+	            },
+
+	            grid: {
+	                containLabel: true
+	            },
+
+	            toolbox: {     //工具栏
+	                feature: {
+	                    saveAsImage: {}
+	                }
+	            },
+
+	            xAxis: {       //直角坐标系 grid 中的 x 轴
+	                axisLabel: {
+	                    show: true,
+	                    rotate : 40,  //文字倾斜
+	                    textStyle: {
+	                        color: '#8f8f8f'  //X轴字体颜色
+	                    }
+	                },
+
+	                axisLine: {
+	                    show: true,
+	                    lineStyle:{
+	                        color:'#a3a3a3'  //X轴颜色
+	                    }
+	                },
+
+	                splitLine : {
+	                    show:false  //无横向分割线
+	                },
+
+	                type: 'category',
+
+	                boundaryGap: false,
+
+	                data: dateNum
+
+	            },
+
+	            yAxis: {       //直角坐标系 grid 中的 y 轴
+	                type: 'value',
+	                axisLine: {
+	                    show: false
+	                },
+
+	                splitLine : {
+	                    show:true,
+	                    lineStyle: {
+	                        color: '#e5e5e5',
+	                        type: 'dotted',
+	                        width: 2
+	                    }
+	                },
+
+	                axisLabel: {
+	                    show : true,
+	                    textStyle: {
+	                        color: '#8f8f8f'  //Y轴字体颜色
+	                    }
+	                }
+
+	            },
+
+	            series: [      //系列列表
+	                {
+	                    name: '提交数',
+	                    type: 'line',
+	                    itemStyle : {
+	                        normal : {
+	                            color:'#51acfd',  //交汇远点颜色
+	                            lineStyle:{
+	                                color:'#badffc',  //折线颜色
+	                                width:5
+	                            }
+	                        }
+	                    },
+	                    data: lArr1
+	                }
+	            ]
+
+	        };
+
+	        myChart.setOption(option);
+		}
+	};
+
+	STATISTICS.init();
+});
+//跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/statistics/complain.html',
+                {
+                    complaintsTypeId: '$!complaintsTypeId',
+                    createdDateStarInt: '$!createdDateStarInt',
+                    createdDateEndInt: '$!createdDateEndInt',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

@@ -1,0 +1,146 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>通知--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/notification.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="javascript:void(0);" class="button-link button-link-disable">通知</a>
+    </article>
+
+    <form action="" method="post">
+        <article class="form-condition">
+            <div class="operate-group">
+                <a href="notification/create.html" class="button-link button-add">发布通知公告</a>
+            </div>
+            
+            <div class="condition-group clearfix">
+                <div class="title">标题&nbsp;&nbsp;</div>
+                <div class="search-box clearfix">
+                    <div class="input-item" style="width: 160px;">
+                        <input type="text" placeholder="请输入标题" class="input-primary input-x-small" value="$!paramTitle" name="paramTitle">
+                        <i class="icon-delete"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">类型</div>
+                <div class="select-box clearfix">
+                    <div class="select-primary select-small" id="paramType">
+                        <input type="hidden" name="paramType" value="$!paramType" class="input-hidden">
+                        #if($!paramType eq 0)
+                        <span class="select-placeholder">全部</span>
+                        #end
+                        #if($!paramType eq 2)
+                        <span class="select-placeholder">管理通知</span>
+                        #end
+                        #if($!paramType eq 1)
+                        <span class="select-placeholder">通知公告</span>
+                        #end
+                        <div class="select-options light-overscroll">
+                            <ul>
+                                <li data-value="0" #if($!paramType eq 0) class="selected" #end>全部</li>
+                                <li data-value="2" #if($!paramType eq 2) class="selected" #end>管理通知</li>
+                                <li data-value="1" #if($!paramType eq 1) class="selected" #end>通知公告</li>
+                             
+                            </ul>
+                        </div>
+                        <select class="select-select">
+                            <option value="0" #if($!paramType eq 0) selected #end>全部</option>
+                            <option value="2" #if($!paramType eq 2) selected #end>管理通知</option>
+                            <option value="1" #if($!paramType eq 1) selected #end>通知公告</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="title">发布日期&nbsp;&nbsp;</div>
+                <div class="input-item">
+                    <input type="text"  class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramStartDate" value="$!{paramStartDate}" placeholder="xxxx年xx月xx日">
+                </div>
+                <span class="text"> - </span>
+                <div class="input-item">
+                    <input type="text"  class="input-primary input-x-small input-datepicker"
+                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="paramEndDate" value="$!{paramEndDate}" placeholder="xxxx年xx月xx日">
+                </div>
+            </div>
+            <div class="condition-group clearfix">
+                <div class="search-box clearfix">
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+        </article>
+    </form>
+
+    <article class="">
+        <div class="table-wrapper">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                
+                <tbody>
+                #if($notices && $notices.size()>0)
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>标题</th>
+                        <th>内容</th>
+                        <th>发布时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                #foreach($notice in $notices)
+                    <tr>
+                    
+                    #if($!notice.type == 2 )<td>管理通知</td> #else <td>通知公告</td> #end
+                        
+                        <td>$!notice.title</td>
+                        <td>$!notice.content</td>
+                        <td>$!DateUtils.formatTimeYMDHM($!notice.createdDate)</td>
+                        <td><a href="notification/detail.html?noticeId=$!notice.id" class="button-link button-link-small">查看</a></td>
+                    </tr>
+                #end
+                #else
+                <div class="table-wrapper" style="float: left;  width: 100%; min-height: 400px;">
+                    <div class="table-nodata"><p>暂无通知</p></div>
+                    #end
+                </tbody>
+            </table>
+        </div>
+        #parse("/layout/pagination.vm")
+    </article>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        var NOTIFICATION = {
+            init: function () {
+                COMMON.selectBind($('.select-primary'), undefined);
+            }
+        };
+
+        NOTIFICATION.init();
+    });
+    
+    //跳转
+    function goPage(pageNo) {
+        COMMON.post('/admin/notification.html',
+                {
+                    paramType: '$!paramType',
+                    paramTitle: '$!paramTitle',
+                    paramStartDate: '$!paramStartDate',
+                    paramEndDate: '$!paramEndDate',
+                    pageNo: pageNo
+                });
+    }
+</script>
+#end

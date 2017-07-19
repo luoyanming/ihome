@@ -1,0 +1,348 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>考勤--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/statistics.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb" style="margin-bottom: 20px;">
+        <a href="/admin/statistics.html" class="button-link">数据统计</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">考勤</a>
+    </article>
+
+    <div class="checking-container">
+        <!-- <div class="common-title fs14">数据统计&nbsp;&nbsp;|&nbsp;&nbsp;<span class="col-333">考勤</span></div> -->
+        <div class="top-content">
+            <div class="left-content clearfix">
+                <div class="fs14 common-text">今日考勤情况</div>
+                   <div class="clearfix">
+                    <div class="pull-left left-container">
+                        <div class="fs14">更新时间：$!currentTime</div>
+                    </div>
+                    <div class="pull-left checking_count" id="checking_count" style="width: 90%; height:300px;float: right;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-content">
+            <div class="common-text fs14">考勤明细</div>
+            <form action="" method="post">
+                <article class="form-condition">
+                    <div class="condition-group clearfix mr0">
+                        <div class="title">日期&nbsp;&nbsp;</div>
+                        <div class="input- item">
+                            <input type="text" class="input-primary input-x-small input-datepicker" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="chooseDateInt" value="$!{chooseDateInt}" placeholder="xxxx年xx月xx日">
+                        </div>
+                    </div>
+                    <div class="condition-group clearfix">
+                        <div class="search-box clearfix">
+                            <input type="submit" value="搜索" class="button-search btn-search" />
+                        </div>
+                    </div>
+                </article>
+            </form>
+            <div class="complaint_detail_form" id="update_checking_count" style="width: 90%;height: 300px; margin-bottom: 40px; margin-left: 10%;"></div>
+            <div class="bottom-detail clearfix">
+                <div class="table" style="width: 100%;">
+                    <article class="">
+                        <div class="table-wrapper">
+                            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary">
+                                <thead>
+                                <tr>
+                                    <th>时间段</th>
+                                    <th>考勤人数</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+									#set($i = 0)
+									#foreach($item in $list)
+										#set($j = $i+1)
+										#if($i<9)
+										<tr>
+											<td>0$i:00-0$j:00</td>
+											<td>$item</td>
+										</tr>
+										#elseif($i == 9)
+										<tr>
+											<td>0$i:00-$j:00</td>
+											<td>$item</td>
+										</tr>
+										#else
+										<tr>
+											<td>$i:00-$j:00</td>
+											<td>$item</td>
+										</tr>	
+										#end									
+									#set($i=$i+1)
+									#end
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script src="/assets/script/lib/echarts-all.js" ></script>
+<script src="/assets/script/My97DatePicker/WdatePicker.js"></script>
+<script>
+$(function() {
+	var STATISTICS =  {
+		init: function() {
+			COMMON.selectBind($('.select-primary'), undefined);
+
+			STATISTICS.getAttendanceTodayData();
+			STATISTICS.getAttendanceBalanceData();
+		},
+		getAttendanceTodayData: function() {
+			 $.ajax({
+	             url: "/attendance/todayStatistics.html",
+	             dataType:"json",
+	             type:"post",
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data;
+
+	            		STATISTICS.attendanceTodayChartBind(chartArr);
+	             	}
+	             },
+	             error: function() {
+	                
+	             }
+	         });
+		},
+		getAttendanceBalanceData: function() {
+			 $.ajax({
+	             url: "/attendance/statistics.html",
+	             dataType:"json",
+	             type:"post",
+	             data: {
+	                chooseDateInt: '$!chooseDateInt'
+	             },
+	             success:function(data) {
+	             	if(data.code != 200) {
+	            		
+	             	} else {
+	            		var chartArr = data.data
+	            		STATISTICS.attendanceBalanceChartBind(chartArr);
+	             	}
+	             },
+	            error: function() {
+	                
+	             }
+	         });
+		},
+		attendanceTodayChartBind: function(tArr) {
+			var myChart = echarts.init(document.getElementById('checking_count'));
+
+            var option = {
+                tooltip: {    //提示框组件
+                    trigger: 'axis', //鼠标跟随可以显示不同时刻的状态
+                    axisPointer :{
+                        type: "none"   //没有指示线
+                    }
+                },
+
+                legend: {     //图例组件
+                    data: ['考勤人数'],
+                    x:'right'
+                },
+
+                grid: {       //直角坐标系内绘图网格
+                    containLabel: true
+                },
+
+                toolbox: {     //工具栏
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+
+                xAxis: {       //直角坐标系 grid 中的 x 轴
+                    axisLabel: {
+                        show: true,
+                        rotate : 40,  //文字倾斜
+                        textStyle: {
+                            color: '#8f8f8f'  //X轴字体颜色
+                        }
+                    },
+
+                    axisLine: {
+                        show: true,
+                        lineStyle:{
+                            color:'#a3a3a3'  //X轴颜色
+                        }
+                    },
+
+                    splitLine : {
+                        show:false  //无横向分割线
+                    },
+
+                    type: 'category',
+
+                    boundaryGap: false,
+
+                    data: ['01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00' ]
+
+                },
+
+                yAxis: {       //直角坐标系 grid 中的 y 轴
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+
+                    splitLine : {
+                        show:true,
+                        lineStyle: {
+                            color: '#e5e5e5',
+                            type: 'dotted',
+                            width: 2
+                        }
+                    },
+
+                    axisLabel: {
+                        show : true,
+                        textStyle: {
+                            color: '#8f8f8f'  //Y轴字体颜色
+                        }
+                    }
+                },
+
+                series: [      //系列列表
+                    {
+                        name: '考勤人数',
+                        type: 'line',
+                        itemStyle : {
+                            normal : {
+                                color:'#51acfd',  //交汇远点颜色
+                                lineStyle:{
+                                    color:'#badffc',  //折线颜色
+                                    width:5
+                                }
+                            }
+                        },
+                        data: tArr
+                    }
+                ]
+
+            };
+
+            myChart.setOption(option);
+		},
+		attendanceBalanceChartBind: function(bArr) {
+			var myChart = echarts.init(document.getElementById('update_checking_count'));
+
+            var option = {
+                tooltip: {    //提示框组件
+                    trigger: 'axis', //鼠标跟随可以显示不同时刻的状态
+                    axisPointer :{
+                        type: "none"   //没有指示线
+                    }
+                },
+
+                legend: {     //图例组件
+                    data: ['考勤人数'],
+                    x:'right'
+                },
+
+                grid: {       //直角坐标系内绘图网格
+                    containLabel: true
+                },
+
+                toolbox: {     //工具栏
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+
+                xAxis: {       //直角坐标系 grid 中的 x 轴
+                    axisLabel: {
+                        show: true,
+                        rotate : 40,  //文字倾斜
+                        textStyle: {
+                            color: '#8f8f8f'  //X轴字体颜色
+                        }
+                    },
+
+                    axisLine: {
+                        show: true,
+                        lineStyle:{
+                            color:'#a3a3a3'  //X轴颜色
+                        }
+                    },
+
+                    splitLine : {
+                        show:false  //无横向分割线
+                    },
+
+                    type: 'category',
+
+                    boundaryGap: false,
+
+                    data: ['01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00' ]
+
+                },
+
+                yAxis: {       //直角坐标系 grid 中的 y 轴
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+
+                    splitLine : {
+                        show:true,
+                        lineStyle: {
+                            color: '#e5e5e5',
+                            type: 'dotted',
+                            width: 2
+                        }
+                    },
+
+                    axisLabel: {
+                        show : true,
+                        textStyle: {
+                            color: '#8f8f8f'  //Y轴字体颜色
+                        }
+                    }
+                },
+
+                series: [      //系列列表
+                    {
+                        name: '考勤人数',
+                        type: 'line',
+                        itemStyle : {
+                            normal : {
+                                color:'#51acfd',  //交汇远点颜色
+                                lineStyle:{
+                                    color:'#badffc',  //折线颜色
+                                    width:5
+                                }
+                            }
+                        },
+                        data: bArr
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+		}
+	};
+
+	STATISTICS.init();
+});
+</script>
+#end

@@ -1,0 +1,118 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看员工--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看员工</a>
+    </article>
+
+    <div class="tabnav tabnav-staff clearfix">
+        <a href="javascript:void(0);" class="tabnav-item link-disable current">基本信息</a>
+        <a href="/admin/staff/detail/assignment.html?employeeId=$!employeeId" class="tabnav-item">任务记录</a>
+        <a href="/admin/staff/detail/warning.html?employeeId=$!employeeId" class="tabnav-item">告警记录</a>
+        <a href="/admin/staff/detail/attendance.html?employeeId=$!employeeId" class="tabnav-item">考勤记录</a>
+        <a href="/admin/staff/detail/grabform.html?employeeId=$!employeeId" class="tabnav-item">抢单记录</a>
+        <a href="/admin/staff/detail/internalreport.html?employeeId=$!employeeId" class="tabnav-item">内部报事</a>
+    </div>
+
+    <form action="" method="get" class="form-main" style="position: relative;">
+        <div class="operate-group" style="position: absolute; top:0; right: 50px;">
+            #if($employeeRole.status eq 0 )
+            <a href="javascript:void(0);" class="button-primary-able button-grey"
+               style="display: inline-block; margin-right: 24px;" onclick="javascript: COMMON.createConfirmation('/employee/quit.html?employeeId=$!employeeRole.employeeId', '是否确认离职？', '确认离职', '取消', COMMON.confirmationEnsure, COMMON.confirmationCancle)">离职</a>
+            <a href="/admin/staff/create.html?id=$!employeeRole.id" class="button-primary-able button-grey"
+               style="display: inline-block;">编辑</a>
+            #end
+        </div>
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">姓名</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!employeeRole.employeeName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">手机号</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!employeeRole.employeeMobile</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">部门</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!employeeRole.departmentName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">岗位</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!employeeRole.positionName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">状态</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">#if($!employeeRole.status eq 0) 在职 #else 离职 #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">入职时间</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">#if($!employeeRole.createdDate) $!DateUtils.formatTimeInSecond($!employeeRole.createdDate) #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">用户评价</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">#if($employeeRole.evaluateStar && $!employeeRole.evaluateStar gt 0 ) $!{employeeRole.evaluateStar}分 #else 0分 #end</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">权限列表</div>
+                <div class="group-item">
+                    #if($menuList && $menuList.size()>0)
+                        #foreach($menu in $menuList)
+                            #if($!menu.checked)
+                                <div class="input-item-text" style="display: block; margin-left: 0;">$!menu.name</div>
+                            #end
+                        #end
+                    #end
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var STAFF = {
+            init: function () {
+
+            }
+        };
+
+        STAFF.init();
+    });
+</script>
+#end

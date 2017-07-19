@@ -1,0 +1,298 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新增控制点--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/data.html" class="button-link">基础数据</a>
+        <span class="separate">|</span>
+        <a href="/admin/data/control.html" class="button-link">控制点管理</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">新增控制点</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" id="controlPointId" value="$!controlPoint.id"/>
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">编码</div>
+                <div class="group-item">
+                    #if($controlPoint.id && $!controlPoint.id gt 0)
+                        <div class="input-item-text" style="margin-left: 0;">
+                            <input type="hidden" id="code" value="$!controlPoint.code"/>$!controlPoint.code
+                        </div>
+                    #else
+                        <div class="input-item-text" style="margin-left: 0;"><input type="hidden" id="code" value="$!code"/>$!code</div>
+                    #end
+                    <div class="errMsg errMsg-code"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">名称</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="name" placeholder="请输入控制点名称"
+                               value="$!controlPoint.name">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">地点</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="addr" placeholder="请输入地点"
+                               value="$!controlPoint.place">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <div class="errMsg errMsg-addr"></div>
+                </div>
+            </div>
+
+        #*
+        <div class="form-group clearfix">
+            <div class="group-title">任务表单</div>
+            <div class="group-item clearfix" style="padding: 11px 0;">
+                #if($!controlPoint.id > 0 && $!controlPoint.formTypeId gt 0)
+                    <a href="javascript:void(0);" class="button-link link-normal" id="btn-form-select"
+                       style="float: left; margin: 0;" data-id="$!controlPoint.formTypeId">$!controlPoint.formTypeName</a>
+                #elseif($!controlPoint.id > 0 && $!controlPoint.formTypeId eq 0)
+                    <a href="javascript:void(0);" class="button-link button-link-small" id="btn-form-select"
+                       style="float: left;" data-id="$!controlPoint.formTypeId">选择表单</a>
+                #else
+                    <a href="javascript:void(0);" class="button-link button-link-small" id="btn-form-select"
+                       style="float: left;" data-id="$!controlPoint.formTypeId">选择表单</a>
+                #end
+                <a href="/admin/form/type/create.html" class="button-link button-link-small"
+                   style="float: left; margin-left: 45px;">创建新表单</a>
+                <div class="clearfix"></div>
+                <div class="errMsg errMsg-form"></div>
+            </div>
+        </div>
+        *#
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                       style="float: left; width: 200px; margin: 20px 0 0 0;">创建</a>
+                    <a href="/admin/data/control.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="form-select-modal">
+    <div class="modal-header">
+        <h1>选择表单</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content" style="padding: 0;">
+        <article class="form-condition" style="padding: 0 16px;">
+            <div class="condition-group clearfix">
+                <div class="title">名称</div>
+                <div class="search-box clearfix">
+                    <div class="input-item">
+                        <input type="search" placeholder="请输入表单名称" class="input-primary input-x-small input-search">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <input type="submit" value="搜索" class="button-search btn-search"/>
+                </div>
+            </div>
+            <div class="errMsg errMsg-search"></div>
+        </article>
+
+        <div class="table-wrapper light-overscroll" style="min-height: 250px; max-height: 350px;">
+            <table cellpadding="0" cellspacing="0" width="100%" class="table-primary table-primary-small">
+                <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>说明</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                ##	<tr>
+				##		<td>某某类型表单1</td>
+				##		<td>某某类型表单说明说明说明说明说明</td>
+				##		<td>
+				##			<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>
+				##		</td>
+				##	</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnFormSelect = $('#btn-form-select'),
+                modalMask = $('.modal-mask'),
+                formSelectModal = $('#form-select-modal'),
+                inputSearch = formSelectModal.find('.input-search'),
+                btnSearch = formSelectModal.find('.btn-search'),
+                formTableMain = formSelectModal.find('.table-primary tbody'),
+                btnSubmit = $('.btn-submit');
+
+        var DATA = {
+            init: function () {
+                // DATA.getFormTableData();
+
+                // DATA.btnFormSelectBind();
+
+                // DATA.btnSearchBind();
+
+                DATA.btnSubmitBind();
+            },
+            getFormTableData: function (searchStr) {
+                // 正常的时候searchStr传undefined，搜索的时候searchStr有值
+                $.ajax({
+                    url: "/form/formTypeList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        name: searchStr
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg($('.errMsg-search'), data.msg);
+                        } else {
+                            var str = '';
+                            for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr data-id="' + data.list[i].id + '">';
+                                str += '<td>' + data.list[i].name + '</td>';
+                                str += '<td>' + data.list[i].description + '</td>';
+                                str += '<td>';
+                                str += '<a href="javascript:void(0);" class="button-link button-link-small btn-select">选择</a>';
+                                str += '</td>';
+                                str += '</tr>';
+                            }
+                            formTableMain.html(str);
+
+                            DATA.btnSelectBind();
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg($('.errMsg-search'), '搜索失败，请重试！');
+                    }
+                });
+            },
+            btnSelectBind: function () {
+                var btnSelect = formTableMain.find('.btn-select');
+
+                btnSelect.unbind('click');
+                btnSelect.on('click', function () {
+                    var title = $(this).parent().parent().find('td').eq(0).html(),
+                            id = $(this).parent().parent().attr('data-id');
+
+                    btnFormSelect.removeClass('button-link-small').addClass('link-normal').html(title).attr('data-id', id).css('margin', 0);
+                    modalMask.fadeOut(200);
+                    formSelectModal.fadeOut(200);
+                });
+            },
+            btnFormSelectBind: function () {
+                btnFormSelect.on('click', function () {
+                    inputSearch.val('');
+                    modalMask.fadeIn(200);
+                    formSelectModal.fadeIn(200);
+                });
+            },
+            btnSearchBind: function () {
+                btnSearch.on('click', function () {
+                    var searchVal = inputSearch.val();
+
+                    if (!COMMON.checkNull(searchVal)) {
+                        COMMON.errMsg($('.errMsg-search'), '请输入搜索内容！');
+                        return false;
+                    }
+                    $('.errMsg-search').html('');
+
+                    DATA.getFormTableData(searchVal);
+                });
+            },
+            btnSubmitBind: function () {
+                btnSubmit.on('click', function () {
+                    var code = $('#code').val(),
+                            name = $('#name').val(),
+                            addr = $('#addr').val();
+                    // formID = btnFormSelect.attr('data-id');
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+
+                    if (!COMMON.checkNull(name)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入控制点名称!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if (!COMMON.checkNull(addr)) {
+                        COMMON.errMsg($('.errMsg-addr'), '请输入地点!');
+                        return false;
+                    }
+                    $('.errMsg-addr').html('');
+
+                    // if (!COMMON.checkNull(formID)) {
+                    //     COMMON.errMsg($('.errMsg-form'), '请选择表单!');
+                    //     return false;
+                    // }
+                    // $('.errMsg-form').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在创建...');
+
+                    var controlPointId = $("#controlPointId").val();
+                    if (controlPointId == null || controlPointId == '' || controlPointId == undefined) {
+                        controlPointId = 0;
+                    }
+
+                    $.ajax({
+                        url: "/equipment/addControlPoint.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            id: controlPointId,
+                            code: code,
+                            name: name,
+                            place: addr
+                            // formTypeId: formID
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-form'), data.msg);
+                                btnSubmit.removeClass('button-primary-disable').html('创建');
+                            } else {
+                                location.href = '/admin/data/control.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-form'), '控制点创建失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('创建');
+                        }
+                    });
+                });
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

@@ -1,0 +1,91 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看表单--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/form.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/form.html" class="button-link">表单</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看表单</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        #set($formDataVos = $!form.formDataVos)
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">提交人</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!form.employeeName</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">提交时间</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">#if($form.createdDate) $DateUtils.formatTimeForHM($!form.createdDate) #end</div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">表单类型</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!form.typeName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">联系电话</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!form.employeeMobile</div>
+                </div>
+            </div>
+
+            #foreach($formDataVo in $!formDataVos)
+                #if($!formDataVo.fieldType eq 1 || $!formDataVo.fieldType eq 2)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!formDataVo.fieldName</div>
+                        <div class="group-item">
+                            <div class="input-item-text" style="margin-left: 0;">$!formDataVo.fieldValue</div>
+                        </div>
+                    </div>
+                #elseif($!formDataVo.fieldType eq 3)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!formDataVo.fieldName</div>
+                        <div class="group-item clearfix">
+                            #foreach($fieldValue in $!formDataVo.fieldValues)
+                                <div class="upload-box" style="float: left;">
+                                    <div class="upload-image">
+                                        <img src="$!fieldValue" class="file-img">
+                                        <div class="img-mask"></div>
+                                    </div>
+                                </div>
+                            #end
+                        </div>
+                    </div>
+                #end
+            #end
+        </div>
+    </form>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var FORM = {
+            init: function () {
+
+            }
+        };
+
+        FORM.init();
+    });
+</script>
+#end

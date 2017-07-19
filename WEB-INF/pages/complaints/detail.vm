@@ -1,0 +1,122 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>查看报事--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb">
+        <a href="/admin/complaints.html" class="button-link">投诉报事</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">查看投诉</a>
+    </article>
+	#set($ownersInfoVo = $!complaintsDetailVo.ownersInfoVo)
+	#set($complaintsDataVos = $!complaintsDetailVo.complaintsDataVos)
+    <form action="/admin/complaints/reply.html" method="post" class="form-main">
+        <div class="form-part">
+            <input type="hidden" name="id" value="$!complaintsDetailVo.id" class="input-hidden">
+            <div class="form-group clearfix">
+                <div class="group-title">投诉人</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!ownersInfoVo.ownersName</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">房间</div>
+                <div class="group-item">
+                    <div class="input-item-text"
+                         style="margin-left: 0;">$!{ownersInfoVo.buildingName}$!{ownersInfoVo.buildingCellName}$!{ownersInfoVo.buildingUnitName}$!{ownersInfoVo.num}</div>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">类型</div>
+                <div class="group-item">
+                    <div class="input-item-text" style="margin-left: 0;">$!complaintsDetailVo.typeName</div>
+                </div>
+            </div>
+
+			#foreach($complaintsDataVo in $!complaintsDataVos)
+				#if($!complaintsDataVo.fieldType eq 1 || $!complaintsDataVo.fieldType eq 2)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!complaintsDataVo.fieldName</div>
+                        <div class="group-item">
+                            <div class="input-item-text" style="margin-left: 0;">$!complaintsDataVo.fieldValue</div>
+                        </div>
+                    </div>
+				#elseif($!complaintsDataVo.fieldType eq 3)
+                    <div class="form-group clearfix">
+                        <div class="group-title">$!complaintsDataVo.fieldName</div>
+                        <div class="group-item clearfix">
+							#foreach($fieldValue in $!complaintsDataVo.fieldValues)
+                                <div class="upload-box" style="float: left;">
+                                    <div class="upload-image">
+                                        <img src="$!fieldValue" class="file-img">
+                                        <div class="img-mask"></div>
+                                    </div>
+                                </div>
+							#end
+                        </div>
+                    </div>
+				#end
+			#end
+			#if($!{complaintsDetailVo.status} eq 1)
+                <div class="form-group clearfix">
+                    <div class="group-title">回复内容</div>
+                    <div class="group-item">
+                        <div class="input-item-text" style="margin-left: 0;">$!complaintsDetailVo.replyContent</div>
+                    </div>
+                </div>
+                #if($complaintsDetailVo.replyEmployeeId && $!complaintsDetailVo.replyEmployeeId gt 0)
+                    <div class="form-group clearfix">
+                        <div class="group-title">回复人</div>
+                        <div class="group-item">
+                            <div class="input-item-text" style="margin-left: 0;">$!employeeRoleVo.employeeName / $!employeeRoleVo.departmentName</div>
+                        </div>
+                    </div>
+                #end
+
+
+			#else
+                <div class="form-group clearfix" style="margin-top: 70px;">
+                    <div class="group-title">回复</div>
+                    <div class="group-item">
+                        <textarea class="textarea-primary" placeholder="请输入回复内容(100字以内))"
+                                  name="replyContent" maxlength="100"></textarea>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <div class="group-title">&nbsp;</div>
+                    <div class="group-item">
+                        <input type="submit" value="提交" class="button-primary-able btn-submit"
+                               style="float: left; width: 200px; margin: 20px 0 0 0;"/>
+                        <a href="/admin/complaints.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+                    </div>
+                </div>
+			#end
+        </div>
+    </form>
+</section>
+
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var DATA = {
+            init: function () {
+
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

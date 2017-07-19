@@ -1,0 +1,234 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>基础数据--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/data.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll data-main">
+    <div class="base-info">
+        <p class="name">$!propertyCompany.projectName</p>
+        <p class="addr">$!propertyCompany.regionsProvName $!propertyCompany.regionsCityName $!propertyCompany.regionsTownName $!propertyCompany.projectAddress</p>
+        <p class="phone">物业经理 / #if($propertyCompany.projectManagerName) $!propertyCompany.projectManagerName #else $!propertyCompany.name #end</p>
+        <p class="phone">手机：#if($propertyCompany.projectManagerMobile) $!propertyCompany.projectManagerMobile #else $!propertyCompany.mobile #end</p>
+        <p class="phone" style="display: inline-block; width: auto;">固定电话：$!propertyCompany.telephone<a
+                href="javascript:void(0);" class="button-link button-history" style="float: right; margin: 0 0 0 30px;"
+                id="btn-edit">修改</a></p>
+        <p class="phone">工作时间：$!propertyCompany.workTime</p>
+    </div>
+
+    <div class="block-list clearfix">
+        <a href="/admin/data/building.html" class="block-building">
+            <div class="text">
+                <p>$!{buildingCount}个分区</p>
+                <p>$!{buildingCellCount}幢楼宇</p>
+                <p>$!{buildingUnitCount}个单元</p>
+            </div>
+        </a>
+        <a href="/admin/data/machine.html" class="block-machine">
+            <div class="text">
+                <p>${equipmentTypeCount}种类别</p>
+                <p>${equipmentCount}件设备</p>
+            </div>
+        </a>
+        <a href="/admin/data/control.html" class="block-control">
+            <div class="text">
+                <p>${controlPointCount}个控制点</p>
+            </div>
+        </a>
+        <a href="/admin/staff.html" class="block-employee">
+            <div class="text">
+                <p>${employeeCount}位员工</p>
+            </div>
+        </a>
+        <a href="/admin/data/proprietor.html" class="block-proprietor">
+            <div class="text">
+                <p>${ownersCount}位业主</p>
+            </div>
+        </a>
+        <a href="/admin/data/car.html" class="block-car">
+            <div class="text">
+                <p>${carCount}辆汽车</p>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="edit-modal">
+    <div class="modal-header">
+        <h1>修改</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">物业经理</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-manager"
+                               placeholder="请输入物业经理姓名">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-manager"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">手机</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-mobile"
+                               placeholder="请输入手机号码">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-mobile"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">固定电话</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-telphone"
+                               placeholder="请输入固定电话">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-telphone"></p>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div class="group-title">工作时间</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 270px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-modal-worktime"
+                               placeholder="9:00 - 18:00">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-modal-worktime"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-modal-submit"
+                       style="float: left; width: 88px; margin: 20px 0 0 0;">保存</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var btnEdit = $('#btn-edit'),
+                modalMask = $('.modal-mask'),
+                editModal = $('#edit-modal'),
+                inputModalManager = $('#input-modal-manager'),
+                inputModalMobile = $('#input-modal-mobile'),
+                inputModalTelphone = $('#input-modal-telphone'),
+                inputModalWorktime = $('#input-modal-worktime'),
+                btnModalSubmit = $('.btn-modal-submit');
+
+        var DATA = {
+            init: function () {
+                DATA.btnEditBind();
+
+                DATA.btnModalSubmitBind();
+            },
+            btnEditBind: function () {
+                btnEdit.on('click', function () {
+                    $('.errMsg-modal-telphone').html('');
+                    $('.errMsg-modal-worktime').html('');
+
+                    inputModalManager.html('');
+                    inputModalMobile.html('');
+                    inputModalTelphone.html('');
+                    inputModalWorktime.html('');
+
+                    modalMask.fadeIn(200);
+                    editModal.fadeIn(200);
+                });
+            },
+            btnModalSubmitBind: function () {
+                btnModalSubmit.on('click', function () {
+                    var inputModalTelphoneVal = inputModalTelphone.val(),
+                            inputModalManagerVal = inputModalManager.val(),
+                            inputModalMobileVal = inputModalMobile.val(),
+                            inputModalWorktimeVal = inputModalWorktime.val();
+
+                    if (btnModalSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-modal-manager').html('');
+                    $('.errMsg-modal-mobile').html('');
+                    $('.errMsg-modal-telphone').html('');
+                    $('.errMsg-modal-worktime').html('');
+
+                    if (!COMMON.checkNull(inputModalManagerVal)) {
+                        COMMON.errMsg($('.errMsg-modal-manager'), '请输入项目经理姓名!');
+                        return false;
+                    }
+                    $('.errMsg-modal-manager').html('');
+
+                    if (!COMMON.checkNull(inputModalMobileVal)) {
+                        COMMON.errMsg($('.errMsg-modal-mobile'), '请输入手机号!');
+                        return false;
+                    }
+                    if (!COMMON.checkMobile(inputModalMobileVal)) {
+                        COMMON.errMsg($('.errMsg-modal-mobile'), '手机号码格式不正确!');
+                        return false;
+                    }
+                    $('.errMsg-modal-mobile').html('');
+
+                    if (!COMMON.checkNull(inputModalTelphoneVal)) {
+                        COMMON.errMsg($('.errMsg-modal-telphone'), '请输入固定电话!');
+                        return false;
+                    }
+                    $('.errMsg-modal-telphone').html('');
+
+                    if (!COMMON.checkNull(inputModalWorktimeVal)) {
+                        COMMON.errMsg($('.errMsg-modal-worktime'), '请输入工作时间!');
+                        return false;
+                    }
+                    $('.errMsg-modal-worktime').html('');
+
+                    btnModalSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/property/company/update/contact.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            name:inputModalManagerVal,
+                            mobile:inputModalMobileVal,
+                            telephone:inputModalTelphoneVal,
+                            workTime:inputModalWorktimeVal
+                        },
+                        success: function (data) {
+                            if (data.code != 200) {
+                                COMMON.errMsg($('.errMsg-modal-worktime'), data.msg);
+                                btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                            } else {
+                                location.href = '/admin/data.html';
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-modal-worktime'), '保存失败，请重试！');
+                            btnModalSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            }
+        };
+
+        DATA.init();
+    });
+</script>
+#end

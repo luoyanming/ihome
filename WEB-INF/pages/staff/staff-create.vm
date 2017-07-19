@@ -1,0 +1,409 @@
+#set($layout = '/layout/common.vm')
+
+#define($title)
+<title>新增员工--i家帮管理后台</title>
+#end
+
+#define($style)
+<link rel="stylesheet" href="/assets/style/staff.css"/>
+#end
+
+#parse("/layout/header.vm")
+#parse("/layout/leftnav.vm")
+<section class="main light-overscroll">
+    <article class="breadcrumb clearfix">
+        <a href="/admin/staff.html" class="button-link">员工</a>
+        <span class="separate">|</span>
+        <a href="javascript:void(0);" class="button-link button-link-disable">新增员工</a>
+    </article>
+
+    <form action="" method="get" class="form-main">
+        <input type="hidden" id="staffId" value="$!employee.employeeId"/>
+        <div class="form-part">
+            <div class="form-group clearfix">
+                <div class="group-title">姓名</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-name" placeholder="请输入员工姓名"
+                               value="$!employee.employeeName">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-name"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">手机号</div>
+                <div class="group-item">
+                    <div class="input-item" style="width: 360px;">
+                        <input type="text" class="input-primary input-small input-null" id="input-mobile" placeholder="请输入员工手机号"
+                               value="$!employee.employeeMobile">
+                        <i class="icon-delete"></i>
+                    </div>
+                    <p class="errMsg errMsg-mobile"></p>
+                </div>
+            </div>
+
+            <div class="form-group clearfix">
+                <div class="group-title">部门</div>
+                <div class="group-item">
+                    <div class="radio-hidden-item" id="radio-department" data-text="$!employee.departmentId">
+						#if($departmentList && $departmentList.size()>0)
+							#foreach($department in $departmentList)
+                                <label>
+                                    <input name="department" type="radio"
+                                           value="$!department.id" #if($!employee.departmentId eq $!department.id) checked #end/>
+                                    <p class="radio-text">$!department.name</p>
+                                </label>
+							#end
+						#end
+                    </div>
+                    <div class="errMsg errMsg-department"></div>
+                </div>
+            </div>
+			#if($!employee.id)
+                <div class="form-group clearfix" id="radio-position-wrapper">
+                    <div class="group-title">岗位</div>
+                    <div class="group-item">
+                        <div class="radio-hidden-item" id="radio-position" data-text="$!employee.positionId">
+							#foreach($position in $positionList)
+                                <label>
+                                    <input name="position" type="radio"
+                                           value="$!position.id" #if($!employee.positionId eq $!position.id) checked #end>
+                                    <p class="radio-text">$!position.name</p>
+                                </label>
+							#end
+                        </div>
+                        <div class="errMsg errMsg-position"></div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" id="checkbox-permission-wrapper">
+                    <div class="group-title">权限列表</div>
+                    <div class="group-item">
+                        <div class="checkbox-hidden-item" id="checkbox-permission" data-text="">
+							#foreach($menu in $menuList)
+                                <label style="width: 180px;">
+                                    <input name="permission" type="checkbox" value="$!menu.id" #if($!menu.checked)checked #end/>
+                                    <p class="checkbox-text">$!menu.name</p>
+                                </label>
+							#end
+                        </div>
+                        <p class="errMsg errMsg-permission"></p>
+                    </div>
+                </div>
+			#else
+                <div class="form-group clearfix" id="radio-position-wrapper" style="display: none;">
+                    <div class="group-title">岗位</div>
+                    <div class="group-item">
+                        <div class="radio-hidden-item" id="radio-position" data-text="">
+                        </div>
+                        <div class="errMsg errMsg-position"></div>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" id="checkbox-permission-wrapper" style="display: none;">
+                    <div class="group-title">权限列表</div>
+                    <div class="group-item">
+                        <div class="checkbox-hidden-item" id="checkbox-permission" data-text="">
+                        </div>
+                        <p class="errMsg errMsg-permission"></p>
+                    </div>
+                </div>
+
+			#end
+
+            <div class="form-group clearfix">
+                <div class="group-title">&nbsp;</div>
+                <div class="group-item">
+                    <a href="javascript:void(0);" class="button-primary-able btn-submit"
+                       style="float: left; width: 200px; margin: 20px 0 0 0;">保存</a>
+                    <a href="/admin/staff.html" class="button-link" style="float: left; margin: 35px 0 0 60px;">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+<section class="modal-mask"></section>
+<section class="modal-box" id="confirm-modal">
+    <div class="modal-header">
+        <h1>提示</h1>
+        <a href="javascript:void(0);" class="btn-close"></a>
+    </div>
+    <div class="modal-content">
+        <div class="form-part" style="padding-bottom: 40px;">
+            <div class="group-text state state-warning" style="font-size: 16px; text-align: center;">
+                您输入的手机号码和姓名不匹配，请先核实员工姓名和手机号是否正确！
+            </div>
+
+            <div class="group-btn clearfix" style="margin-top: 40px; text-align: center">
+                <a href="javascript:void(0);" class="button-primary-able btn-confirm-modal-ensure"
+                   style="display: inline-block; width: auto; padding: 0 30px;">我已核实准确无误</a>
+                <a href="javascript:void(0);" class="button-primary-able btn-confirm-modal-cancle"
+                   style="display: inline-block; width: auto; padding: 0 30px; margin: 0 0 0 30px;">去核实</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+#define($script)
+<script src="/assets/script/common.js"></script>
+<script>
+    $(function () {
+        var inputName = $('#input-name'),
+                inputMobile = $('#input-mobile'),
+                radioDepartment = $('#radio-department'),
+                radioPositionWrapper = $('#radio-position-wrapper'),
+                radioPosition = $('#radio-position'),
+                checkboxPermissionWrapper = $('#checkbox-permission-wrapper'),
+                checkboxPermission = $('#checkbox-permission'),
+                btnSubmit = $('.btn-submit');
+
+
+        var STAFF = {
+            init: function () {
+                STAFF.radioDepartmentBind();
+
+                STAFF.btnSubmitBind();
+            },
+            radioDepartmentBind: function () {
+                radioDepartment.find('input[name="department"]').change(function () {
+                    //  清除错误提示
+                    COMMON.errMsg($('.errMsg-department'), '');
+                    COMMON.errMsg($('.errMsg-position'), '');
+                    var departmentID = radioDepartment.find('input[name="department"]:checked').val();
+                    STAFF.getPositionList(departmentID);
+                });
+            },
+            getPositionList: function (DID) {
+                $.ajax({
+                    url: "/department/positionList.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        departmentId: DID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            data.list.forEach(function (element, index, array) {
+                                str += '<label>';
+                                str += '<input name="position" type="radio" value="' + element.id + '"/>';
+                                str += '<p class="radio-text">' + element.name + '</p>';
+                                str += '</label>';
+                            });
+
+                            radioPosition.html(str);
+                            radioPositionWrapper.show();
+                            checkboxPermissionWrapper.hide();
+                            checkboxPermission.html('');
+
+                            STAFF.radioPositionBind();
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            radioPositionBind: function () {
+                radioPosition.find('input[name="position"]').change(function () {
+                    var positionID = radioPosition.find('input[name="position"]:checked').val();
+                    STAFF.getPermissionList(positionID);
+                });
+            },
+            getPermissionList: function (PID) {
+                $.ajax({
+                    url: "/department/position/menu/list.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        positionId: PID
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+
+                        } else {
+                            var str = '';
+                            data.list.forEach(function (element, index, array) {
+                                str += '<label style="width: 180px;">';
+                                if (element.checked) {
+                                    str += '<input name="permission" type="checkbox" value="' + element.id + '" checked />';
+                                } else {
+                                    str += '<input name="permission" type="checkbox" value="' + element.id + '"/>';
+                                }
+                                str += '<p class="checkbox-text">' + element.name + '</p>';
+                                str += '</label>';
+                            });
+                            checkboxPermission.html(str);
+                            checkboxPermissionWrapper.show();
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            btnSubmitBind: function () {
+                btnSubmit.on('click', function () {
+                    var inputNameVal = inputName.val(),
+                            inputMobileVal = inputMobile.val(),
+                            departmentID = radioDepartment.find('input[name="department"]:checked').val(),
+                            positionID = radioPosition.find('input[name="position"]:checked').val(),
+                            permissionStr = '';
+
+                    if (btnSubmit.hasClass('button-primary-disable')) {
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+                    $('.errMsg-mobile').html('');
+                    $('.errMsg-department').html('');
+                    $('.errMsg-position').html('');
+                    $('.errMsg-permission').html('');
+
+                    if (!COMMON.checkNull(inputNameVal)) {
+                        COMMON.errMsg($('.errMsg-name'), '请输入员工姓名!');
+                        return false;
+                    }
+                    $('.errMsg-name').html('');
+
+                    if (!COMMON.checkNull(inputMobileVal)) {
+                        COMMON.errMsg($('.errMsg-mobile'), '请输入员工手机号!');
+                        return false;
+                    }
+                    if (!COMMON.checkMobile(inputMobileVal)) {
+                        COMMON.errMsg($('.errMsg-mobile'), '手机号格式不正确!');
+                        return false;
+                    }
+                    $('.errMsg-mobile').html('');
+
+                    if (!departmentID || departmentID == undefined) {
+                        COMMON.errMsg($('.errMsg-department'), '请选择部门!');
+                        return false;
+                    }
+                    $('.errMsg-department').html('');
+
+                    if (!positionID || positionID == undefined) {
+                        COMMON.errMsg($('.errMsg-position'), '请选择岗位!');
+                        return false;
+                    }
+                    $('.errMsg-position').html('');
+
+                    var checkboxPermissionItem = checkboxPermission.find('label'),
+                            permissionArr = [];
+                    for (var i = 0; i < checkboxPermissionItem.length; i++) {
+                        var checkboxPermissionItemInput = checkboxPermissionItem.eq(i).find('input[name="permission"]:checked'),
+                                _v = checkboxPermissionItemInput.val();
+                        if (_v) {
+                            permissionArr.push(_v);
+                        }
+                    }
+                    permissionStr = permissionArr.join(',');
+                    if (!permissionStr) {
+                        COMMON.errMsg($('.errMsg-permission'), '请选择权限!');
+                        return false;
+                    }
+                    $('.errMsg-permission').html('');
+
+                    btnSubmit.addClass('button-primary-disable').html('正在保存...');
+
+                    $.ajax({
+                        url: "/employee/existEmployee.html",
+                        dataType: "json",
+                        type: "post",
+                        data: {
+                            name: inputNameVal,
+                            mobile: inputMobileVal,
+                        },
+                        success: function (data) {
+                            btnSubmit.removeClass('button-primary-disable').html('保存');
+                            if (data.code == 200) {
+                                STAFF.commitStaffInfo($('.errMsg-permission'), btnSubmit);
+                            } else if (data.code == 1026) {
+                                //COMMON.confirmBind($('#confirm-modal'), data.msg, STAFF.confirmEnsure, STAFF.confirmCancle);
+                                COMMON.confirmBind($('#confirm-modal'), data.msg, '我已核实准确无误', '去核实', STAFF.confirmEnsure, STAFF.confirmCancle);
+                            } else {
+                                COMMON.errMsg($('.errMsg-permission'), data.msg);
+                            }
+                        },
+                        error: function () {
+                            COMMON.errMsg($('.errMsg-permission'), '保存失败，请重试！');
+                            btnSubmit.removeClass('button-primary-disable').html('保存');
+                        }
+                    });
+                });
+            },
+            confirmEnsure: function () {
+                $('#confirm-modal').hide();
+                COMMON.confirmBind($('#confirm-modal'), '您确定已核实员工姓名和手机号都准确无误吗？', '确定', '取消', STAFF.confirmEnsure2, STAFF.confirmCancle2);
+            },
+            confirmCancle: function () {
+                location.href = '/admin/staff.html';
+            },
+            confirmEnsure2: function () {
+                $('.modal-mask').hide();
+                $('#confirm-modal').hide();
+                STAFF.commitStaffInfo($('.errMsg-permission'), btnSubmit);
+            },
+            confirmCancle2: function () {
+                $('.modal-mask').fadeOut(200);
+                $('#confirm-modal').fadeOut(200);
+            },
+            commitStaffInfo: function (errObj, btnObj) {
+                var inputNameVal = inputName.val(),
+                        inputMobileVal = inputMobile.val(),
+                        departmentID = radioDepartment.find('input[name="department"]:checked').val(),
+                        positionID = radioPosition.find('input[name="position"]:checked').val(),
+                        permissionStr = '';
+
+                $('.errMsg-permission').html('');
+                errObj.html('');
+
+                var checkboxPermissionItem = checkboxPermission.find('label'),
+                        permissionArr = [];
+                for (var i = 0; i < checkboxPermissionItem.length; i++) {
+                    var checkboxPermissionItemInput = checkboxPermissionItem.eq(i).find('input[name="permission"]:checked'),
+                            _v = checkboxPermissionItemInput.val();
+                    if (_v) {
+                        permissionArr.push(_v);
+                    }
+                }
+                permissionStr = permissionArr.join(',');
+
+                btnObj.addClass('button-primary-disable').html('正在保存...');
+
+                $.ajax({
+                    url: "/employee/save.html",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        id: $('#staffId').val(),
+                        name: inputNameVal,
+                        mobile: inputMobileVal,
+                        departmentId: departmentID,
+                        positionId: positionID,
+                        permissionStr: permissionStr
+                    },
+                    success: function (data) {
+                        if (data.code != 200) {
+                            COMMON.errMsg(errObj, data.msg);
+                            btnObj.removeClass('button-primary-disable').html('保存');
+                        } else {
+                            location.href = '/admin/staff.html';
+                        }
+                    },
+                    error: function () {
+                        COMMON.errMsg(errObj, '保存失败，请重试！');
+                        btnObj.removeClass('button-primary-disable').html('保存');
+                    }
+                });
+            }
+        };
+
+        STAFF.init();
+    });
+</script>
+#end
